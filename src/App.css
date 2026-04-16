@@ -2309,6 +2309,65 @@ tbody tr:last-child td { border-bottom: none; }
   padding: 2px 5px;
 }
 
+/* Modale reporter */
+.pw-report-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.pw-report-modal {
+  background: white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  animation: slideUp 0.25s;
+}
+.pw-report-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--gray-100);
+}
+.pw-report-head h3 { font-size: 16px; margin: 0; }
+.pw-report-head button {
+  background: none; border: none; color: var(--gray-400); cursor: pointer; padding: 4px;
+}
+.pw-report-info {
+  padding: 16px 22px;
+  background: var(--gray-50);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.pw-report-info strong { font-size: 15px; }
+.pw-report-info span { font-size: 13px; color: var(--gray-600); }
+.pw-report-old {
+  margin-top: 4px;
+  font-size: 12px !important;
+  color: var(--gray-400) !important;
+  font-style: italic;
+}
+.pw-report-form {
+  padding: 18px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.pw-report-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 22px;
+  border-top: 1px solid var(--gray-100);
+}
+
 @media (max-width: 768px) {
   .pw-month-cell { min-height: 70px; padding: 4px; }
   .pw-month-cell-num { font-size: 11px; }

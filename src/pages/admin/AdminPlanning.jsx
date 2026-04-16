@@ -120,7 +120,7 @@ function formatDateLong(isoStr) {
 }
 
 // ── Shared card component ───────────────────────────────────
-function InterventionCard({ inter, changeStatut, removeIntervention, compact = false }) {
+function InterventionCard({ inter, changeStatut, removeIntervention, onReport, compact = false }) {
   const badgeColor = inter.statut === 'confirme' ? 'green' : inter.statut === 'a-confirmer' ? 'orange' : 'gray'
   return (
     <div className={`pw-card pw-card-${badgeColor} ${compact ? 'pw-card-compact' : ''}`}>
@@ -137,6 +137,7 @@ function InterventionCard({ inter, changeStatut, removeIntervention, compact = f
             { icon: <Clock size={13} />, label: 'À confirmer', onClick: () => changeStatut(inter.id, 'a-confirmer') },
             { icon: <Check size={13} />, label: 'Terminée', onClick: () => changeStatut(inter.id, 'termine') },
             { divider: true },
+            { icon: <Calendar size={13} />, label: 'Reporter', onClick: () => onReport(inter) },
             { icon: <XIcon size={13} />, label: 'Annuler', onClick: () => changeStatut(inter.id, 'annulee') },
             { icon: <Trash2 size={13} />, label: 'Supprimer', danger: true, onClick: () => removeIntervention(inter.id) },
           ]} />
@@ -147,7 +148,7 @@ function InterventionCard({ inter, changeStatut, removeIntervention, compact = f
 }
 
 // ── Day column (reused in week + day views) ─────────────────
-function DayColumn({ day, interventions, changeStatut, removeIntervention, full = false }) {
+function DayColumn({ day, interventions, changeStatut, removeIntervention, onReport, full = false }) {
   const cap = computeCapacity(interventions)
   const capClass = cap.status === 'over' ? 'over' : cap.status === 'full' ? 'full' : cap.status === 'warning' ? 'warn' : 'ok'
   return (
@@ -164,7 +165,7 @@ function DayColumn({ day, interventions, changeStatut, removeIntervention, full 
       <div className="pw-col-body">
         {interventions.length === 0 && <div className="pw-empty"><span>Libre</span></div>}
         {interventions.map(inter => (
-          <InterventionCard key={inter.id} inter={inter} changeStatut={changeStatut} removeIntervention={removeIntervention} />
+          <InterventionCard key={inter.id} inter={inter} changeStatut={changeStatut} removeIntervention={removeIntervention} onReport={onReport} />
         ))}
       </div>
     </div>
@@ -181,6 +182,8 @@ export default function AdminPlanning() {
   const initialPreselected = location.state?.preselected ?? null
   const [addOpen, setAddOpen] = useState(!!initialPreselected)
   const [preselected, setPreselected] = useState(initialPreselected)
+  const [reportTarget, setReportTarget] = useState(null) // intervention à reporter
+  const [reportForm, setReportForm] = useState({ date: '', heure: '' })
 
   useEffect(() => {
     if (location.state?.preselected) {
@@ -190,6 +193,22 @@ export default function AdminPlanning() {
 
   const changeStatut = (id, statut) => setInterventions(list => list.map(i => i.id === id ? { ...i, statut } : i))
   const removeIntervention = (id) => setInterventions(list => list.filter(i => i.id !== id))
+
+  const openReport = (inter) => {
+    setReportTarget(inter)
+    setReportForm({ date: inter.date, heure: inter.heure })
+  }
+  const submitReport = () => {
+    if (!reportForm.date || !reportForm.heure) return
+    const heureSort = reportForm.heure.replace(/h/, ':').replace(/-.*/, '').replace(/^(\d):/, '0$1:').padStart(5, '0')
+    setInterventions(list => list.map(i =>
+      i.id === reportTarget.id
+        ? { ...i, date: reportForm.date, heure: reportForm.heure, heureSort }
+        : i
+    ))
+    setReportTarget(null)
+    setCurrentDate(reportForm.date)
+  }
 
   // ── Navigation ──
   const navPrev = () => {
@@ -350,6 +369,7 @@ export default function AdminPlanning() {
             interventions={filtered}
             changeStatut={changeStatut}
             removeIntervention={removeIntervention}
+            onReport={openReport}
             full
           />
         </div>
@@ -365,6 +385,7 @@ export default function AdminPlanning() {
               interventions={byDay[day.iso] || []}
               changeStatut={changeStatut}
               removeIntervention={removeIntervention}
+              onReport={openReport}
             />
           ))}
         </div>
@@ -409,6 +430,49 @@ export default function AdminPlanning() {
                 </div>
               )
             })}
+          </div>
+        </div>
+      )}
+
+      {/* Modale reporter */}
+      {reportTarget && (
+        <div className="pw-report-backdrop" onClick={() => setReportTarget(null)}>
+          <div className="pw-report-modal" onClick={e => e.stopPropagation()}>
+            <div className="pw-report-head">
+              <h3>Reporter l'intervention</h3>
+              <button onClick={() => setReportTarget(null)}><XIcon size={20} /></button>
+            </div>
+            <div className="pw-report-info">
+              <strong>{reportTarget.client}</strong>
+              <span>{reportTarget.ville} — {reportTarget.panneaux} panneaux</span>
+              <span className="pw-report-old">Actuellement : {formatDateLong(reportTarget.date)} de {reportTarget.heure}</span>
+            </div>
+            <div className="pw-report-form">
+              <div className="prosp-field">
+                <label>Nouvelle date</label>
+                <input type="date" value={reportForm.date} onChange={e => setReportForm(f => ({ ...f, date: e.target.value }))} />
+              </div>
+              <div className="prosp-field">
+                <label>Nouveau créneau</label>
+                <select value={reportForm.heure} onChange={e => setReportForm(f => ({ ...f, heure: e.target.value }))}>
+                  <option value="">Choisir...</option>
+                  <option value="8h-10h">8h - 10h</option>
+                  <option value="8h-9h30">8h - 9h30</option>
+                  <option value="9h-11h">9h - 11h</option>
+                  <option value="10h-12h">10h - 12h</option>
+                  <option value="10h30-12h30">10h30 - 12h30</option>
+                  <option value="13h-14h30">13h - 14h30</option>
+                  <option value="14h-16h">14h - 16h</option>
+                  <option value="15h-16h30">15h - 16h30</option>
+                </select>
+              </div>
+            </div>
+            <div className="pw-report-actions">
+              <button className="btn btn-outline" onClick={() => setReportTarget(null)}>Annuler</button>
+              <button className="btn btn-primary" onClick={submitReport} disabled={!reportForm.date || !reportForm.heure}>
+                <Calendar size={14} /> Confirmer le report
+              </button>
+            </div>
           </div>
         </div>
       )}
