@@ -1919,12 +1919,48 @@ tbody tr:last-child td { border-bottom: none; }
    PLANNING VUE SEMAINE (pw- prefix)
    ═══════════════════════════════════════════════════════════ */
 
+/* Toolbar: toggle + nav */
+.pw-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.pw-view-toggle {
+  display: flex;
+  background: var(--gray-100);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 2px;
+}
+.pw-view-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--gray-500);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.pw-view-btn:hover { color: var(--primary); }
+.pw-view-btn.active {
+  background: white;
+  color: var(--primary);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
 .pw-nav {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 16px;
-  margin-bottom: 16px;
+  gap: 12px;
 }
 .pw-nav-label {
   display: flex;
@@ -1933,7 +1969,7 @@ tbody tr:last-child td { border-bottom: none; }
   font-size: 15px;
   font-weight: 700;
   color: var(--primary);
-  min-width: 240px;
+  min-width: 200px;
   justify-content: center;
 }
 
@@ -2159,6 +2195,125 @@ tbody tr:last-child td { border-bottom: none; }
   .pw-grid {
     grid-template-columns: 1fr;
   }
+  .pw-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .pw-view-toggle { justify-content: center; }
+  .pw-nav { justify-content: center; }
+}
+
+/* Vue jour (colonne unique large) */
+.pw-day-view {
+  max-width: 600px;
+}
+.pw-col-full .pw-col-head {
+  padding: 14px 18px;
+}
+.pw-col-day-long {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--primary);
+}
+.pw-col-full .pw-col-body {
+  padding: 12px;
+  gap: 10px;
+}
+.pw-col-full .pw-card {
+  padding: 12px 14px;
+}
+
+/* Vue mois */
+.pw-month {
+  background: white;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.pw-month-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  border-bottom: 1px solid var(--admin-border);
+}
+.pw-month-hdr-cell {
+  padding: 10px 8px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--gray-500);
+  letter-spacing: 0.5px;
+}
+.pw-month-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+.pw-month-cell {
+  min-height: 100px;
+  border-right: 1px solid var(--gray-100);
+  border-bottom: 1px solid var(--gray-100);
+  padding: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.pw-month-cell:hover { background: var(--gray-50); }
+.pw-month-cell:nth-child(7n) { border-right: none; }
+.pw-month-cell-out {
+  opacity: 0.35;
+  background: var(--gray-50);
+}
+.pw-month-cell-has { background: #fafbff; }
+.pw-month-cell-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.pw-month-cell-num {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gray-700);
+}
+.pw-month-cell-out .pw-month-cell-num { color: var(--gray-400); }
+.pw-month-cell-cap {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 6px;
+}
+
+/* Pills mois */
+.pw-month-pill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  margin-bottom: 2px;
+  font-size: 10px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.pw-month-pill-green { background: #e8f5e9; color: #2e7d32; }
+.pw-month-pill-orange { background: #fff3e0; color: #e65100; }
+.pw-month-pill-gray { background: var(--gray-100); color: var(--gray-500); }
+.pw-month-pill-time { font-weight: 700; }
+.pw-month-pill-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pw-month-more {
+  font-size: 10px;
+  color: var(--gray-400);
+  font-weight: 600;
+  padding: 2px 5px;
+}
+
+@media (max-width: 768px) {
+  .pw-month-cell { min-height: 70px; padding: 4px; }
+  .pw-month-cell-num { font-size: 11px; }
+  .pw-month-pill { font-size: 9px; }
+  .pw-month-pill-name { display: none; }
 }
 
 /* --- Planning (legacy styles kept for AddInterventionModal) --- */

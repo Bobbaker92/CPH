@@ -2,8 +2,8 @@ import { useState, useMemo, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import {
   MapPin, Clock, ChevronLeft, ChevronRight, Plus,
-  Calendar, Phone, Sun, Download, Check, X as XIcon, Edit3, Trash2,
-  AlertTriangle, Info, List
+  Calendar, Phone, Sun, Download, Check, X as XIcon, Trash2,
+  AlertTriangle, LayoutGrid, List, CalendarDays
 } from 'lucide-react'
 import ActionMenu from '../../components/ActionMenu'
 import AddInterventionModal from '../../components/AddInterventionModal'
@@ -11,43 +11,41 @@ import AddInterventionModal from '../../components/AddInterventionModal'
 const COUVREUR_UNIQUE = 'Karim Ziani'
 
 const ALL_INTERVENTIONS_INIT = [
-  // Lundi 4 mai
   { id: 'i1', date: '2026-05-04', heure: '8h-10h', heureSort: '08:00', client: 'Robert Vidal', ville: 'Marseille 13005', couvreur: COUVREUR_UNIQUE, panneaux: 12, statut: 'confirme' },
   { id: 'i2', date: '2026-05-04', heure: '10h30-12h30', heureSort: '10:30', client: 'Jean-Pierre Martin', ville: 'Marseille 13008', couvreur: COUVREUR_UNIQUE, panneaux: 16, statut: 'confirme' },
   { id: 'i3', date: '2026-05-04', heure: '14h-16h', heureSort: '14:00', client: 'Marie Duval', ville: 'Marseille 13012', couvreur: COUVREUR_UNIQUE, panneaux: 8, statut: 'confirme' },
-  // Mardi 5 mai
   { id: 'i6', date: '2026-05-05', heure: '9h-11h', heureSort: '09:00', client: 'Claire Dubois', ville: 'Aix 13100', couvreur: COUVREUR_UNIQUE, panneaux: 10, statut: 'confirme' },
   { id: 'i8', date: '2026-05-05', heure: '14h-16h', heureSort: '14:00', client: 'Isabelle Morel', ville: 'Gardanne 13120', couvreur: COUVREUR_UNIQUE, panneaux: 16, statut: 'confirme' },
-  // Mercredi 7 mai
   { id: 'i13', date: '2026-05-07', heure: '8h-10h', heureSort: '08:00', client: 'Thomas Roux', ville: 'Aubagne 13400', couvreur: COUVREUR_UNIQUE, panneaux: 14, statut: 'a-confirmer' },
   { id: 'i14', date: '2026-05-07', heure: '10h-12h', heureSort: '10:00', client: 'Nadia Khelif', ville: 'Aubagne 13400', couvreur: COUVREUR_UNIQUE, panneaux: 10, statut: 'confirme' },
-  // Jeudi 8 mai (férié mais intervention prévue)
   { id: 'i15', date: '2026-05-08', heure: '9h-11h', heureSort: '09:00', client: 'Alain Bernard', ville: 'Aix 13100', couvreur: COUVREUR_UNIQUE, panneaux: 20, statut: 'a-confirmer' },
-  // Vendredi 9 mai
   { id: 'i16', date: '2026-05-09', heure: '8h-10h', heureSort: '08:00', client: 'Sylvie Mercier', ville: 'Marseille 13004', couvreur: COUVREUR_UNIQUE, panneaux: 8, statut: 'confirme' },
   { id: 'i17', date: '2026-05-09', heure: '10h-12h', heureSort: '10:00', client: 'Bruno Costa', ville: 'Marseille 13006', couvreur: COUVREUR_UNIQUE, panneaux: 12, statut: 'confirme' },
   { id: 'i18', date: '2026-05-09', heure: '14h-16h', heureSort: '14:00', client: 'Fatima Aoudi', ville: 'Marseille 13010', couvreur: COUVREUR_UNIQUE, panneaux: 6, statut: 'confirme' },
-  // Samedi 10 mai
   { id: 'i19', date: '2026-05-10', heure: '8h-10h', heureSort: '08:00', client: 'Patrick Leroy', ville: 'Toulon 83000', couvreur: COUVREUR_UNIQUE, panneaux: 10, statut: 'a-confirmer' },
-  // Semaine 2 — Lundi 12 mai
   { id: 'i9', date: '2026-05-12', heure: '8h-9h30', heureSort: '08:00', client: 'Laurent Petit', ville: 'Toulon 83000', couvreur: COUVREUR_UNIQUE, panneaux: 8, statut: 'confirme' },
   { id: 'i10', date: '2026-05-12', heure: '10h-11h30', heureSort: '10:00', client: 'Sophie Blanc', ville: 'Toulon 83200', couvreur: COUVREUR_UNIQUE, panneaux: 10, statut: 'confirme' },
   { id: 'i11', date: '2026-05-12', heure: '13h-14h30', heureSort: '13:00', client: 'Nicolas Fabre', ville: 'Toulon 83500', couvreur: COUVREUR_UNIQUE, panneaux: 6, statut: 'a-confirmer' },
   { id: 'i12', date: '2026-05-12', heure: '15h-16h30', heureSort: '15:00', client: 'Claire Vasseur', ville: 'Toulon 83100', couvreur: COUVREUR_UNIQUE, panneaux: 8, statut: 'confirme' },
-  // Mardi 13 mai
   { id: 'i20', date: '2026-05-13', heure: '9h-11h', heureSort: '09:00', client: 'Michel Dupont', ville: 'Nice 06000', couvreur: COUVREUR_UNIQUE, panneaux: 18, statut: 'confirme' },
   { id: 'i21', date: '2026-05-13', heure: '14h-16h', heureSort: '14:00', client: 'Sandra Ricci', ville: 'Nice 06300', couvreur: COUVREUR_UNIQUE, panneaux: 12, statut: 'confirme' },
+  { id: 'i22', date: '2026-05-15', heure: '8h-10h', heureSort: '08:00', client: 'Yves Garnier', ville: 'Marseille 13001', couvreur: COUVREUR_UNIQUE, panneaux: 14, statut: 'confirme' },
+  { id: 'i23', date: '2026-05-16', heure: '9h-11h', heureSort: '09:00', client: 'Lucie Blanc', ville: 'Aix 13100', couvreur: COUVREUR_UNIQUE, panneaux: 10, statut: 'a-confirmer' },
+  { id: 'i24', date: '2026-05-19', heure: '8h-10h', heureSort: '08:00', client: 'Rachid Bouzid', ville: 'Marseille 13003', couvreur: COUVREUR_UNIQUE, panneaux: 8, statut: 'confirme' },
+  { id: 'i25', date: '2026-05-20', heure: '10h-12h', heureSort: '10:00', client: 'Chantal Morin', ville: 'Toulon 83000', couvreur: COUVREUR_UNIQUE, panneaux: 16, statut: 'a-confirmer' },
+  { id: 'i26', date: '2026-05-22', heure: '8h-10h', heureSort: '08:00', client: 'Henri Faure', ville: 'Nice 06000', couvreur: COUVREUR_UNIQUE, panneaux: 12, statut: 'confirme' },
 ]
 
 const STATUT_LABEL = { 'confirme': 'Confirmé', 'a-confirmer': 'À confirmer', 'termine': 'Terminée', 'annulee': 'Annulée' }
-
 const CAPACITE_STANDARD = 3
 const CAPACITE_ETENDUE = 4
 const SEUIL_PETITE_INSTALLATION = 10
+const MOIS_NOMS = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+const MOIS_COURTS = ['jan', 'fév', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc']
+const JOURS_COURTS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
+const JOURS_LONGS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
 
-function getSecteur(ville) {
-  return ville.split(/\s+\d/)[0].trim()
-}
+function getSecteur(ville) { return ville.split(/\s+\d/)[0].trim() }
 
 function computeCapacity(interventions) {
   const count = interventions.length
@@ -70,44 +68,116 @@ function exportCSV(interventions) {
   const blob = new Blob([`\ufeff${csv}`], { type: 'text/csv;charset=utf-8;' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
-  a.href = url
-  a.download = `planning-cph-${new Date().toISOString().slice(0, 10)}.csv`
-  a.click()
+  a.href = url; a.download = `planning-cph-${new Date().toISOString().slice(0, 10)}.csv`; a.click()
   URL.revokeObjectURL(url)
 }
 
-// Génère les jours d'une semaine (lun-sam) à partir du lundi
 function getWeekDays(mondayStr) {
-  const JOURS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam']
-  const JOURS_LONG = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi']
-  const MOIS = ['jan', 'fév', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc']
   const monday = new Date(mondayStr + 'T00:00:00')
   return Array.from({ length: 6 }, (_, i) => {
-    const d = new Date(monday)
-    d.setDate(monday.getDate() + i)
-    const iso = d.toISOString().slice(0, 10)
-    return {
-      iso,
-      short: JOURS[i],
-      long: JOURS_LONG[i],
-      dayNum: d.getDate(),
-      month: MOIS[d.getMonth()],
-      isToday: false, // maquette
-    }
+    const d = new Date(monday); d.setDate(monday.getDate() + i)
+    return { iso: d.toISOString().slice(0, 10), short: JOURS_COURTS[i], long: JOURS_LONGS[i], dayNum: d.getDate(), month: MOIS_COURTS[d.getMonth()] }
   })
 }
 
-const SEMAINES = [
-  { monday: '2026-05-04', label: '4 — 10 mai 2026' },
-  { monday: '2026-05-11', label: '11 — 17 mai 2026' },
-  { monday: '2026-05-18', label: '18 — 24 mai 2026' },
-]
+// Monday of the week containing a given date
+function getMondayOf(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00')
+  const day = d.getDay()
+  const diff = day === 0 ? -6 : 1 - day
+  d.setDate(d.getDate() + diff)
+  return d.toISOString().slice(0, 10)
+}
 
+// All days in a month grid (includes padding from prev/next month)
+function getMonthGrid(year, month) {
+  const first = new Date(year, month, 1)
+  const startDay = first.getDay() === 0 ? 6 : first.getDay() - 1 // Monday=0
+  const daysInMonth = new Date(year, month + 1, 0).getDate()
+  const grid = []
+  // Padding before
+  for (let i = startDay - 1; i >= 0; i--) {
+    const d = new Date(year, month, -i)
+    grid.push({ iso: d.toISOString().slice(0, 10), dayNum: d.getDate(), inMonth: false })
+  }
+  // Current month
+  for (let i = 1; i <= daysInMonth; i++) {
+    const d = new Date(year, month, i)
+    grid.push({ iso: d.toISOString().slice(0, 10), dayNum: i, inMonth: true })
+  }
+  // Padding after (fill to 42 = 6 rows)
+  while (grid.length < 42) {
+    const d = new Date(year, month + 1, grid.length - startDay - daysInMonth + 1)
+    grid.push({ iso: d.toISOString().slice(0, 10), dayNum: d.getDate(), inMonth: false })
+  }
+  return grid
+}
+
+function formatDateLong(isoStr) {
+  const d = new Date(isoStr + 'T00:00:00')
+  const day = d.getDay() === 0 ? 6 : d.getDay() - 1
+  return `${JOURS_LONGS[day]} ${d.getDate()} ${MOIS_NOMS[d.getMonth()].toLowerCase()} ${d.getFullYear()}`
+}
+
+// ── Shared card component ───────────────────────────────────
+function InterventionCard({ inter, changeStatut, removeIntervention, compact = false }) {
+  const badgeColor = inter.statut === 'confirme' ? 'green' : inter.statut === 'a-confirmer' ? 'orange' : 'gray'
+  return (
+    <div className={`pw-card pw-card-${badgeColor} ${compact ? 'pw-card-compact' : ''}`}>
+      <div className="pw-card-time"><Clock size={11} /><span>{inter.heure}</span></div>
+      <div className="pw-card-client">{inter.client}</div>
+      <div className="pw-card-meta"><MapPin size={10} /> {inter.ville}</div>
+      {!compact && <div className="pw-card-meta"><Sun size={10} /> {inter.panneaux} panneaux</div>}
+      <div className="pw-card-bottom">
+        <span className={`pw-badge pw-badge-${badgeColor}`}>{STATUT_LABEL[inter.statut]}</span>
+        <div className="pw-card-actions">
+          <a href="tel:0412160630" className="icon-btn icon-btn-sm" title="Appeler"><Phone size={12} /></a>
+          <ActionMenu items={[
+            { icon: <Check size={13} />, label: 'Confirmé', onClick: () => changeStatut(inter.id, 'confirme') },
+            { icon: <Clock size={13} />, label: 'À confirmer', onClick: () => changeStatut(inter.id, 'a-confirmer') },
+            { icon: <Check size={13} />, label: 'Terminée', onClick: () => changeStatut(inter.id, 'termine') },
+            { divider: true },
+            { icon: <XIcon size={13} />, label: 'Annuler', onClick: () => changeStatut(inter.id, 'annulee') },
+            { icon: <Trash2 size={13} />, label: 'Supprimer', danger: true, onClick: () => removeIntervention(inter.id) },
+          ]} />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── Day column (reused in week + day views) ─────────────────
+function DayColumn({ day, interventions, changeStatut, removeIntervention, full = false }) {
+  const cap = computeCapacity(interventions)
+  const capClass = cap.status === 'over' ? 'over' : cap.status === 'full' ? 'full' : cap.status === 'warning' ? 'warn' : 'ok'
+  return (
+    <div className={`pw-col ${interventions.length === 0 ? 'pw-col-empty' : ''} ${full ? 'pw-col-full' : ''}`}>
+      <div className={`pw-col-head pw-col-head-${capClass}`}>
+        <div className="pw-col-day">
+          {full
+            ? <span className="pw-col-day-long">{day.long || day.short} {day.dayNum} {day.month}</span>
+            : <><span className="pw-col-day-name">{day.short}</span><span className="pw-col-day-num">{day.dayNum}</span><span className="pw-col-day-month">{day.month}</span></>
+          }
+        </div>
+        <div className={`pw-col-cap pw-cap-${capClass}`}>{cap.used}/{cap.max}</div>
+      </div>
+      <div className="pw-col-body">
+        {interventions.length === 0 && <div className="pw-empty"><span>Libre</span></div>}
+        {interventions.map(inter => (
+          <InterventionCard key={inter.id} inter={inter} changeStatut={changeStatut} removeIntervention={removeIntervention} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════
 export default function AdminPlanning() {
   const location = useLocation()
   const navigate = useNavigate()
   const [interventions, setInterventions] = useState(ALL_INTERVENTIONS_INIT)
-  const [semaineIdx, setSemaineIdx] = useState(0)
+  const [view, setView] = useState('semaine') // jour | semaine | mois
+  const [currentDate, setCurrentDate] = useState('2026-05-04') // date pivot
   const initialPreselected = location.state?.preselected ?? null
   const [addOpen, setAddOpen] = useState(!!initialPreselected)
   const [preselected, setPreselected] = useState(initialPreselected)
@@ -118,39 +188,107 @@ export default function AdminPlanning() {
     }
   }, [location, navigate])
 
-  const semaine = SEMAINES[semaineIdx]
-  const weekDays = useMemo(() => getWeekDays(semaine.monday), [semaine.monday])
+  const changeStatut = (id, statut) => setInterventions(list => list.map(i => i.id === id ? { ...i, statut } : i))
+  const removeIntervention = (id) => setInterventions(list => list.filter(i => i.id !== id))
 
-  const endDate = weekDays[weekDays.length - 1].iso
+  // ── Navigation ──
+  const navPrev = () => {
+    const d = new Date(currentDate + 'T00:00:00')
+    if (view === 'jour') d.setDate(d.getDate() - 1)
+    else if (view === 'semaine') d.setDate(d.getDate() - 7)
+    else d.setMonth(d.getMonth() - 1)
+    setCurrentDate(d.toISOString().slice(0, 10))
+  }
+  const navNext = () => {
+    const d = new Date(currentDate + 'T00:00:00')
+    if (view === 'jour') d.setDate(d.getDate() + 1)
+    else if (view === 'semaine') d.setDate(d.getDate() + 7)
+    else d.setMonth(d.getMonth() + 1)
+    setCurrentDate(d.toISOString().slice(0, 10))
+  }
+
+  // ── Date range for current view ──
+  const { startDate, endDate, navLabel } = useMemo(() => {
+    const d = new Date(currentDate + 'T00:00:00')
+    if (view === 'jour') {
+      return { startDate: currentDate, endDate: currentDate, navLabel: formatDateLong(currentDate) }
+    } else if (view === 'semaine') {
+      const mon = getMondayOf(currentDate)
+      const sat = new Date(mon + 'T00:00:00')
+      sat.setDate(sat.getDate() + 5)
+      const end = sat.toISOString().slice(0, 10)
+      const monD = new Date(mon + 'T00:00:00')
+      return {
+        startDate: mon, endDate: end,
+        navLabel: `${monD.getDate()} — ${sat.getDate()} ${MOIS_NOMS[sat.getMonth()].toLowerCase()} ${sat.getFullYear()}`
+      }
+    } else {
+      const first = new Date(d.getFullYear(), d.getMonth(), 1)
+      const last = new Date(d.getFullYear(), d.getMonth() + 1, 0)
+      return {
+        startDate: first.toISOString().slice(0, 10),
+        endDate: last.toISOString().slice(0, 10),
+        navLabel: `${MOIS_NOMS[d.getMonth()]} ${d.getFullYear()}`
+      }
+    }
+  }, [currentDate, view])
 
   const filtered = useMemo(() => {
     return interventions
-      .filter(i => i.date >= semaine.monday && i.date <= endDate)
+      .filter(i => i.date >= startDate && i.date <= endDate)
       .sort((a, b) => a.date.localeCompare(b.date) || a.heureSort.localeCompare(b.heureSort))
-  }, [interventions, semaine.monday, endDate])
+  }, [interventions, startDate, endDate])
 
-  // Interventions par jour
-  const byDay = useMemo(() => {
-    const map = {}
-    weekDays.forEach(d => { map[d.iso] = [] })
-    filtered.forEach(i => {
-      if (map[i.date]) map[i.date].push(i)
-    })
-    return map
-  }, [filtered, weekDays])
-
-  // Stats semaine
+  // Stats
   const totalInterv = filtered.length
   const totalPanneaux = filtered.reduce((s, i) => s + i.panneaux, 0)
   const totalConfirme = filtered.filter(i => i.statut === 'confirme').length
   const totalAConfirmer = filtered.filter(i => i.statut === 'a-confirmer').length
 
-  const changeStatut = (id, statut) => {
-    setInterventions(list => list.map(i => i.id === id ? { ...i, statut } : i))
-  }
-  const removeIntervention = (id) => {
-    setInterventions(list => list.filter(i => i.id !== id))
-  }
+  // ── Week data ──
+  const weekDays = useMemo(() => {
+    if (view !== 'semaine') return []
+    return getWeekDays(getMondayOf(currentDate))
+  }, [currentDate, view])
+
+  const byDay = useMemo(() => {
+    const map = {}
+    filtered.forEach(i => {
+      if (!map[i.date]) map[i.date] = []
+      map[i.date].push(i)
+    })
+    return map
+  }, [filtered])
+
+  // ── Month data ──
+  const monthGrid = useMemo(() => {
+    if (view !== 'mois') return []
+    const d = new Date(currentDate + 'T00:00:00')
+    return getMonthGrid(d.getFullYear(), d.getMonth())
+  }, [currentDate, view])
+
+  const allByDay = useMemo(() => {
+    const map = {}
+    interventions.forEach(i => {
+      if (!map[i.date]) map[i.date] = []
+      map[i.date].push(i)
+    })
+    return map
+  }, [interventions])
+
+  // ── Day data ──
+  const dayInfo = useMemo(() => {
+    if (view !== 'jour') return null
+    const d = new Date(currentDate + 'T00:00:00')
+    const dow = d.getDay() === 0 ? 6 : d.getDay() - 1
+    return {
+      iso: currentDate,
+      short: JOURS_COURTS[dow],
+      long: JOURS_LONGS[dow],
+      dayNum: d.getDate(),
+      month: MOIS_COURTS[d.getMonth()],
+    }
+  }, [currentDate, view])
 
   return (
     <>
@@ -158,7 +296,7 @@ export default function AdminPlanning() {
         <div className="page-header-row">
           <div>
             <h1>Planning</h1>
-            <p>Vue semaine — organisé par jour avec capacité journalière.</p>
+            <p>{totalInterv} intervention{totalInterv > 1 ? 's' : ''} sur cette période</p>
           </div>
           <div className="page-header-actions">
             <button className="btn btn-sm btn-outline" onClick={() => exportCSV(filtered)}><Download size={14} /> Exporter</button>
@@ -167,114 +305,119 @@ export default function AdminPlanning() {
         </div>
       </div>
 
-      {/* Navigation semaine */}
-      <div className="pw-nav">
-        <button className="icon-btn" onClick={() => setSemaineIdx(Math.max(0, semaineIdx - 1))} disabled={semaineIdx === 0}>
-          <ChevronLeft size={18} />
-        </button>
-        <div className="pw-nav-label">
-          <Calendar size={15} />
-          <span>Semaine du {semaine.label}</span>
+      {/* Toggle vue + navigation */}
+      <div className="pw-toolbar">
+        <div className="pw-view-toggle">
+          {[
+            { key: 'jour', icon: <List size={14} />, label: 'Jour' },
+            { key: 'semaine', icon: <LayoutGrid size={14} />, label: 'Semaine' },
+            { key: 'mois', icon: <CalendarDays size={14} />, label: 'Mois' },
+          ].map(v => (
+            <button
+              key={v.key}
+              className={`pw-view-btn ${view === v.key ? 'active' : ''}`}
+              onClick={() => setView(v.key)}
+            >
+              {v.icon} {v.label}
+            </button>
+          ))}
         </div>
-        <button className="icon-btn" onClick={() => setSemaineIdx(Math.min(SEMAINES.length - 1, semaineIdx + 1))} disabled={semaineIdx === SEMAINES.length - 1}>
-          <ChevronRight size={18} />
-        </button>
+
+        <div className="pw-nav">
+          <button className="icon-btn" onClick={navPrev}><ChevronLeft size={18} /></button>
+          <div className="pw-nav-label">
+            <Calendar size={15} />
+            <span>{navLabel}</span>
+          </div>
+          <button className="icon-btn" onClick={navNext}><ChevronRight size={18} /></button>
+        </div>
       </div>
 
-      {/* Stats semaine */}
+      {/* Stats */}
       <div className="pw-stats">
-        <div className="pw-stat">
-          <span className="pw-stat-val">{totalInterv}</span>
-          <span className="pw-stat-lbl">interventions</span>
-        </div>
-        <div className="pw-stat">
-          <span className="pw-stat-val pw-stat-green">{totalConfirme}</span>
-          <span className="pw-stat-lbl">confirmées</span>
-        </div>
-        <div className="pw-stat">
-          <span className="pw-stat-val pw-stat-orange">{totalAConfirmer}</span>
-          <span className="pw-stat-lbl">à confirmer</span>
-        </div>
-        <div className="pw-stat">
-          <span className="pw-stat-val">{totalPanneaux}</span>
-          <span className="pw-stat-lbl">panneaux</span>
-        </div>
-        <div className="pw-stat">
-          <span className="pw-stat-val">{(totalInterv * 199).toLocaleString('fr-FR')}&nbsp;€</span>
-          <span className="pw-stat-lbl">CA potentiel</span>
-        </div>
+        <div className="pw-stat"><span className="pw-stat-val">{totalInterv}</span><span className="pw-stat-lbl">interventions</span></div>
+        <div className="pw-stat"><span className="pw-stat-val pw-stat-green">{totalConfirme}</span><span className="pw-stat-lbl">confirmées</span></div>
+        <div className="pw-stat"><span className="pw-stat-val pw-stat-orange">{totalAConfirmer}</span><span className="pw-stat-lbl">à confirmer</span></div>
+        <div className="pw-stat"><span className="pw-stat-val">{totalPanneaux}</span><span className="pw-stat-lbl">panneaux</span></div>
+        <div className="pw-stat"><span className="pw-stat-val">{(totalInterv * 199).toLocaleString('fr-FR')}&nbsp;€</span><span className="pw-stat-lbl">CA potentiel</span></div>
       </div>
 
-      {/* Grille semaine */}
-      <div className="pw-grid">
-        {weekDays.map(day => {
-          const dayInterventions = byDay[day.iso] || []
-          const cap = computeCapacity(dayInterventions)
-          const capClass = cap.status === 'over' ? 'over' : cap.status === 'full' ? 'full' : cap.status === 'warning' ? 'warn' : 'ok'
+      {/* ═══ VUE JOUR ═══ */}
+      {view === 'jour' && dayInfo && (
+        <div className="pw-day-view">
+          <DayColumn
+            day={dayInfo}
+            interventions={filtered}
+            changeStatut={changeStatut}
+            removeIntervention={removeIntervention}
+            full
+          />
+        </div>
+      )}
 
-          return (
-            <div key={day.iso} className={`pw-col ${dayInterventions.length === 0 ? 'pw-col-empty' : ''}`}>
-              {/* Header jour */}
-              <div className={`pw-col-head pw-col-head-${capClass}`}>
-                <div className="pw-col-day">
-                  <span className="pw-col-day-name">{day.short}</span>
-                  <span className="pw-col-day-num">{day.dayNum}</span>
-                  <span className="pw-col-day-month">{day.month}</span>
-                </div>
-                <div className={`pw-col-cap pw-cap-${capClass}`}>
-                  {cap.used}/{cap.max}
-                </div>
-              </div>
+      {/* ═══ VUE SEMAINE ═══ */}
+      {view === 'semaine' && (
+        <div className="pw-grid">
+          {weekDays.map(day => (
+            <DayColumn
+              key={day.iso}
+              day={day}
+              interventions={byDay[day.iso] || []}
+              changeStatut={changeStatut}
+              removeIntervention={removeIntervention}
+            />
+          ))}
+        </div>
+      )}
 
-              {/* Interventions du jour */}
-              <div className="pw-col-body">
-                {dayInterventions.length === 0 && (
-                  <div className="pw-empty">
-                    <span>Libre</span>
+      {/* ═══ VUE MOIS ═══ */}
+      {view === 'mois' && (
+        <div className="pw-month">
+          <div className="pw-month-header">
+            {JOURS_COURTS.slice(0, 7).map(j => (
+              <div key={j} className="pw-month-hdr-cell">{j}</div>
+            ))}
+          </div>
+          <div className="pw-month-grid">
+            {monthGrid.map((cell) => {
+              const dayInts = (allByDay[cell.iso] || []).sort((a, b) => a.heureSort.localeCompare(b.heureSort))
+              const cap = computeCapacity(dayInts)
+              const capClass = cap.status === 'over' ? 'over' : cap.status === 'full' ? 'full' : cap.status === 'warning' ? 'warn' : 'ok'
+              return (
+                <div
+                  key={cell.iso}
+                  className={`pw-month-cell ${!cell.inMonth ? 'pw-month-cell-out' : ''} ${dayInts.length > 0 ? 'pw-month-cell-has' : ''}`}
+                  onClick={() => { setCurrentDate(cell.iso); setView('jour') }}
+                >
+                  <div className="pw-month-cell-head">
+                    <span className="pw-month-cell-num">{cell.dayNum}</span>
+                    {dayInts.length > 0 && (
+                      <span className={`pw-month-cell-cap pw-cap-${capClass}`}>{cap.used}/{cap.max}</span>
+                    )}
                   </div>
-                )}
-                {dayInterventions.map(inter => (
-                  <div key={inter.id} className={`pw-card pw-card-${inter.statut === 'confirme' ? 'green' : inter.statut === 'a-confirmer' ? 'orange' : 'gray'}`}>
-                    <div className="pw-card-time">
-                      <Clock size={11} />
-                      <span>{inter.heure}</span>
-                    </div>
-                    <div className="pw-card-client">{inter.client}</div>
-                    <div className="pw-card-meta">
-                      <MapPin size={10} /> {inter.ville}
-                    </div>
-                    <div className="pw-card-meta">
-                      <Sun size={10} /> {inter.panneaux} panneaux
-                    </div>
-                    <div className="pw-card-bottom">
-                      <span className={`pw-badge pw-badge-${inter.statut === 'confirme' ? 'green' : inter.statut === 'a-confirmer' ? 'orange' : 'gray'}`}>
-                        {STATUT_LABEL[inter.statut]}
-                      </span>
-                      <div className="pw-card-actions">
-                        <a href={`tel:${inter.ville ? '0412160630' : ''}`} className="icon-btn icon-btn-sm" title="Appeler"><Phone size={12} /></a>
-                        <ActionMenu items={[
-                          { icon: <Check size={13} />, label: 'Confirmé', onClick: () => changeStatut(inter.id, 'confirme') },
-                          { icon: <Clock size={13} />, label: 'À confirmer', onClick: () => changeStatut(inter.id, 'a-confirmer') },
-                          { icon: <Check size={13} />, label: 'Terminée', onClick: () => changeStatut(inter.id, 'termine') },
-                          { divider: true },
-                          { icon: <XIcon size={13} />, label: 'Annuler', onClick: () => changeStatut(inter.id, 'annulee') },
-                          { icon: <Trash2 size={13} />, label: 'Supprimer', danger: true, onClick: () => removeIntervention(inter.id) },
-                        ]} />
+                  <div className="pw-month-cell-body">
+                    {dayInts.slice(0, 3).map(inter => (
+                      <div key={inter.id} className={`pw-month-pill pw-month-pill-${inter.statut === 'confirme' ? 'green' : inter.statut === 'a-confirmer' ? 'orange' : 'gray'}`}>
+                        <span className="pw-month-pill-time">{inter.heure.split('-')[0]}</span>
+                        <span className="pw-month-pill-name">{inter.client.split(' ')[0]}</span>
                       </div>
-                    </div>
+                    ))}
+                    {dayInts.length > 3 && (
+                      <div className="pw-month-more">+{dayInts.length - 3} autre{dayInts.length - 3 > 1 ? 's' : ''}</div>
+                    )}
                   </div>
-                ))}
-              </div>
-            </div>
-          )
-        })}
-      </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Modale ajout */}
       {addOpen && (
         <AddInterventionModal
           onClose={() => { setAddOpen(false); setPreselected(null) }}
-          today={SEMAINES[0].monday}
+          today={startDate}
           interventions={interventions}
           preselectedNom={preselected?.nom || ''}
           preselectedTel={preselected?.tel || ''}
@@ -290,11 +433,7 @@ export default function AdminPlanning() {
             }])
             setAddOpen(false)
             setPreselected(null)
-            const weekIdx = SEMAINES.findIndex(s => {
-              const days = getWeekDays(s.monday)
-              return data.date >= days[0].iso && data.date <= days[5].iso
-            })
-            if (weekIdx >= 0) setSemaineIdx(weekIdx)
+            setCurrentDate(data.date)
           }}
         />
       )}
