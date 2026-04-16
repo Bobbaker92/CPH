@@ -1915,7 +1915,253 @@ tbody tr:last-child td { border-bottom: none; }
 .lead-item-amount { font-size: 14px; font-weight: 700; color: var(--primary); }
 .lead-item-actions { display: flex; gap: 4px; }
 
-/* --- Planning --- */
+/* ═══════════════════════════════════════════════════════════
+   PLANNING VUE SEMAINE (pw- prefix)
+   ═══════════════════════════════════════════════════════════ */
+
+.pw-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.pw-nav-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--primary);
+  min-width: 240px;
+  justify-content: center;
+}
+
+.pw-stats {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.pw-stat {
+  background: white;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--radius);
+  padding: 10px 16px;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex: 1;
+  min-width: 120px;
+}
+.pw-stat-val {
+  font-size: 20px;
+  font-weight: 800;
+}
+.pw-stat-lbl {
+  font-size: 12px;
+  color: var(--gray-500);
+}
+.pw-stat-green { color: var(--green); }
+.pw-stat-orange { color: var(--orange); }
+
+/* Grille semaine */
+.pw-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+/* Colonne = 1 jour */
+.pw-col {
+  background: white;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+}
+.pw-col-empty {
+  opacity: 0.6;
+}
+
+/* Header du jour */
+.pw-col-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--admin-border);
+  background: var(--gray-50);
+}
+.pw-col-head-full { border-bottom-color: var(--green); background: #f0fdf4; }
+.pw-col-head-over { border-bottom-color: var(--red); background: #fef2f2; }
+.pw-col-head-warn { border-bottom-color: var(--orange); background: #fff7ed; }
+
+.pw-col-day {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+.pw-col-day-name {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--gray-500);
+  letter-spacing: 0.5px;
+}
+.pw-col-day-num {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--primary);
+}
+.pw-col-day-month {
+  font-size: 11px;
+  color: var(--gray-400);
+}
+
+.pw-col-cap {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+.pw-cap-ok { background: var(--blue-light); color: var(--blue); }
+.pw-cap-warn { background: var(--orange-light); color: var(--orange); }
+.pw-cap-full { background: var(--green-light); color: var(--green); }
+.pw-cap-over { background: var(--red-light); color: var(--red); }
+.pw-cap-empty { background: var(--gray-100); color: var(--gray-400); }
+
+/* Body du jour */
+.pw-col-body {
+  flex: 1;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pw-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-300);
+  font-size: 12px;
+  font-style: italic;
+}
+
+/* Card intervention */
+.pw-card {
+  border-radius: 8px;
+  padding: 8px 10px;
+  border-left: 3px solid var(--gray-200);
+  background: var(--gray-50);
+  transition: box-shadow 0.15s;
+}
+.pw-card:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.pw-card-green { border-left-color: var(--green); }
+.pw-card-orange { border-left-color: var(--orange); }
+.pw-card-gray { border-left-color: var(--gray-300); }
+
+.pw-card-time {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+.pw-card-client {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pw-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  color: var(--gray-500);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pw-card-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 6px;
+}
+.pw-card-actions {
+  display: flex;
+  gap: 2px;
+}
+.icon-btn-sm {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--gray-400);
+  cursor: pointer;
+  padding: 0;
+  text-decoration: none;
+}
+.icon-btn-sm:hover { color: var(--primary); background: var(--gray-100); }
+
+.pw-badge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.pw-badge-green { background: var(--green-light); color: var(--green); }
+.pw-badge-orange { background: var(--orange-light); color: var(--orange); }
+.pw-badge-gray { background: var(--gray-100); color: var(--gray-500); }
+
+/* Responsive planning semaine */
+@media (max-width: 1100px) {
+  .pw-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 768px) {
+  .pw-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .pw-stats {
+    flex-wrap: wrap;
+  }
+  .pw-stat {
+    min-width: 80px;
+    padding: 8px 10px;
+  }
+  .pw-stat-val { font-size: 16px; }
+  .pw-nav-label { font-size: 13px; min-width: auto; }
+}
+@media (max-width: 480px) {
+  .pw-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --- Planning (legacy styles kept for AddInterventionModal) --- */
 .planning-toolbar {
   display: flex; justify-content: space-between; align-items: center;
   gap: 16px; margin-bottom: 16px; flex-wrap: wrap;
@@ -3823,6 +4069,9 @@ tbody tr:last-child td { border-bottom: none; }
   font-size: 12px;
   color: var(--gray-500);
 }
+.admin-prosp-comm-stats-6 {
+  grid-template-columns: repeat(6, 1fr);
+}
 .admin-prosp-comm-stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -4001,6 +4250,9 @@ tbody tr:last-child td { border-bottom: none; }
 }
 
 /* KPI row (réutilisable) */
+.admin-kpi-row-6 {
+  grid-template-columns: repeat(6, 1fr);
+}
 .admin-kpi-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -4041,6 +4293,12 @@ tbody tr:last-child td { border-bottom: none; }
   .admin-kpi-row {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
+  }
+  .admin-kpi-row-6 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .admin-prosp-comm-stats-6 {
+    grid-template-columns: repeat(3, 1fr);
   }
   .admin-prosp-comm-grid {
     grid-template-columns: 1fr;

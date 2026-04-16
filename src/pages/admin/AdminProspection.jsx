@@ -155,11 +155,15 @@ export default function AdminProspection() {
   // Stats globales
   const globalStats = useMemo(() => {
     const vendu = rdvs.filter(r => r.statut === 'vendu')
+    const fait = rdvs.filter(r => r.statut === 'fait' || r.statut === 'vendu' || r.statut === 'pas_vendu')
     const caTotal = vendu.reduce((s, r) => s + (r.montantHT || 0), 0)
     return {
       totalRdvs: rdvs.length,
+      qualifies: fait.length,
       vendus: vendu.length,
-      taux: rdvs.length > 0 ? Math.round((vendu.length / rdvs.length) * 100) : 0,
+      pasVendu: rdvs.filter(r => r.statut === 'pas_vendu').length,
+      enAttente: rdvs.filter(r => r.statut === 'planifie').length,
+      tauxConversion: fait.length > 0 ? Math.round((vendu.length / fait.length) * 100) : 0,
       caTotal,
     }
   }, [rdvs])
@@ -176,18 +180,26 @@ export default function AdminProspection() {
       </div>
 
       {/* KPI cards */}
-      <div className="admin-kpi-row">
+      <div className="admin-kpi-row admin-kpi-row-6">
         <div className="admin-kpi-card">
           <div className="admin-kpi-icon" style={{ background: 'var(--blue-light)', color: 'var(--blue)' }}><Calendar size={20} /></div>
-          <div><p className="admin-kpi-value">{globalStats.totalRdvs}</p><p className="admin-kpi-label">RDV total</p></div>
+          <div><p className="admin-kpi-value">{globalStats.totalRdvs}</p><p className="admin-kpi-label">RDV pris</p></div>
+        </div>
+        <div className="admin-kpi-card">
+          <div className="admin-kpi-icon" style={{ background: 'var(--primary)', color: 'white' }}><Check size={20} /></div>
+          <div><p className="admin-kpi-value">{globalStats.qualifies}</p><p className="admin-kpi-label">RDV qualifiés</p></div>
         </div>
         <div className="admin-kpi-card">
           <div className="admin-kpi-icon" style={{ background: 'var(--green-light)', color: 'var(--green)' }}><Check size={20} /></div>
           <div><p className="admin-kpi-value">{globalStats.vendus}</p><p className="admin-kpi-label">Vendus</p></div>
         </div>
         <div className="admin-kpi-card">
+          <div className="admin-kpi-icon" style={{ background: 'var(--gray-100)', color: 'var(--gray-500)' }}><X size={20} /></div>
+          <div><p className="admin-kpi-value">{globalStats.pasVendu}</p><p className="admin-kpi-label">Pas vendu</p></div>
+        </div>
+        <div className="admin-kpi-card">
           <div className="admin-kpi-icon" style={{ background: 'var(--orange-light)', color: 'var(--orange)' }}><TrendingUp size={20} /></div>
-          <div><p className="admin-kpi-value">{globalStats.taux}%</p><p className="admin-kpi-label">Taux conversion</p></div>
+          <div><p className="admin-kpi-value">{globalStats.tauxConversion}%</p><p className="admin-kpi-label">Taux conversion</p></div>
         </div>
         <div className="admin-kpi-card">
           <div className="admin-kpi-icon" style={{ background: 'var(--accent-light)', color: 'var(--accent)' }}><Euro size={20} /></div>
@@ -202,8 +214,12 @@ export default function AdminProspection() {
           {PROSPECTRICES_LIST.map(p => {
             const pRdvs = rdvs.filter(r => r.prospectrice === p.id)
             const c = calcCommissions(pRdvs)
-            const nbVendus = pRdvs.filter(r => r.statut === 'vendu').length
             const nbTotal = pRdvs.length
+            const nbQualifies = pRdvs.filter(r => r.statut === 'fait' || r.statut === 'vendu' || r.statut === 'pas_vendu').length
+            const nbVendus = pRdvs.filter(r => r.statut === 'vendu').length
+            const nbPasVendu = pRdvs.filter(r => r.statut === 'pas_vendu').length
+            const nbPlanifie = pRdvs.filter(r => r.statut === 'planifie').length
+            const tauxConv = nbQualifies > 0 ? Math.round((nbVendus / nbQualifies) * 100) : 0
             return (
               <div key={p.id} className="admin-prosp-comm-card">
                 <div className="admin-prosp-comm-head">
@@ -213,15 +229,33 @@ export default function AdminProspection() {
                     <span>{p.secteur}</span>
                   </div>
                 </div>
-                <div className="admin-prosp-comm-stats">
+                <div className="admin-prosp-comm-stats admin-prosp-comm-stats-6">
                   <div>
                     <span className="admin-prosp-comm-stat-val">{nbTotal}</span>
-                    <span className="admin-prosp-comm-stat-label">RDV</span>
+                    <span className="admin-prosp-comm-stat-label">RDV pris</span>
                   </div>
                   <div>
-                    <span className="admin-prosp-comm-stat-val">{nbVendus}</span>
+                    <span className="admin-prosp-comm-stat-val">{nbQualifies}</span>
+                    <span className="admin-prosp-comm-stat-label">Qualifiés</span>
+                  </div>
+                  <div>
+                    <span className="admin-prosp-comm-stat-val" style={{color: 'var(--green)'}}>{nbVendus}</span>
                     <span className="admin-prosp-comm-stat-label">Vendus</span>
                   </div>
+                  <div>
+                    <span className="admin-prosp-comm-stat-val" style={{color: 'var(--gray-400)'}}>{nbPasVendu}</span>
+                    <span className="admin-prosp-comm-stat-label">Pas vendu</span>
+                  </div>
+                  <div>
+                    <span className="admin-prosp-comm-stat-val" style={{color: 'var(--blue)'}}>{nbPlanifie}</span>
+                    <span className="admin-prosp-comm-stat-label">En attente</span>
+                  </div>
+                  <div>
+                    <span className="admin-prosp-comm-stat-val" style={{color: tauxConv >= 50 ? 'var(--green)' : tauxConv >= 30 ? 'var(--orange)' : 'var(--red)'}}>{tauxConv}%</span>
+                    <span className="admin-prosp-comm-stat-label">Conversion</span>
+                  </div>
+                </div>
+                <div className="admin-prosp-comm-stats" style={{borderBottom: '1px solid var(--gray-100)'}}>
                   <div>
                     <span className="admin-prosp-comm-stat-val">{formatMontant(c.totalVendu)}</span>
                     <span className="admin-prosp-comm-stat-label">CA HT</span>
