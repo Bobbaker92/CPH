@@ -3,7 +3,7 @@ import { Copy, Check } from 'lucide-react'
 
 export default function ClientRecommander() {
   const [copied, setCopied] = useState(false)
-  const lien = 'https://solaire-paca.fr/r/jp-martin'
+  const lien = 'https://cphpaca.fr/r/jp-martin'
 
   const handleCopy = () => {
     navigator.clipboard.writeText(lien)

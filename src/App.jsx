@@ -22,7 +22,9 @@ import AdminDemandes from './pages/admin/AdminDemandes'
 import AdminClients from './pages/admin/AdminClients'
 import AdminCouvreurs from './pages/admin/AdminCouvreurs'
 import AdminParrainages from './pages/admin/AdminParrainages'
+import AdminProspection from './pages/admin/AdminProspection'
 import CouvreurApp from './pages/couvreur/CouvreurApp'
+import ProspectionApp from './pages/prospection/ProspectionApp'
 
 function App() {
   return (
@@ -56,7 +58,11 @@ function App() {
           <Route path="clients" element={<AdminClients />} />
           <Route path="couvreurs" element={<AdminCouvreurs />} />
           <Route path="parrainages" element={<AdminParrainages />} />
+          <Route path="prospection" element={<AdminProspection />} />
         </Route>
+
+        {/* Espace Prospection */}
+        <Route path="/prospection" element={<ProspectionApp />} />
 
         {/* Espace Couvreur */}
         <Route path="/couvreur" element={<CouvreurApp />} />

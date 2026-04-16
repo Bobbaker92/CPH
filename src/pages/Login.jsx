@@ -6,6 +6,7 @@ const COMPTES = {
   'admin@cphpaca.fr': { password: 'admin123', role: 'admin', nom: 'Fares' },
   'karim@cphpaca.fr': { password: 'couvreur123', role: 'couvreur', nom: 'Karim Z.' },
   'client@test.fr': { password: 'client123', role: 'client', nom: 'Jean-Pierre Martin' },
+  'prospection@cphpaca.fr': { password: 'prospection123', role: 'prospectrice', nom: 'Nadia Belkacem' },
 }
 
 export default function Login() {
@@ -38,6 +39,7 @@ export default function Login() {
 
       if (compte.role === 'admin') navigate('/admin')
       else if (compte.role === 'couvreur') navigate('/couvreur')
+      else if (compte.role === 'prospectrice') navigate('/prospection')
       else navigate('/client')
     }, 600)
   }
@@ -150,6 +152,7 @@ export default function Login() {
             { label: 'Admin', email: 'admin@cphpaca.fr', pass: 'admin123' },
             { label: 'Couvreur', email: 'karim@cphpaca.fr', pass: 'couvreur123' },
             { label: 'Client', email: 'client@test.fr', pass: 'client123' },
+            { label: 'Prospectrice', email: 'prospection@cphpaca.fr', pass: 'prospection123' },
           ].map((c) => (
             <button
               key={c.label}

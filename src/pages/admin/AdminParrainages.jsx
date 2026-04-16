@@ -65,7 +65,7 @@ export default function AdminParrainages() {
             <p>30&nbsp;&euro; offerts au parrain pour chaque filleul converti.</p>
           </div>
           <div style={{display:'flex', gap:8}}>
-            <button className="btn btn-sm btn-outline" onClick={() => exportCSV(PARRAINAGES)}><Download size={14} /> Exporter</button>
+            <button className="btn btn-sm btn-outline" onClick={() => exportCSV(filtered)}><Download size={14} /> Exporter</button>
             <button
               className="btn btn-sm btn-outline"
               onClick={() => navigator.clipboard?.writeText('https://cphpaca.fr/?parrain=XXX')}

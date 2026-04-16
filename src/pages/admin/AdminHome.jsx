@@ -42,7 +42,7 @@ export default function AdminHome() {
       <div className="page-header">
         <div className="page-header-row">
           <div>
-            <h1>Bonjour Karim 👋</h1>
+            <h1>Bonjour Fares 👋</h1>
             <p>Voici votre activit&eacute; du moment, mercredi 15 avril 2026.</p>
           </div>
           <div className="page-header-actions">

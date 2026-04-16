@@ -3376,3 +3376,705 @@ tbody tr:last-child td { border-bottom: none; }
   .confirm-referral { flex-direction: column; text-align: center; }
 }
 
+/* ═══════════════════════════════════════════════════════════
+   ESPACE PROSPECTION (app mobile terrain)
+   ═══════════════════════════════════════════════════════════ */
+
+.prosp-app {
+  min-height: 100vh;
+  background: var(--bg);
+  padding-bottom: 100px;
+}
+
+.prosp-header {
+  background: var(--primary);
+  color: white;
+  padding: 16px 20px 20px;
+}
+.prosp-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.prosp-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.prosp-header-brand h1 {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+  color: white;
+}
+.prosp-header-brand span {
+  font-size: 11px;
+  opacity: 0.5;
+}
+.prosp-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+}
+.prosp-logout {
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.prosp-header-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.prosp-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.prosp-header-user strong {
+  display: block;
+  font-size: 14px;
+}
+.prosp-header-user span {
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+/* Stats */
+.prosp-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 16px;
+}
+.prosp-stat {
+  background: white;
+  border-radius: var(--radius-sm);
+  padding: 12px 8px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.prosp-stat-value {
+  display: block;
+  font-size: 22px;
+  font-weight: 800;
+}
+.prosp-stat-label {
+  font-size: 11px;
+  color: var(--gray-500);
+}
+.prosp-stat-green { color: var(--green); }
+.prosp-stat-blue { color: var(--blue); }
+.prosp-stat-orange { color: var(--orange); }
+
+/* Commission card */
+.prosp-commission {
+  margin: 0 16px 12px;
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.prosp-commission-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, var(--primary) 0%, #0a4a7a 100%);
+  color: white;
+  font-size: 14px;
+}
+.prosp-commission-body {
+  padding: 12px 16px 16px;
+}
+.prosp-commission-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  font-size: 13px;
+  border-bottom: 1px solid var(--gray-100);
+}
+.prosp-commission-row:last-child { border-bottom: none; }
+.prosp-commission-row span { color: var(--gray-600); }
+.prosp-commission-total {
+  border-top: 2px solid var(--primary);
+  margin-top: 4px;
+  padding-top: 10px;
+}
+.prosp-commission-total strong {
+  color: var(--primary);
+  font-size: 16px;
+}
+.prosp-commission-progress {
+  margin-top: 12px;
+}
+.prosp-commission-progress-text {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--gray-500);
+  margin-bottom: 6px;
+}
+.prosp-commission-bar {
+  height: 6px;
+  background: var(--gray-100);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.prosp-commission-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+
+/* Filtres */
+.prosp-filters {
+  display: flex;
+  gap: 6px;
+  padding: 0 16px 12px;
+  overflow-x: auto;
+}
+.prosp-filter-btn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--gray-200);
+  background: white;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  color: var(--gray-600);
+  transition: all 0.2s;
+}
+.prosp-filter-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+/* RDV list */
+.prosp-rdv-list {
+  padding: 0 16px;
+}
+.prosp-rdv-card {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+.prosp-rdv-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 14px 16px;
+  cursor: pointer;
+  gap: 12px;
+}
+.prosp-rdv-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.prosp-rdv-info strong {
+  font-size: 14px;
+}
+.prosp-rdv-date, .prosp-rdv-addr {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--gray-500);
+}
+.prosp-rdv-addr {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 250px;
+}
+.prosp-rdv-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.prosp-rdv-montant {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--green);
+}
+.prosp-rdv-detail {
+  padding: 0 16px 14px;
+  border-top: 1px solid var(--gray-100);
+  padding-top: 12px;
+}
+.prosp-rdv-detail-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--gray-700);
+  padding: 4px 0;
+}
+.prosp-rdv-detail-row a {
+  color: var(--blue);
+  text-decoration: none;
+  font-weight: 500;
+}
+.prosp-rdv-notes {
+  font-style: italic;
+  color: var(--gray-500);
+}
+.prosp-rdv-created {
+  font-size: 11px;
+  color: var(--gray-400);
+  margin-top: 4px;
+}
+.prosp-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--gray-400);
+  font-size: 14px;
+}
+
+/* Badges */
+.prosp-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.badge-blue { background: var(--blue-light); color: var(--blue); }
+.badge-orange { background: var(--orange-light); color: var(--orange); }
+.badge-green { background: var(--green-light); color: var(--green); }
+.badge-gray { background: var(--gray-100); color: var(--gray-500); }
+
+/* FAB */
+.prosp-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--primary);
+  border: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s;
+  z-index: 100;
+}
+.prosp-fab:hover { transform: scale(1.1); }
+
+/* Modal */
+.prosp-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.prosp-modal {
+  background: white;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 16px 16px 0 0;
+  animation: slideUp 0.3s;
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.prosp-modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--gray-100);
+}
+.prosp-modal-head h3 {
+  font-size: 16px;
+  margin: 0;
+}
+.prosp-modal-head button {
+  background: none;
+  border: none;
+  color: var(--gray-400);
+  cursor: pointer;
+  padding: 4px;
+}
+.prosp-modal-form {
+  padding: 16px 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.prosp-field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gray-600);
+  margin-bottom: 4px;
+}
+.prosp-field input,
+.prosp-field select,
+.prosp-field textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+.prosp-field input:focus,
+.prosp-field select:focus,
+.prosp-field textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(11,48,79,0.08);
+}
+.prosp-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.prosp-modal-submit {
+  width: 100%;
+  justify-content: center;
+  padding: 14px;
+  font-size: 15px;
+  margin-top: 4px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ADMIN PROSPECTION
+   ═══════════════════════════════════════════════════════════ */
+
+.admin-prosp-commissions {
+  margin-bottom: 24px;
+}
+.admin-prosp-commissions h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  margin-bottom: 14px;
+}
+.admin-prosp-comm-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+}
+.admin-prosp-comm-card {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.admin-prosp-comm-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid var(--gray-100);
+}
+.admin-prosp-comm-head strong {
+  display: block;
+  font-size: 14px;
+}
+.admin-prosp-comm-head span {
+  font-size: 12px;
+  color: var(--gray-500);
+}
+.admin-prosp-comm-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  text-align: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--gray-100);
+}
+.admin-prosp-comm-stat-val {
+  display: block;
+  font-size: 16px;
+  font-weight: 700;
+}
+.admin-prosp-comm-stat-label {
+  font-size: 11px;
+  color: var(--gray-500);
+}
+.admin-prosp-comm-detail {
+  padding: 12px 16px;
+}
+.admin-prosp-comm-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  font-size: 13px;
+}
+.admin-prosp-comm-row span { color: var(--gray-600); }
+.admin-prosp-comm-total {
+  border-top: 2px solid var(--primary);
+  margin-top: 4px;
+  padding-top: 8px;
+}
+.admin-prosp-comm-total strong {
+  color: var(--primary);
+  font-size: 15px;
+}
+
+/* Toolbar */
+.admin-prosp-toolbar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.admin-prosp-select {
+  padding: 8px 12px;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-family: inherit;
+  background: white;
+  cursor: pointer;
+}
+.admin-prosp-select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* Badge select dans le tableau */
+.prosp-badge-select {
+  padding: 4px 10px;
+  border-radius: 12px;
+  border: none;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23666' fill='none' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 24px;
+}
+.prosp-badge-select.badge-blue { background: var(--blue-light); color: var(--blue); }
+.prosp-badge-select.badge-orange { background: var(--orange-light); color: var(--orange); }
+.prosp-badge-select.badge-green { background: var(--green-light); color: var(--green); }
+.prosp-badge-select.badge-gray { background: var(--gray-100); color: var(--gray-500); }
+
+/* Prospect cell */
+.admin-prosp-prospect strong { display: block; font-size: 13px; }
+.admin-prosp-prospect span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--gray-500);
+}
+.admin-prosp-date { font-size: 13px; }
+.admin-prosp-addr {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--gray-500);
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Montant edit */
+.admin-prosp-montant {
+  font-weight: 700;
+  color: var(--green);
+  cursor: pointer;
+  border-bottom: 1px dashed var(--gray-300);
+}
+.admin-prosp-montant:hover { border-color: var(--green); }
+.admin-prosp-montant-empty {
+  color: var(--orange);
+  font-weight: 500;
+  cursor: pointer;
+}
+.admin-prosp-montant-na {
+  color: var(--gray-300);
+}
+.admin-prosp-montant-edit {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.admin-prosp-montant-edit input {
+  width: 100px;
+  padding: 4px 8px;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+}
+
+/* Detail row expand */
+.admin-prosp-detail-row td {
+  padding: 0 !important;
+  border-top: none !important;
+}
+.admin-prosp-detail-content {
+  padding: 16px 20px;
+  background: var(--gray-50);
+  border-top: 1px dashed var(--gray-200);
+}
+.admin-prosp-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+.admin-prosp-detail-grid strong {
+  font-size: 11px;
+  color: var(--gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.admin-prosp-detail-grid a {
+  color: var(--blue);
+  text-decoration: none;
+}
+.admin-prosp-detail-notes {
+  font-size: 13px;
+  color: var(--gray-600);
+  font-style: italic;
+  margin-bottom: 12px;
+}
+.admin-prosp-detail-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Admin empty */
+.admin-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--gray-400);
+  font-size: 14px;
+}
+
+/* KPI row (réutilisable) */
+.admin-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.admin-kpi-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.admin-kpi-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.admin-kpi-value {
+  font-size: 22px;
+  font-weight: 800;
+  margin: 0;
+}
+.admin-kpi-label {
+  font-size: 12px;
+  color: var(--gray-500);
+  margin: 0;
+}
+
+/* Responsive prospection */
+@media (max-width: 768px) {
+  .admin-kpi-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .admin-prosp-comm-grid {
+    grid-template-columns: 1fr;
+  }
+  .admin-prosp-toolbar {
+    flex-direction: column;
+  }
+  .admin-prosp-toolbar .admin-search { max-width: 100% !important; }
+  .admin-prosp-select { width: 100%; }
+
+  /* Table -> cards */
+  .admin-table-wrap table thead { display: none; }
+  .admin-table-wrap table tbody tr {
+    display: block;
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 10px;
+    padding: 12px;
+  }
+  .admin-table-wrap table tbody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    border: none;
+  }
+  .admin-table-wrap table tbody td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    font-size: 11px;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+

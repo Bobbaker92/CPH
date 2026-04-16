@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom'
 import {
-  LayoutDashboard, Inbox, Calendar, Users, UserCheck, Gift, LogOut, Sun,
+  LayoutDashboard, Inbox, Calendar, Users, UserCheck, Gift, Target, LogOut, Sun,
   Search, Bell, ChevronDown, Menu, X, Settings
 } from 'lucide-react'
 
@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { to: '/admin/clients', icon: Users, label: 'Clients', short: 'Clients' },
   { to: '/admin/couvreurs', icon: UserCheck, label: 'Couvreurs', short: 'Couvreurs' },
   { to: '/admin/parrainages', icon: Gift, label: 'Parrainages', short: 'Parrain.' },
+  { to: '/admin/prospection', icon: Target, label: 'Prospection', short: 'Prosp.' },
 ]
 
 const MOBILE_NAV = NAV_ITEMS.slice(0, 5) // 5 items max en bottom nav

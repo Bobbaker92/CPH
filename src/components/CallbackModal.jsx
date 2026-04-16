@@ -6,7 +6,7 @@ import { X, Phone, Clock, Check, Loader2, Shield } from 'lucide-react'
  * onClose: fonction fermeture
  * context: 'landing' | 'devis' | 'reservation' | 'paiement' — indique d'où vient le lead
  */
-export default function CallbackModal({ onClose, context = 'landing' }) {
+export default function CallbackModal({ onClose }) {
   const [form, setForm] = useState({ nom: '', tel: '', dispo: 'rapide', note: '' })
   const [loading, setLoading] = useState(false)
   const [done, setDone] = useState(false)

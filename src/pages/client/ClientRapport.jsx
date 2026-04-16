@@ -82,7 +82,7 @@ export default function ClientRapport() {
         <p style={{fontSize:14, color:'var(--gray-600)', lineHeight:1.7}}>
           {"\"Panneaux nettoy\u00E9s sans difficult\u00E9. J'ai constat\u00E9 un probl\u00E8me de fa\u00EEtage c\u00F4t\u00E9 sud\u00A0: le closoir est absent sur environ 3m, ce qui peut provoquer des infiltrations en cas de fortes pluies. Les rives c\u00F4t\u00E9 ouest montrent des fissures dans le mortier. Je recommande une intervention de remise en \u00E9tat pour s\u00E9curiser la couverture. N'h\u00E9sitez pas \u00E0 nous contacter pour un devis gratuit.\""}
         </p>
-        <p style={{fontSize:13, color:'var(--gray-400)', marginTop:8}}>{"- Thomas, couvreur certifi\u00E9 Qualibat"}</p>
+        <p style={{fontSize:13, color:'var(--gray-400)', marginTop:8}}>{"- Karim, couvreur certifi\u00E9 Qualibat"}</p>
       </div>
 
       {/* Actions */}

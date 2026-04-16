@@ -153,7 +153,7 @@ export default function AdminClients() {
                 <td data-label="Ville"><span className="cell-with-icon"><MapPin size={12} /> {c.ville}</span></td>
                 <td data-label="Contact">
                   <div className="cell-contact">
-                    <a href={`tel:${c.tel}`} onClick={e => e.stopPropagation()}><Phone size={12} /> {c.tel}</a>
+                    <a href={`tel:${c.tel.replace(/\s/g, '')}`} onClick={e => e.stopPropagation()}><Phone size={12} /> {c.tel}</a>
                     <a href={`mailto:${c.email}`} className="muted" onClick={e => e.stopPropagation()}><Mail size={12} /> {c.email}</a>
                   </div>
                 </td>
@@ -211,7 +211,7 @@ export default function AdminClients() {
                 <>
                   <section className="admin-detail-section">
                     <h4>Contact</h4>
-                    <div className="admin-detail-row"><span>T&eacute;l&eacute;phone</span><a href={`tel:${selected.tel}`}>{selected.tel}</a></div>
+                    <div className="admin-detail-row"><span>T&eacute;l&eacute;phone</span><a href={`tel:${selected.tel.replace(/\s/g, '')}`}>{selected.tel}</a></div>
                     <div className="admin-detail-row"><span>Email</span><a href={`mailto:${selected.email}`}>{selected.email}</a></div>
                     <div className="admin-detail-row"><span>Adresse</span><strong>{selected.adresse}</strong></div>
                     <div className="admin-detail-row"><span>Ville</span><strong>{selected.ville}</strong></div>

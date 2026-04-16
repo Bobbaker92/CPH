@@ -63,7 +63,7 @@ export default function CouvreurApp() {
               </div>
             </div>
             <div className="card-actions">
-              <button onClick={() => window.open(`tel:${inter.tel}`)}>
+              <button onClick={() => window.open(`tel:${inter.tel.replace(/\s/g, '')}`)}>
                 <Phone size={14} style={{marginRight:4}} /> Appeler
               </button>
               <button onClick={() => { setSelected(inter); setView('detail') }}>
@@ -97,10 +97,10 @@ export default function CouvreurApp() {
             <h3 style={{fontSize:18, fontWeight:700, marginBottom:4}}>{selected.client}</h3>
             <p style={{fontSize:14, color:'var(--gray-500)', marginBottom:12}}><MapPin size={13} style={{verticalAlign:'middle'}} /> {selected.adresse}</p>
             <div style={{display:'flex', gap:12}}>
-              <a href={`tel:${selected.tel}`} className="btn btn-sm btn-dark" style={{flex:1, justifyContent:'center'}}>
+              <a href={`tel:${selected.tel.replace(/\s/g, '')}`} className="btn btn-sm btn-dark" style={{flex:1, justifyContent:'center'}}>
                 <Phone size={14} /> Appeler
               </a>
-              <button className="btn btn-sm btn-outline" style={{flex:1, justifyContent:'center'}}>
+              <button className="btn btn-sm btn-outline" style={{flex:1, justifyContent:'center'}} onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(selected.adresse)}`, '_blank')}>
                 <Navigation size={14} /> {"Itin\u00E9raire"}
               </button>
             </div>

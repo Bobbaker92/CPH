@@ -84,15 +84,13 @@ export default function AdminPlanning() {
   const [interventions, setInterventions] = useState(ALL_INTERVENTIONS_INIT)
   const [semaineIdx, setSemaineIdx] = useState(0)
   const [showRule, setShowRule] = useState(true)
-  const [addOpen, setAddOpen] = useState(false)
-  const [preselected, setPreselected] = useState(null)
+  const initialPreselected = location.state?.preselected ?? null
+  const [addOpen, setAddOpen] = useState(!!initialPreselected)
+  const [preselected, setPreselected] = useState(initialPreselected)
 
-  // Auto-ouvre la modale si on vient de /admin/demandes avec state.preselected
+  // Nettoie le state pour éviter réouverture au back/forward
   useEffect(() => {
     if (location.state?.preselected) {
-      setPreselected(location.state.preselected)
-      setAddOpen(true)
-      // nettoie le state pour éviter réouverture au back/forward
       navigate(location.pathname, { replace: true, state: null })
     }
   }, [location, navigate])

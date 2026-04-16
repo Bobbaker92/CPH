@@ -309,7 +309,7 @@ export default function AdminDemandes() {
             <div className="admin-detail-body">
               <section className="admin-detail-section">
                 <h4>Contact</h4>
-                <div className="admin-detail-row"><span>T&eacute;l&eacute;phone</span><a href={`tel:${selected.tel}`}>{selected.tel}</a></div>
+                <div className="admin-detail-row"><span>T&eacute;l&eacute;phone</span><a href={`tel:${selected.tel.replace(/\s/g, '')}`}>{selected.tel}</a></div>
                 <div className="admin-detail-row"><span>Email</span><a href={`mailto:${selected.email}`}>{selected.email}</a></div>
                 <div className="admin-detail-row"><span>Adresse</span><strong>{selected.adresse}</strong></div>
                 <div className="admin-detail-row"><span>Ville</span><strong>{selected.ville}</strong></div>

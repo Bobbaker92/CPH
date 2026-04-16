@@ -66,7 +66,7 @@ export default function AdminCouvreurs() {
             </div>
 
             <div className="couvreur-contact">
-              <a href={`tel:${c.tel}`}><Phone size={13} /> {c.tel}</a>
+              <a href={`tel:${c.tel.replace(/\s/g, '')}`}><Phone size={13} /> {c.tel}</a>
               <a href={`mailto:${c.email}`}><Mail size={13} /> {c.email}</a>
             </div>
 

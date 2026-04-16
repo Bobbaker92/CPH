@@ -94,36 +94,41 @@ export default function Formulaire() {
   // Auto-remplissage ville depuis code postal (API geo.api.gouv.fr)
   useEffect(() => {
     const cp = form.codePostal
-    if (!/^\d{5}$/.test(cp)) {
-      setCpLookup({ loading: false, error: '', options: [] })
-      return
-    }
-    setCpLookup({ loading: true, error: '', options: [] })
+    if (!/^\d{5}$/.test(cp)) return
+
+    let cancelled = false
     const controller = new AbortController()
-    fetch(`https://geo.api.gouv.fr/communes?codePostal=${cp}&fields=nom,codeDepartement&limit=10`, { signal: controller.signal })
-      .then(r => r.json())
-      .then(data => {
+
+    ;(async () => {
+      try {
+        const r = await fetch(
+          `https://geo.api.gouv.fr/communes?codePostal=${cp}&fields=nom,codeDepartement&limit=10`,
+          { signal: controller.signal }
+        )
+        const data = await r.json()
+        if (cancelled) return
         if (!Array.isArray(data) || data.length === 0) {
           setCpLookup({ loading: false, error: 'Code postal inconnu', options: [] })
           return
         }
         const communesPaca = data.filter(c => DEPTS_PACA.includes(c.codeDepartement))
         if (communesPaca.length === 0) {
-          setCpLookup({ loading: false, error: 'Hors r\u00E9gion PACA', options: [] })
+          setCpLookup({ loading: false, error: 'Hors région PACA', options: [] })
           return
         }
         setCpLookup({ loading: false, error: '', options: communesPaca })
-        // Si une seule ville, on la s\u00E9lectionne automatiquement
+        // Si une seule ville, on la sélectionne automatiquement
         if (communesPaca.length === 1) {
           setForm(f => ({ ...f, ville: communesPaca[0].nom }))
         }
-      })
-      .catch(err => {
-        if (err.name !== 'AbortError') {
+      } catch (err) {
+        if (!cancelled && err.name !== 'AbortError') {
           setCpLookup({ loading: false, error: 'Erreur de connexion', options: [] })
         }
-      })
-    return () => controller.abort()
+      }
+    })()
+
+    return () => { cancelled = true; controller.abort() }
   }, [form.codePostal])
 
   const canNext = () => {
