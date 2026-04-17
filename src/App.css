@@ -2324,7 +2324,9 @@ tbody tr:last-child td { border-bottom: none; }
   background: white;
   border-radius: 16px;
   width: 100%;
-  max-width: 440px;
+  max-width: 560px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
   box-shadow: 0 20px 60px rgba(0,0,0,0.15);
   animation: slideUp 0.25s;
 }
@@ -2366,6 +2368,104 @@ tbody tr:last-child td { border-bottom: none; }
   gap: 10px;
   padding: 14px 22px;
   border-top: 1px solid var(--gray-100);
+}
+.pw-report-secteur {
+  margin-top: 2px;
+  font-size: 12px !important;
+  color: var(--blue) !important;
+}
+.pw-report-secteur strong { color: var(--blue); }
+
+.pw-report-suggestions {
+  padding: 14px 22px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.pw-report-suggestions-other {
+  padding-top: 4px;
+  border-top: 1px dashed var(--gray-100);
+  margin-top: 4px;
+}
+.pw-report-suggestions-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gray-600);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.pw-report-suggestions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.pw-report-sug {
+  background: white;
+  border: 1px solid var(--gray-100);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, background 0.15s;
+}
+.pw-report-sug:hover { border-color: var(--blue); background: var(--blue-light); }
+.pw-report-sug-active {
+  border-color: var(--blue);
+  background: var(--blue-light);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+.pw-report-sug-dim { opacity: 0.75; }
+.pw-report-sug-dim:hover { opacity: 1; }
+.pw-report-sug-date {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.pw-report-sug-date strong { font-size: 13px; color: var(--gray-900); }
+.pw-report-sug-detail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  font-size: 11px;
+}
+.pw-report-sug-pill {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-100);
+  border-radius: 6px;
+  padding: 2px 6px;
+  color: var(--gray-700);
+  font-weight: 500;
+}
+.pw-report-sug-other {
+  color: var(--gray-500);
+  font-style: italic;
+  align-self: center;
+}
+
+.pw-report-form-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gray-600);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: -4px;
+}
+.pw-report-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+@media (max-width: 640px) {
+  .pw-report-form-row { grid-template-columns: 1fr; }
+  .pw-report-sug-detail { font-size: 10px; }
 }
 
 @media (max-width: 768px) {
