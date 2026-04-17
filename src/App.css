@@ -3442,6 +3442,121 @@ tbody tr:last-child td { border-bottom: none; }
   word-break: break-all;
 }
 
+/* Espace client — Mon compte */
+.client-compte-page { max-width: 900px; margin: 0 auto; }
+.client-compte-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-top: 8px;
+}
+.client-compte-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.client-compte-card-head {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.client-compte-card-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--accent-light); color: var(--accent-hover);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.client-compte-card-head h2 { font-size: 15px; margin: 0; }
+.client-compte-card-head p { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
+.client-compte-infos {
+  display: flex; flex-direction: column; gap: 2px;
+}
+.client-compte-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--gray-100);
+  font-size: 13px;
+}
+.client-compte-row:last-child { border-bottom: none; }
+.client-compte-row span { color: var(--gray-500); }
+.client-compte-row strong { color: var(--gray-800); }
+.client-compte-note {
+  font-size: 12px; color: var(--gray-500); line-height: 1.5;
+  padding: 10px 12px; background: var(--gray-50); border-radius: 8px;
+}
+.client-compte-note a { color: var(--primary); font-weight: 600; }
+.client-compte-form {
+  display: flex; flex-direction: column; gap: 14px;
+}
+.client-compte-pwd-wrap { position: relative; }
+.client-compte-pwd-wrap input { width: 100%; padding-right: 42px; }
+.client-compte-pwd-toggle {
+  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; color: var(--gray-400); padding: 4px;
+}
+.client-compte-status {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 12px; border-radius: 8px;
+  font-size: 13px; font-weight: 500;
+}
+.client-compte-status-success { background: var(--green-light); color: var(--green); }
+.client-compte-status-error { background: var(--red-light); color: var(--red); }
+.client-compte-submit { width: 100%; justify-content: center; }
+
+@media (max-width: 768px) {
+  .client-compte-grid { grid-template-columns: 1fr; }
+}
+
+/* Modale reset mdp admin */
+.admin-pwd-reset-modal { max-width: 460px; }
+.admin-pwd-reset-body {
+  padding: 16px 22px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.admin-pwd-reset-client {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; background: var(--gray-50); border-radius: 10px;
+}
+.admin-pwd-reset-client strong { display: block; font-size: 14px; }
+.admin-pwd-reset-client span { font-size: 12px; color: var(--gray-500); }
+.admin-pwd-reset-info {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 12px; background: var(--accent-light); border-radius: 10px;
+  font-size: 13px; color: var(--gray-700);
+}
+.admin-pwd-reset-info svg { color: var(--accent-hover); margin-top: 2px; flex-shrink: 0; }
+.admin-pwd-reset-info strong { display: block; font-size: 13px; margin-bottom: 2px; }
+.admin-pwd-reset-info span { font-size: 12px; line-height: 1.5; }
+.admin-pwd-reset-cred {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px;
+  border: 1px dashed var(--gray-300); border-radius: 10px;
+  background: white;
+}
+.admin-pwd-reset-cred span {
+  font-size: 11px; color: var(--gray-500); text-transform: uppercase;
+  letter-spacing: 0.4px; font-weight: 600;
+}
+.admin-pwd-reset-cred code {
+  flex: 1;
+  font-family: 'Poppins', monospace; font-size: 15px; font-weight: 700;
+  color: var(--primary); letter-spacing: 0.3px;
+}
+.admin-pwd-reset-send { width: 100%; justify-content: center; }
+.admin-pwd-reset-sent {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px;
+  background: var(--green-light); color: var(--green);
+  border-radius: 10px;
+  font-size: 13px;
+}
+.admin-pwd-reset-sent strong { color: var(--green); }
+
 /* Steps */
 .confirm-steps {
   list-style: none; display: flex; flex-direction: column; gap: 14px;

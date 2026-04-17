@@ -1,9 +1,10 @@
 import { useState, useMemo } from 'react'
 import {
   Search, MapPin, Phone, Mail, Plus, Users, Repeat, TrendingUp, X as XIcon,
-  Calendar, FileText, Star, MessageCircle, Edit3, Trash2, Copy, Download, Gift, Sun
+  Calendar, FileText, Star, MessageCircle, Edit3, Trash2, Copy, Download, Gift, Sun, Key, Check, Send
 } from 'lucide-react'
 import ActionMenu from '../../components/ActionMenu'
+import { resetClientPasswordByAdmin } from '../../lib/clientAuth'
 
 const CLIENTS = [
   { id: 1, nom: 'Jean-Pierre Martin', tel: '06 12 34 56 78', email: 'jp.martin@free.fr', ville: 'Marseille 13008', adresse: '12 rue Paradis', interventions: 3, ca: 597, derniere: '12/03/2026', statut: 'actif', notes: 'Client r\u00E9gulier, 2 panneaux suppl\u00E9mentaires pr\u00E9vus.' },
@@ -48,6 +49,18 @@ export default function AdminClients() {
   const [statut, setStatut] = useState('tous')
   const [selected, setSelected] = useState(null)
   const [tab, setTab] = useState('infos')
+  const [pwdReset, setPwdReset] = useState(null) // { client, password, sent }
+  const [copied, setCopied] = useState('')
+
+  const openPwdReset = (client) => {
+    const { password } = resetClientPasswordByAdmin(client.email, { nom: client.nom, tel: client.tel })
+    setPwdReset({ client, password, sent: false })
+  }
+  const copy = (value, key) => {
+    navigator.clipboard?.writeText(value)
+    setCopied(key)
+    setTimeout(() => setCopied(''), 1500)
+  }
 
   const stats = useMemo(() => ({
     total: CLIENTS.length,
@@ -168,6 +181,7 @@ export default function AdminClients() {
                     { icon: <Calendar size={13} />, label: 'Planifier une intervention' },
                     { icon: <FileText size={13} />, label: 'Cr\u00E9er un devis' },
                     { divider: true },
+                    { icon: <Key size={13} />, label: 'R\u00E9initialiser le mot de passe', onClick: () => openPwdReset(c) },
                     { icon: <Copy size={13} />, label: 'Copier l\'email', onClick: () => navigator.clipboard?.writeText(c.email) },
                     { divider: true },
                     { icon: <Trash2 size={13} />, label: 'Supprimer', danger: true },
@@ -272,6 +286,59 @@ export default function AdminClients() {
             </div>
           </aside>
         </>
+      )}
+
+      {/* Modale r\u00e9initialisation mot de passe */}
+      {pwdReset && (
+        <div className="pw-report-backdrop" onClick={() => setPwdReset(null)}>
+          <div className="pw-report-modal admin-pwd-reset-modal" onClick={e => e.stopPropagation()}>
+            <div className="pw-report-head">
+              <h3>R&eacute;initialiser le mot de passe</h3>
+              <button onClick={() => setPwdReset(null)}><XIcon size={20} /></button>
+            </div>
+
+            <div className="admin-pwd-reset-body">
+              <div className="admin-pwd-reset-client">
+                <span className="avatar-sm">{pwdReset.client.nom.split(' ').map(s => s[0]).slice(0, 2).join('')}</span>
+                <div>
+                  <strong>{pwdReset.client.nom}</strong>
+                  <span>{pwdReset.client.email}</span>
+                </div>
+              </div>
+
+              <div className="admin-pwd-reset-info">
+                <Key size={14} />
+                <div>
+                  <strong>Nouveau mot de passe g&eacute;n&eacute;r&eacute;</strong>
+                  <span>Communiquez-le au client. Son ancien mot de passe est d&eacute;sormais invalide.</span>
+                </div>
+              </div>
+
+              <div className="admin-pwd-reset-cred">
+                <span>Mot de passe</span>
+                <code>{pwdReset.password}</code>
+                <button className="icon-btn" onClick={() => copy(pwdReset.password, 'pwd')} title="Copier">
+                  {copied === 'pwd' ? <Check size={14} /> : <Copy size={14} />}
+                </button>
+              </div>
+
+              {!pwdReset.sent ? (
+                <button className="btn btn-primary admin-pwd-reset-send" onClick={() => setPwdReset(p => ({ ...p, sent: true }))}>
+                  <Send size={14} /> Envoyer par email &agrave; {pwdReset.client.email}
+                </button>
+              ) : (
+                <div className="admin-pwd-reset-sent">
+                  <Check size={16} />
+                  <span>Email envoy&eacute; &agrave; <strong>{pwdReset.client.email}</strong> (simul&eacute; en maquette).</span>
+                </div>
+              )}
+            </div>
+
+            <div className="pw-report-actions">
+              <button className="btn btn-outline" onClick={() => setPwdReset(null)}>Fermer</button>
+            </div>
+          </div>
+        </div>
       )}
     </>
   )

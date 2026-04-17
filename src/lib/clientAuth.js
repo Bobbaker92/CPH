@@ -66,4 +66,47 @@ export function verifyClientPassword(email, password) {
   return account.passwordHash === hashPassword(password)
 }
 
+export function changeClientPassword(email, currentPassword, newPassword) {
+  const key = email.toLowerCase()
+  const accounts = readAll()
+  const account = accounts[key]
+  if (!account) return { ok: false, reason: 'not_found' }
+  if (account.passwordHash !== hashPassword(currentPassword)) {
+    return { ok: false, reason: 'wrong_password' }
+  }
+  if (!newPassword || newPassword.length < 6) {
+    return { ok: false, reason: 'too_short' }
+  }
+  accounts[key] = {
+    ...account,
+    passwordHash: hashPassword(newPassword),
+    passwordUpdatedAt: new Date().toISOString(),
+  }
+  writeAll(accounts)
+  return { ok: true }
+}
+
+export function resetClientPasswordByAdmin(email, { nom, tel } = {}) {
+  const key = email.toLowerCase()
+  const accounts = readAll()
+  const newPassword = generatePassword()
+  const existing = accounts[key] || {
+    email: key,
+    nom: nom || '',
+    tel: tel || '',
+    reservationId: '',
+    createdAt: new Date().toISOString(),
+  }
+  accounts[key] = {
+    ...existing,
+    nom: existing.nom || nom || '',
+    tel: existing.tel || tel || '',
+    passwordHash: hashPassword(newPassword),
+    passwordUpdatedAt: new Date().toISOString(),
+    resetByAdmin: true,
+  }
+  writeAll(accounts)
+  return { account: accounts[key], password: newPassword, created: !accounts[key].createdAt || accounts[key].createdAt === accounts[key].passwordUpdatedAt }
+}
+
 export const CLIENT_AUTH_INTERNAL = { ACCOUNTS_KEY, hashPassword, generatePassword }

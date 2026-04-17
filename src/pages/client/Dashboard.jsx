@@ -1,5 +1,5 @@
 import { useNavigate, NavLink, Outlet, useLocation } from 'react-router-dom'
-import { Home, Calendar, Image, FileText, Gift, LogOut, Sun } from 'lucide-react'
+import { Home, Calendar, Image, FileText, Gift, LogOut, Sun, User } from 'lucide-react'
 
 const NAV_ITEMS = [
   { to: '/client', icon: Home, label: 'Accueil', end: true },
@@ -7,6 +7,9 @@ const NAV_ITEMS = [
   { to: '/client/photos', icon: Image, label: 'Photos' },
   { to: '/client/rapport', icon: FileText, label: 'Rapport' },
   { to: '/client/recommander', icon: Gift, label: 'Recommander' },
+]
+const SECONDARY_ITEMS = [
+  { to: '/client/compte', icon: User, label: 'Mon compte' },
 ]
 
 export default function ClientDashboard() {
@@ -31,7 +34,14 @@ export default function ClientDashboard() {
           ))}
         </ul>
         <ul className="sidebar-nav" style={{borderTop:'1px solid rgba(255,255,255,0.1)', paddingTop:8}}>
-          <li><button onClick={() => navigate('/')}><LogOut size={18} /> {"D\u00E9connexion"}</button></li>
+          {SECONDARY_ITEMS.map(item => (
+            <li key={item.to}>
+              <NavLink to={item.to} className={({isActive}) => isActive ? 'active' : ''}>
+                <item.icon size={18} /> {item.label}
+              </NavLink>
+            </li>
+          ))}
+          <li><button onClick={() => { localStorage.removeItem('user'); navigate('/') }}><LogOut size={18} /> {"D\u00E9connexion"}</button></li>
         </ul>
       </aside>
 
@@ -44,12 +54,21 @@ export default function ClientDashboard() {
             </div>
             <span style={{fontWeight:700, fontSize:14, color:'white'}}>CPH</span>
           </div>
-          <button
-            onClick={() => navigate('/')}
-            style={{background:'none', border:'none', color:'rgba(255,255,255,0.5)', fontSize:12, fontFamily:'inherit', cursor:'pointer'}}
-          >
-            <LogOut size={14} />
-          </button>
+          <div style={{display:'flex', gap:8, alignItems:'center'}}>
+            <NavLink
+              to="/client/compte"
+              style={{color:'rgba(255,255,255,0.5)'}}
+              className={({isActive}) => isActive ? 'mobile-topbar-link active' : 'mobile-topbar-link'}
+            >
+              <User size={14} />
+            </NavLink>
+            <button
+              onClick={() => { localStorage.removeItem('user'); navigate('/') }}
+              style={{background:'none', border:'none', color:'rgba(255,255,255,0.5)', fontSize:12, fontFamily:'inherit', cursor:'pointer'}}
+            >
+              <LogOut size={14} />
+            </button>
+          </div>
         </div>
       </div>
 

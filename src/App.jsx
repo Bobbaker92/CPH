@@ -15,6 +15,7 @@ import ClientIntervention from './pages/client/ClientIntervention'
 import ClientPhotos from './pages/client/ClientPhotos'
 import ClientRapport from './pages/client/ClientRapport'
 import ClientRecommander from './pages/client/ClientRecommander'
+import ClientCompte from './pages/client/ClientCompte'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminHome from './pages/admin/AdminHome'
 import AdminPlanning from './pages/admin/AdminPlanning'
@@ -48,6 +49,7 @@ function App() {
           <Route path="photos" element={<ClientPhotos />} />
           <Route path="rapport" element={<ClientRapport />} />
           <Route path="recommander" element={<ClientRecommander />} />
+          <Route path="compte" element={<ClientCompte />} />
         </Route>
 
         {/* Espace Admin */}
