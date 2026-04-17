@@ -2,8 +2,9 @@ import { useState } from 'react'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
 import {
   CheckCircle, Calendar, MapPin, Mail, MessageSquare, Copy, Check, ArrowRight,
-  User, Key, Shield, Download, Phone, Sun, Eye, EyeOff
+  User, Shield, Download, Phone, Sun, Inbox, ChevronDown, ChevronUp
 } from 'lucide-react'
+import { createClientAccount } from '../lib/clientAuth'
 
 const JOURS_LONG = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi']
 const MOIS = ['janvier', 'f\u00E9vrier', 'mars', 'avril', 'mai', 'juin', 'juillet', 'ao\u00FBt', 'septembre', 'octobre', 'novembre', 'd\u00E9cembre']
@@ -13,19 +14,10 @@ function formatDateLisible(dateStr) {
   return `${JOURS_LONG[d.getDay()]} ${d.getDate()} ${MOIS[d.getMonth()]} ${d.getFullYear()}`
 }
 
-// Génère un ID lisible
 function genReservation() {
   const y = new Date().getFullYear()
   const n = Math.floor(1000 + Math.random() * 9000)
   return `CPH-${y}-${n}`
-}
-
-// Mot de passe temporaire façon "Adj-Nom-1234"
-function genPassword() {
-  const words = ['Soleil', 'Toit', 'Azur', 'Mistral', 'Olivier', 'Provence']
-  const w = words[Math.floor(Math.random() * words.length)]
-  const n = Math.floor(1000 + Math.random() * 9000)
-  return `${w}-${n}`
 }
 
 export default function Confirmation() {
@@ -43,11 +35,15 @@ export default function Confirmation() {
   const email = state.email || 'pierre.vidal@free.fr'
   const tel = state.tel || '06 12 34 56 78'
 
-  const [showPwd, setShowPwd] = useState(false)
   const [copied, setCopied] = useState('')
+  const [showEmailPreview, setShowEmailPreview] = useState(false)
 
   const [reservationId] = useState(() => genReservation())
-  const [password] = useState(() => genPassword())
+  const [accountInfo] = useState(() => createClientAccount({
+    email, nom: state.nom || '', tel, reservationId: undefined,
+  }))
+  const generatedPassword = accountInfo.password
+  const accountReused = accountInfo.reused
 
   const copy = (value, key) => {
     navigator.clipboard?.writeText(value)
@@ -152,43 +148,66 @@ export default function Confirmation() {
             </div>
           </div>
 
-          <div className="confirm-credentials">
-            <div className="confirm-credential">
-              <div className="confirm-credential-label">
-                <Mail size={12} /> Identifiant
-              </div>
-              <div className="confirm-credential-value">
-                <code>{email}</code>
-                <button className="icon-btn" onClick={() => copy(email, 'email')} title="Copier">
-                  {copied === 'email' ? <Check size={14} /> : <Copy size={14} />}
-                </button>
-              </div>
-            </div>
-            <div className="confirm-credential">
-              <div className="confirm-credential-label">
-                <Key size={12} /> Mot de passe temporaire
-              </div>
-              <div className="confirm-credential-value">
-                <code>{showPwd ? password : '\u2022'.repeat(password.length)}</code>
-                <button className="icon-btn" onClick={() => setShowPwd(s => !s)} title={showPwd ? 'Masquer' : 'Afficher'}>
-                  {showPwd ? <EyeOff size={14} /> : <Eye size={14} />}
-                </button>
-                <button className="icon-btn" onClick={() => copy(password, 'pwd')} title="Copier">
-                  {copied === 'pwd' ? <Check size={14} /> : <Copy size={14} />}
-                </button>
-              </div>
+          <div className="confirm-credentials-sent">
+            <div className="confirm-credentials-sent-icon"><Mail size={18} /></div>
+            <div className="confirm-credentials-sent-body">
+              <strong>Vos identifiants viennent d&rsquo;&ecirc;tre envoy&eacute;s &agrave; <em>{email}</em></strong>
+              <span>
+                {accountReused
+                  ? 'Vous avez d\u00E9j\u00E0 un compte avec cette adresse. Utilisez le mot de passe que vous aviez d\u00E9fini.'
+                  : 'Ouvrez votre bo\u00EEte mail : vous y trouverez votre email de connexion et un mot de passe. Pensez \u00E0 v\u00E9rifier vos spams si vous ne le voyez pas.'}
+              </span>
             </div>
           </div>
 
           <div className="confirm-credentials-note">
             <Shield size={12} />
-            <span>Ce mot de passe est <strong>temporaire</strong>. Vous pourrez le modifier &agrave; votre premi&egrave;re connexion.</span>
+            <span>Pour votre s&eacute;curit&eacute;, votre mot de passe n&apos;est <strong>jamais affich&eacute; &agrave; l&apos;&eacute;cran</strong>. Vous pourrez le modifier depuis votre espace client.</span>
           </div>
 
-          <button className="btn btn-primary confirm-cta" onClick={() => navigate('/client')}>
-            Acc&eacute;der &agrave; mon espace client <ArrowRight size={16} />
+          <button className="btn btn-primary confirm-cta" onClick={() => navigate('/connexion')}>
+            Me connecter &agrave; mon espace <ArrowRight size={16} />
           </button>
         </div>
+
+        {/* Aperçu maquette de l'email — uniquement si nouveau compte */}
+        {generatedPassword && (
+          <div className="confirm-card confirm-email-preview">
+            <button className="confirm-email-preview-head" onClick={() => setShowEmailPreview(s => !s)}>
+              <div className="confirm-email-preview-head-left">
+                <Inbox size={18} />
+                <div>
+                  <strong>Aper&ccedil;u de l&rsquo;email envoy&eacute;</strong>
+                  <span>D&eacute;mo maquette &mdash; en prod, cet encart dispara&icirc;t</span>
+                </div>
+              </div>
+              {showEmailPreview ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+            </button>
+            {showEmailPreview && (
+              <div className="confirm-email-preview-body">
+                <div className="confirm-email-headers">
+                  <div><span>De</span><em>CPH Solar &lt;noreply@cphpaca.fr&gt;</em></div>
+                  <div><span>&Agrave;</span><em>{email}</em></div>
+                  <div><span>Objet</span><em>Vos identifiants de connexion &mdash; CPH Solar</em></div>
+                </div>
+                <div className="confirm-email-body-text">
+                  <p>Bonjour,</p>
+                  <p>Votre intervention est bien confirm&eacute;e. Voici vos identifiants pour acc&eacute;der &agrave; votre espace client :</p>
+                  <div className="confirm-email-creds">
+                    <div><span>Identifiant</span><code>{email}</code></div>
+                    <div><span>Mot de passe</span><code>{generatedPassword}</code>
+                      <button className="icon-btn" onClick={() => copy(generatedPassword, 'pwd')} title="Copier">
+                        {copied === 'pwd' ? <Check size={14} /> : <Copy size={14} />}
+                      </button>
+                    </div>
+                  </div>
+                  <p>Vous pourrez modifier votre mot de passe &agrave; tout moment depuis votre espace.</p>
+                  <p>&Agrave; tr&egrave;s vite,<br/>L&rsquo;&eacute;quipe CPH Solar</p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Prochaines étapes */}
         <div className="confirm-card confirm-steps-card">

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { LogIn, Eye, EyeOff, Shield } from 'lucide-react'
+import { getClientAccount, verifyClientPassword } from '../lib/clientAuth'
 
 const COMPTES = {
   'admin@cphpaca.fr': { password: 'admin123', role: 'admin', nom: 'Fares' },
@@ -23,24 +24,35 @@ export default function Login() {
     setLoading(true)
 
     setTimeout(() => {
-      const compte = COMPTES[email.toLowerCase()]
-      if (!compte) {
+      const key = email.toLowerCase()
+      const compte = COMPTES[key]
+      if (compte) {
+        if (compte.password !== password) {
+          setError('Mot de passe incorrect.')
+          setLoading(false)
+          return
+        }
+        localStorage.setItem('user', JSON.stringify({ email: key, role: compte.role, nom: compte.nom }))
+        if (compte.role === 'admin') navigate('/admin')
+        else if (compte.role === 'couvreur') navigate('/couvreur')
+        else if (compte.role === 'prospectrice') navigate('/prospection')
+        else navigate('/client')
+        return
+      }
+
+      const client = getClientAccount(key)
+      if (!client) {
         setError('Adresse email inconnue.')
         setLoading(false)
         return
       }
-      if (compte.password !== password) {
+      if (!verifyClientPassword(key, password)) {
         setError('Mot de passe incorrect.')
         setLoading(false)
         return
       }
-
-      localStorage.setItem('user', JSON.stringify({ email, role: compte.role, nom: compte.nom }))
-
-      if (compte.role === 'admin') navigate('/admin')
-      else if (compte.role === 'couvreur') navigate('/couvreur')
-      else if (compte.role === 'prospectrice') navigate('/prospection')
-      else navigate('/client')
+      localStorage.setItem('user', JSON.stringify({ email: key, role: 'client', nom: client.nom || 'Client' }))
+      navigate('/client')
     }, 600)
   }
 

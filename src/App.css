@@ -3303,6 +3303,145 @@ tbody tr:last-child td { border-bottom: none; }
   font-size: 14px;
 }
 
+/* Bloc "Email envoyé" */
+.confirm-credentials-sent {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--green-light);
+  border: 1px solid rgba(64, 191, 64, 0.3);
+  border-radius: 12px;
+  margin-bottom: 14px;
+}
+.confirm-credentials-sent-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: white; color: var(--green);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.confirm-credentials-sent-body {
+  display: flex; flex-direction: column; gap: 4px;
+}
+.confirm-credentials-sent-body strong {
+  font-size: 14px; color: var(--gray-800);
+}
+.confirm-credentials-sent-body strong em {
+  font-style: normal; color: var(--green); font-weight: 700;
+}
+.confirm-credentials-sent-body span {
+  font-size: 12px; color: var(--gray-600); line-height: 1.5;
+}
+
+/* Aperçu simulé email (démo maquette uniquement) */
+.confirm-email-preview {
+  border: 1px dashed var(--gray-300);
+  background: var(--gray-50);
+  padding: 0;
+  overflow: hidden;
+}
+.confirm-email-preview-head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--gray-700);
+}
+.confirm-email-preview-head-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+}
+.confirm-email-preview-head-left strong {
+  font-size: 13px;
+  display: block;
+  color: var(--gray-800);
+}
+.confirm-email-preview-head-left span {
+  font-size: 11px;
+  color: var(--gray-500);
+  font-style: italic;
+}
+.confirm-email-preview-body {
+  padding: 0 18px 18px;
+  background: white;
+  border-top: 1px solid var(--gray-200);
+}
+.confirm-email-headers {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--gray-100);
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--gray-700);
+}
+.confirm-email-headers > div {
+  display: flex;
+  gap: 10px;
+}
+.confirm-email-headers span {
+  color: var(--gray-400);
+  width: 56px;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  padding-top: 1px;
+}
+.confirm-email-headers em {
+  font-style: normal;
+  color: var(--gray-800);
+}
+.confirm-email-body-text {
+  padding-top: 14px;
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--gray-800);
+}
+.confirm-email-body-text p {
+  margin-bottom: 10px;
+}
+.confirm-email-creds {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin: 12px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.confirm-email-creds > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.confirm-email-creds span {
+  font-size: 11px;
+  color: var(--gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  font-weight: 600;
+  width: 90px;
+  flex-shrink: 0;
+}
+.confirm-email-creds code {
+  flex: 1;
+  font-family: 'Poppins', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  word-break: break-all;
+}
+
 /* Steps */
 .confirm-steps {
   list-style: none; display: flex; flex-direction: column; gap: 14px;
