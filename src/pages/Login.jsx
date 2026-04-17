@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { LogIn, Eye, EyeOff, Shield } from 'lucide-react'
-import { getClientAccount, verifyClientPassword } from '../lib/clientAuth'
+import { bootstrapClientAccount, getClientAccount, verifyClientPassword } from '../lib/clientAuth'
 
 const COMPTES = {
   'admin@cphpaca.fr': { password: 'admin123', role: 'admin', nom: 'Fares' },
@@ -26,11 +26,31 @@ export default function Login() {
     setTimeout(() => {
       const key = email.toLowerCase()
       const compte = COMPTES[key]
+
+      // Si compte client déjà enregistré dans clientAuth, il a priorité
+      // (on ne retombe PAS sur le mdp hardcodé pour éviter un mdp fantôme après changement)
+      const existingClient = getClientAccount(key)
+      if (existingClient) {
+        if (!verifyClientPassword(key, password)) {
+          setError('Mot de passe incorrect.')
+          setLoading(false)
+          return
+        }
+        localStorage.setItem('user', JSON.stringify({ email: key, role: 'client', nom: existingClient.nom || compte?.nom || 'Client' }))
+        navigate('/client')
+        return
+      }
+
+      // Comptes non-client (admin / couvreur / prospectrice) : hardcodé uniquement
       if (compte) {
         if (compte.password !== password) {
           setError('Mot de passe incorrect.')
           setLoading(false)
           return
+        }
+        // Premier login client démo → bootstrap clientAuth avec le même mdp
+        if (compte.role === 'client') {
+          bootstrapClientAccount({ email: key, password, nom: compte.nom })
         }
         localStorage.setItem('user', JSON.stringify({ email: key, role: compte.role, nom: compte.nom }))
         if (compte.role === 'admin') navigate('/admin')
@@ -40,19 +60,8 @@ export default function Login() {
         return
       }
 
-      const client = getClientAccount(key)
-      if (!client) {
-        setError('Adresse email inconnue.')
-        setLoading(false)
-        return
-      }
-      if (!verifyClientPassword(key, password)) {
-        setError('Mot de passe incorrect.')
-        setLoading(false)
-        return
-      }
-      localStorage.setItem('user', JSON.stringify({ email: key, role: 'client', nom: client.nom || 'Client' }))
-      navigate('/client')
+      setError('Adresse email inconnue.')
+      setLoading(false)
     }, 600)
   }
 

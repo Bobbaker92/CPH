@@ -66,6 +66,23 @@ export function verifyClientPassword(email, password) {
   return account.passwordHash === hashPassword(password)
 }
 
+export function bootstrapClientAccount({ email, password, nom }) {
+  const key = email.toLowerCase()
+  const accounts = readAll()
+  if (accounts[key]) return accounts[key]
+  accounts[key] = {
+    email: key,
+    nom: nom || '',
+    tel: '',
+    reservationId: '',
+    passwordHash: hashPassword(password),
+    createdAt: new Date().toISOString(),
+    bootstrapped: true,
+  }
+  writeAll(accounts)
+  return accounts[key]
+}
+
 export function changeClientPassword(email, currentPassword, newPassword) {
   const key = email.toLowerCase()
   const accounts = readAll()
