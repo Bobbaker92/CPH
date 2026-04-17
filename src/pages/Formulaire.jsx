@@ -168,7 +168,7 @@ export default function Formulaire() {
   const handleNext = () => {
     if (!canNext()) return
     if (step < ETAPES.length - 1) setStep(step + 1)
-    else navigate('/reservation')
+    else navigate('/reservation', { state: { devis: form } })
   }
 
   const handleBack = () => {

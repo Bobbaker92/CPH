@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { ChevronLeft, MapPin, Calendar, CheckCircle, Tag, Phone } from 'lucide-react'
 import CallbackModal from '../components/CallbackModal'
 
@@ -24,10 +24,12 @@ const INTERVENTIONS_EXISTANTES = {
 
 export default function Reservation() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const devis = location.state?.devis || null
   const [selected, setSelected] = useState(null)
   const [creneau, setCreneau] = useState('')
   const [callbackOpen, setCallbackOpen] = useState(false)
-  const clientVille = 'Marseille'
+  const clientVille = devis?.ville || 'Marseille'
 
   const today = new Date(2026, 3, 14)
   const minDate = new Date(today)
@@ -76,6 +78,7 @@ export default function Reservation() {
         prix: prixFinal,
         estRecommande,
         ville: clientVille,
+        devis,
       }
     })
   }

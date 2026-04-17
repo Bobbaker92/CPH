@@ -44,6 +44,10 @@ export default function Paiement() {
   const dateStr = state.date || '2026-05-04'
   const creneau = state.creneau || '10h-12h'
   const ville = state.ville || 'Marseille'
+  const devis = state.devis || {}
+  const clientEmail = devis.email || 'pierre.vidal@free.fr'
+  const clientTel = devis.tel || '06 12 34 56 78'
+  const clientNom = [devis.prenom, devis.nom].filter(Boolean).join(' ').trim()
 
   const [methode, setMethode] = useState('carte') // 'carte' | 'intervention'
   const [notif, setNotif] = useState({ email: true, sms: false })
@@ -77,8 +81,9 @@ export default function Paiement() {
           prix,
           paiement: methode === 'carte' ? { mode: 'carte', brand, last4: card.number.replace(/\s/g, '').slice(-4) } : { mode: 'intervention' },
           notif,
-          email: 'pierre.vidal@free.fr',
-          tel: '06 12 34 56 78',
+          email: clientEmail,
+          tel: clientTel,
+          nom: clientNom,
         }
       })
     }, 1400)
@@ -238,7 +243,7 @@ export default function Paiement() {
                 <div className="paiement-notif-icon"><Mail size={16} /></div>
                 <div className="paiement-notif-body">
                   <strong>Par e-mail</strong>
-                  <span>pierre.vidal@free.fr &mdash; Gratuit, recommand&eacute;</span>
+                  <span>{clientEmail} &mdash; Gratuit, recommand&eacute;</span>
                 </div>
                 <span className="paiement-notif-tag paiement-notif-tag-free">Gratuit</span>
               </label>
@@ -252,7 +257,7 @@ export default function Paiement() {
                 <div className="paiement-notif-icon"><MessageSquare size={16} /></div>
                 <div className="paiement-notif-body">
                   <strong>Aussi par SMS</strong>
-                  <span>06 12 34 56 78 &mdash; Plus rapide pour retrouver le lien</span>
+                  <span>{clientTel} &mdash; Plus rapide pour retrouver le lien</span>
                 </div>
                 <span className="paiement-notif-tag paiement-notif-tag-offer">Offert</span>
               </label>
