@@ -1,13 +1,30 @@
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { TrendingUp, MapPin, Inbox, Calendar, ArrowRight, MoreVertical, Phone, FileText, Plus, Euro, Sun, AlertCircle } from 'lucide-react'
+import { TrendingUp, MapPin, Calendar, ArrowRight, MoreVertical, Phone, FileText, Plus, Euro, AlertCircle } from 'lucide-react'
+import { DATA_SYNC_KEYS, readSyncedData, subscribeSyncedData } from '../../lib/dataSync'
 
-const INTERVENTIONS = [
-  { id: 1, client: 'Jean-Pierre Martin', ville: 'Marseille 13008', date: '04/05/2026', creneau: '10h-12h', couvreur: 'Karim Z.', statut: 'Planifi\u00E9', potentiel: 'Fa\u00EEtage + Rives' },
-  { id: 2, client: 'Marie Duval', ville: 'Marseille 13012', date: '04/05/2026', creneau: '14h-16h', couvreur: 'Karim Z.', statut: 'Planifi\u00E9', potentiel: '-' },
-  { id: 3, client: 'Paul Roche', ville: 'Aubagne 13400', date: '05/05/2026', creneau: '8h-10h', couvreur: 'Karim Z.', statut: 'Planifi\u00E9', potentiel: '-' },
-  { id: 4, client: 'Sophie Blanc', ville: 'Marseille 13004', date: '12/05/2026', creneau: '10h-12h', couvreur: 'Karim Z.', statut: 'Planifi\u00E9', potentiel: '-' },
-  { id: 5, client: 'Ahmed Mansour', ville: 'Aix 13100', date: '18/05/2026', creneau: '8h-10h', couvreur: 'Karim Z.', statut: 'Planifi\u00E9', potentiel: '-' },
+const PIVOT_DATE = '2026-05-04'
+
+const INTERVENTIONS_FALLBACK = [
+  { id: 'f1', client: 'Jean-Pierre Martin', ville: 'Marseille 13008', date: '2026-05-04', heure: '10h-12h', couvreur: 'Karim Z.', statut: 'confirme' },
+  { id: 'f2', client: 'Marie Duval', ville: 'Marseille 13012', date: '2026-05-04', heure: '14h-16h', couvreur: 'Karim Z.', statut: 'confirme' },
+  { id: 'f3', client: 'Paul Roche', ville: 'Aubagne 13400', date: '2026-05-05', heure: '8h-10h', couvreur: 'Karim Z.', statut: 'confirme' },
+  { id: 'f4', client: 'Sophie Blanc', ville: 'Marseille 13004', date: '2026-05-12', heure: '10h-12h', couvreur: 'Karim Z.', statut: 'confirme' },
+  { id: 'f5', client: 'Ahmed Mansour', ville: 'Aix 13100', date: '2026-05-18', heure: '8h-10h', couvreur: 'Karim Z.', statut: 'confirme' },
 ]
+
+function formatDateFR(iso) {
+  if (!iso) return ''
+  const [y, m, d] = iso.split('-')
+  return `${d}/${m}/${y}`
+}
+
+function shortCouvreur(full) {
+  if (!full) return ''
+  const parts = full.split(' ')
+  if (parts.length < 2) return full
+  return `${parts[0]} ${parts[parts.length - 1][0]}.`
+}
 
 const LEADS_COUVERTURE = [
   { client: 'Robert Vidal', ville: 'Marseille 13005', prestation: 'Fa\u00EEtage closoir 8ml', montant: 2800, statut: 'Devis envoy\u00E9' },
@@ -36,6 +53,21 @@ function Sparkline({ points, color = 'var(--green)' }) {
 
 export default function AdminHome() {
   const navigate = useNavigate()
+  const [planning, setPlanning] = useState(() => readSyncedData(DATA_SYNC_KEYS.planningInterventions, []))
+
+  useEffect(() => {
+    return subscribeSyncedData(DATA_SYNC_KEYS.planningInterventions, () => {
+      setPlanning(readSyncedData(DATA_SYNC_KEYS.planningInterventions, []))
+    })
+  }, [])
+
+  const prochaines = useMemo(() => {
+    const source = planning.length ? planning : INTERVENTIONS_FALLBACK
+    return [...source]
+      .filter(i => i.date >= PIVOT_DATE && i.statut !== 'termine' && i.statut !== 'annule')
+      .sort((a, b) => a.date.localeCompare(b.date) || (a.heureSort || a.heure || '').localeCompare(b.heureSort || b.heure || ''))
+      .slice(0, 5)
+  }, [planning])
 
   return (
     <>
@@ -129,19 +161,22 @@ export default function AdminHome() {
               </tr>
             </thead>
             <tbody>
-              {INTERVENTIONS.map(i => (
+              {prochaines.length === 0 && (
+                <tr><td colSpan={7} style={{textAlign:'center', color:'var(--gray-500)', padding:'20px 0'}}>Aucune intervention planifi&eacute;e.</td></tr>
+              )}
+              {prochaines.map(i => (
                 <tr key={i.id}>
                   <td data-label="Client"><strong>{i.client}</strong></td>
                   <td data-label="Ville"><span className="cell-with-icon"><MapPin size={12} /> {i.ville}</span></td>
-                  <td data-label="Date">{i.date}</td>
-                  <td data-label="Cr&eacute;neau"><span className="cell-chip">{i.creneau}</span></td>
-                  <td data-label="Couvreur">{i.couvreur}</td>
+                  <td data-label="Date">{formatDateFR(i.date)}</td>
+                  <td data-label="Cr&eacute;neau"><span className="cell-chip">{i.heure}</span></td>
+                  <td data-label="Couvreur">{shortCouvreur(i.couvreur)}</td>
                   <td data-label="Couverture">
-                    {i.potentiel !== '-'
+                    {i.potentiel && i.potentiel !== '-'
                       ? <span className="badge badge-orange">{i.potentiel}</span>
                       : <span className="muted">&mdash;</span>}
                   </td>
-                  <td data-label=""><button className="icon-btn"><MoreVertical size={16} /></button></td>
+                  <td data-label=""><button className="icon-btn" onClick={() => navigate('/admin/planning')}><MoreVertical size={16} /></button></td>
                 </tr>
               ))}
             </tbody>
