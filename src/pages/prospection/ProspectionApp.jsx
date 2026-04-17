@@ -1,9 +1,10 @@
-import { useState, useMemo } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Plus, Calendar, MapPin, Phone, User, Euro, TrendingUp, LogOut,
-  Clock, Check, X, ChevronDown, ChevronUp, Edit3, Target, Award, Sun
+  Clock, Check, X, ChevronDown, ChevronUp, Edit3, Target, Award, House
 } from 'lucide-react'
+import { DATA_SYNC_KEYS, readSyncedData, subscribeSyncedData, writeSyncedData } from '../../lib/dataSync'
 
 // ─── Données mock ───────────────────────────────────────────
 const PROSPECTRICES = {
@@ -19,7 +20,7 @@ const RDV_INIT = [
     nom: 'Robert Garcia', tel: '06 12 34 56 78',
     adresse: '15 rue des Lilas, 13012 Marseille',
     dateRdv: '2026-04-18', heureRdv: '10:00',
-    nbPanneaux: 20, typeToiture: 'Tuile canal',
+    typeRdv: 'panneaux', typeToiture: 'Tuile canal',
     notes: 'Toiture ancienne, potentiel travaux faîtage',
     statut: 'planifie', montantHT: null,
     dateCreation: '2026-04-14',
@@ -29,8 +30,8 @@ const RDV_INIT = [
     nom: 'Fatima Aoudia', tel: '07 88 99 00 11',
     adresse: '8 chemin du Roy, 13400 Aubagne',
     dateRdv: '2026-04-17', heureRdv: '14:00',
-    nbPanneaux: 12, typeToiture: 'Tuile romane',
-    notes: 'Intéressée nettoyage + hydrofuge',
+    typeRdv: 'diagnostic', typeToiture: 'Tuile romane',
+    notes: 'Intéressée réfection + hydrofuge',
     statut: 'fait', montantHT: null,
     dateCreation: '2026-04-13',
   },
@@ -39,7 +40,7 @@ const RDV_INIT = [
     nom: 'Marc Lefèvre', tel: '06 44 55 66 77',
     adresse: '22 avenue de la République, 13001 Marseille',
     dateRdv: '2026-04-15', heureRdv: '09:00',
-    nbPanneaux: 24, typeToiture: 'Ardoise',
+    typeRdv: 'diagnostic', typeToiture: 'Ardoise',
     notes: 'Remplacement faîtage complet, gros chantier',
     statut: 'vendu', montantHT: 12500,
     dateCreation: '2026-04-10',
@@ -49,7 +50,7 @@ const RDV_INIT = [
     nom: 'Sophie Martin', tel: '06 22 33 44 55',
     adresse: '3 impasse des Oliviers, 13400 Aubagne',
     dateRdv: '2026-04-14', heureRdv: '16:00',
-    nbPanneaux: 8, typeToiture: 'Tuile plate',
+    typeRdv: 'panneaux', typeToiture: 'Tuile plate',
     notes: 'Pas de budget pour le moment',
     statut: 'pas_vendu', montantHT: null,
     dateCreation: '2026-04-09',
@@ -59,7 +60,7 @@ const RDV_INIT = [
     nom: 'Karim Zaoui', tel: '06 99 88 77 66',
     adresse: '45 bd Michelet, 13008 Marseille',
     dateRdv: '2026-04-12', heureRdv: '11:00',
-    nbPanneaux: 16, typeToiture: 'Tuile canal',
+    typeRdv: 'diagnostic', typeToiture: 'Tuile canal',
     notes: 'Travaux rives + faîtage',
     statut: 'vendu', montantHT: 8500,
     dateCreation: '2026-04-07',
@@ -93,16 +94,31 @@ const STATUT_LABELS = {
   pas_vendu: { label: 'Pas vendu', cls: 'badge-gray' },
 }
 
+const RDV_TYPE_LABELS = {
+  panneaux: 'Panneaux',
+  diagnostic: 'Diagnostic',
+}
+
 // ─── Composant principal ────────────────────────────────────
 export default function ProspectionApp() {
   const navigate = useNavigate()
   const user = JSON.parse(localStorage.getItem('user') || '{}')
   const prospectrice = PROSPECTRICES[user.email] || PROSPECTRICES['prospection@cphpaca.fr']
 
-  const [rdvs, setRdvs] = useState(RDV_INIT)
+  const [rdvs, setRdvs] = useState(() => readSyncedData(DATA_SYNC_KEYS.prospectionRdvs, RDV_INIT))
   const [showAdd, setShowAdd] = useState(false)
   const [expandedId, setExpandedId] = useState(null)
   const [filter, setFilter] = useState('tous')
+
+  useEffect(() => {
+    writeSyncedData(DATA_SYNC_KEYS.prospectionRdvs, rdvs)
+  }, [rdvs])
+
+  useEffect(() => {
+    return subscribeSyncedData(DATA_SYNC_KEYS.prospectionRdvs, () => {
+      setRdvs(readSyncedData(DATA_SYNC_KEYS.prospectionRdvs, RDV_INIT))
+    })
+  }, [])
 
   const mesRdvs = useMemo(() => {
     let list = rdvs.filter(r => r.prospectrice === prospectrice.id)
@@ -126,7 +142,7 @@ export default function ProspectionApp() {
   // ── Formulaire nouveau RDV ──
   const [form, setForm] = useState({
     nom: '', tel: '', adresse: '', dateRdv: '', heureRdv: '',
-    nbPanneaux: '', typeToiture: '', notes: '',
+    typeRdv: 'diagnostic', typeToiture: '', notes: '',
   })
 
   const handleAdd = (e) => {
@@ -136,13 +152,13 @@ export default function ProspectionApp() {
       prospectrice: prospectrice.id,
       nom: form.nom, tel: form.tel, adresse: form.adresse,
       dateRdv: form.dateRdv, heureRdv: form.heureRdv,
-      nbPanneaux: parseInt(form.nbPanneaux) || 0,
+      typeRdv: form.typeRdv,
       typeToiture: form.typeToiture, notes: form.notes,
       statut: 'planifie', montantHT: null,
       dateCreation: new Date().toISOString().slice(0, 10),
     }
     setRdvs(prev => [...prev, newRdv])
-    setForm({ nom: '', tel: '', adresse: '', dateRdv: '', heureRdv: '', nbPanneaux: '', typeToiture: '', notes: '' })
+    setForm({ nom: '', tel: '', adresse: '', dateRdv: '', heureRdv: '', typeRdv: 'diagnostic', typeToiture: '', notes: '' })
     setShowAdd(false)
   }
 
@@ -159,7 +175,7 @@ export default function ProspectionApp() {
       <header className="prosp-header">
         <div className="prosp-header-top">
           <div className="prosp-header-brand">
-            <div className="prosp-logo"><Sun size={18} /></div>
+            <div className="prosp-logo"><House size={18} /></div>
             <div>
               <h1>CPH Solar</h1>
               <span>Prospection terrain</span>
@@ -288,11 +304,9 @@ export default function ProspectionApp() {
                   <div className="prosp-rdv-detail-row">
                     <Phone size={14} /> <a href={`tel:${rdv.tel.replace(/\s/g, '')}`}>{rdv.tel}</a>
                   </div>
-                  {rdv.nbPanneaux > 0 && (
-                    <div className="prosp-rdv-detail-row">
-                      <Sun size={14} /> {rdv.nbPanneaux} panneaux — {rdv.typeToiture}
-                    </div>
-                  )}
+                  <div className="prosp-rdv-detail-row">
+                    <House size={14} /> Type de RDV: {RDV_TYPE_LABELS[rdv.typeRdv] || 'Diagnostic'} {rdv.typeToiture ? `— ${rdv.typeToiture}` : ''}
+                  </div>
                   {rdv.notes && (
                     <div className="prosp-rdv-detail-row prosp-rdv-notes">
                       <Edit3 size={14} /> {rdv.notes}
@@ -346,8 +360,15 @@ export default function ProspectionApp() {
               </div>
               <div className="prosp-field-row">
                 <div className="prosp-field">
-                  <label>Nb panneaux</label>
-                  <input type="number" value={form.nbPanneaux} onChange={e => setForm(f => ({...f, nbPanneaux: e.target.value}))} placeholder="16" />
+                  <label>Type de RDV</label>
+                  <div className="prosp-rdv-type-buttons">
+                    <button type="button" className={`prosp-filter-btn ${form.typeRdv === 'panneaux' ? 'active' : ''}`} onClick={() => setForm(f => ({...f, typeRdv: 'panneaux'}))}>
+                      Panneaux
+                    </button>
+                    <button type="button" className={`prosp-filter-btn ${form.typeRdv === 'diagnostic' ? 'active' : ''}`} onClick={() => setForm(f => ({...f, typeRdv: 'diagnostic'}))}>
+                      Diagnostic
+                    </button>
+                  </div>
                 </div>
                 <div className="prosp-field">
                   <label>Type toiture</label>

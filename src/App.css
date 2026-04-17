@@ -4235,6 +4235,10 @@ tbody tr:last-child td { border-bottom: none; }
   grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
+.prosp-rdv-type-buttons {
+  display: flex;
+  gap: 8px;
+}
 .prosp-modal-submit {
   width: 100%;
   justify-content: center;
@@ -4549,4 +4553,3 @@ tbody tr:last-child td { border-bottom: none; }
     letter-spacing: 0.5px;
   }
 }
-

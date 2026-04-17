@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import ActionMenu from '../../components/ActionMenu'
 import AddInterventionModal from '../../components/AddInterventionModal'
+import { DATA_SYNC_KEYS, readSyncedData, subscribeSyncedData, writeSyncedData } from '../../lib/dataSync'
 
 const COUVREUR_UNIQUE = 'Karim Ziani'
 
@@ -172,11 +173,161 @@ function DayColumn({ day, interventions, changeStatut, removeIntervention, onRep
   )
 }
 
+// ── Modale report avec suggestions secteur ──────────────────
+function ReportModal({ target, form, setForm, allInterventions, onSubmit, onClose }) {
+  const secteur = getSecteur(target.ville)
+
+  // Jours à venir qui ont des interventions dans le même secteur
+  const suggestions = useMemo(() => {
+    const today = target.date
+    const others = allInterventions.filter(i => i.id !== target.id && i.date >= today)
+
+    // Grouper par date
+    const byDate = {}
+    others.forEach(i => {
+      if (!byDate[i.date]) byDate[i.date] = []
+      byDate[i.date].push(i)
+    })
+
+    return Object.entries(byDate)
+      .map(([date, ints]) => {
+        const sameSector = ints.filter(i => getSecteur(i.ville) === secteur)
+        const cap = computeCapacity(ints)
+        return { date, ints, sameSector, cap, hasSector: sameSector.length > 0 }
+      })
+      .filter(s => s.cap.status !== 'over') // pas de jours surchargés
+      .sort((a, b) => {
+        // Même secteur d'abord, puis par date
+        if (a.hasSector !== b.hasSector) return a.hasSector ? -1 : 1
+        return a.date.localeCompare(b.date)
+      })
+      .slice(0, 8)
+  }, [allInterventions, target, secteur])
+
+  return (
+    <div className="pw-report-backdrop" onClick={onClose}>
+      <div className="pw-report-modal" onClick={e => e.stopPropagation()}>
+        <div className="pw-report-head">
+          <h3>Reporter l'intervention</h3>
+          <button onClick={onClose}><XIcon size={20} /></button>
+        </div>
+        <div className="pw-report-info">
+          <strong>{target.client}</strong>
+          <span><MapPin size={12} /> {target.ville} — {target.panneaux} panneaux</span>
+          <span className="pw-report-old">Actuellement : {formatDateLong(target.date)} de {target.heure}</span>
+          <span className="pw-report-secteur">Secteur : <strong>{secteur}</strong></span>
+        </div>
+
+        {/* Suggestions par secteur */}
+        {suggestions.some(s => s.hasSector) && (
+          <div className="pw-report-suggestions">
+            <div className="pw-report-suggestions-title">
+              <MapPin size={14} />
+              <span>Dates avec interventions sur <strong>{secteur}</strong></span>
+            </div>
+            <div className="pw-report-suggestions-list">
+              {suggestions.filter(s => s.hasSector).map(s => {
+                const capClass = s.cap.status === 'full' ? 'full' : s.cap.status === 'warning' ? 'warn' : 'ok'
+                const selected = form.date === s.date
+                return (
+                  <button
+                    key={s.date}
+                    className={`pw-report-sug ${selected ? 'pw-report-sug-active' : ''}`}
+                    onClick={() => setForm(f => ({ ...f, date: s.date }))}
+                  >
+                    <div className="pw-report-sug-date">
+                      <strong>{formatDateLong(s.date)}</strong>
+                      <span className={`pw-col-cap pw-cap-${capClass}`}>{s.cap.used}/{s.cap.max}</span>
+                    </div>
+                    <div className="pw-report-sug-detail">
+                      {s.sameSector.map(i => (
+                        <span key={i.id} className="pw-report-sug-pill">
+                          {i.heure} — {i.client}
+                        </span>
+                      ))}
+                      {s.ints.length > s.sameSector.length && (
+                        <span className="pw-report-sug-other">+ {s.ints.length - s.sameSector.length} autre{s.ints.length - s.sameSector.length > 1 ? 's' : ''} hors secteur</span>
+                      )}
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Autres jours disponibles */}
+        {suggestions.some(s => !s.hasSector) && (
+          <div className="pw-report-suggestions pw-report-suggestions-other">
+            <div className="pw-report-suggestions-title">
+              <Calendar size={14} />
+              <span>Autres jours avec de la place</span>
+            </div>
+            <div className="pw-report-suggestions-list">
+              {suggestions.filter(s => !s.hasSector).map(s => {
+                const capClass = s.cap.status === 'full' ? 'full' : s.cap.status === 'warning' ? 'warn' : 'ok'
+                const selected = form.date === s.date
+                return (
+                  <button
+                    key={s.date}
+                    className={`pw-report-sug pw-report-sug-dim ${selected ? 'pw-report-sug-active' : ''}`}
+                    onClick={() => setForm(f => ({ ...f, date: s.date }))}
+                  >
+                    <div className="pw-report-sug-date">
+                      <strong>{formatDateLong(s.date)}</strong>
+                      <span className={`pw-col-cap pw-cap-${capClass}`}>{s.cap.used}/{s.cap.max}</span>
+                    </div>
+                    <div className="pw-report-sug-detail">
+                      <span className="pw-report-sug-other">{s.ints.map(i => getSecteur(i.ville)).filter((v, idx, a) => a.indexOf(v) === idx).join(', ')}</span>
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Saisie manuelle */}
+        <div className="pw-report-form">
+          <div className="pw-report-form-title">Ou choisir manuellement</div>
+          <div className="pw-report-form-row">
+            <div className="prosp-field">
+              <label>Date</label>
+              <input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} />
+            </div>
+            <div className="prosp-field">
+              <label>Créneau</label>
+              <select value={form.heure} onChange={e => setForm(f => ({ ...f, heure: e.target.value }))}>
+                <option value="">Choisir...</option>
+                <option value="8h-10h">8h - 10h</option>
+                <option value="8h-9h30">8h - 9h30</option>
+                <option value="9h-11h">9h - 11h</option>
+                <option value="10h-12h">10h - 12h</option>
+                <option value="10h30-12h30">10h30 - 12h30</option>
+                <option value="13h-14h30">13h - 14h30</option>
+                <option value="14h-16h">14h - 16h</option>
+                <option value="15h-16h30">15h - 16h30</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div className="pw-report-actions">
+          <button className="btn btn-outline" onClick={onClose}>Annuler</button>
+          <button className="btn btn-primary" onClick={onSubmit} disabled={!form.date || !form.heure}>
+            <Calendar size={14} /> Confirmer le report
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ═══════════════════════════════════════════════════════════
 export default function AdminPlanning() {
   const location = useLocation()
   const navigate = useNavigate()
-  const [interventions, setInterventions] = useState(ALL_INTERVENTIONS_INIT)
+  const [interventions, setInterventions] = useState(() => readSyncedData(DATA_SYNC_KEYS.planningInterventions, ALL_INTERVENTIONS_INIT))
   const [view, setView] = useState('semaine') // jour | semaine | mois
   const [currentDate, setCurrentDate] = useState('2026-05-04') // date pivot
   const initialPreselected = location.state?.preselected ?? null
@@ -190,6 +341,16 @@ export default function AdminPlanning() {
       navigate(location.pathname, { replace: true, state: null })
     }
   }, [location, navigate])
+
+  useEffect(() => {
+    writeSyncedData(DATA_SYNC_KEYS.planningInterventions, interventions)
+  }, [interventions])
+
+  useEffect(() => {
+    return subscribeSyncedData(DATA_SYNC_KEYS.planningInterventions, () => {
+      setInterventions(readSyncedData(DATA_SYNC_KEYS.planningInterventions, ALL_INTERVENTIONS_INIT))
+    })
+  }, [])
 
   const changeStatut = (id, statut) => setInterventions(list => list.map(i => i.id === id ? { ...i, statut } : i))
   const removeIntervention = (id) => setInterventions(list => list.filter(i => i.id !== id))
@@ -436,45 +597,14 @@ export default function AdminPlanning() {
 
       {/* Modale reporter */}
       {reportTarget && (
-        <div className="pw-report-backdrop" onClick={() => setReportTarget(null)}>
-          <div className="pw-report-modal" onClick={e => e.stopPropagation()}>
-            <div className="pw-report-head">
-              <h3>Reporter l'intervention</h3>
-              <button onClick={() => setReportTarget(null)}><XIcon size={20} /></button>
-            </div>
-            <div className="pw-report-info">
-              <strong>{reportTarget.client}</strong>
-              <span>{reportTarget.ville} — {reportTarget.panneaux} panneaux</span>
-              <span className="pw-report-old">Actuellement : {formatDateLong(reportTarget.date)} de {reportTarget.heure}</span>
-            </div>
-            <div className="pw-report-form">
-              <div className="prosp-field">
-                <label>Nouvelle date</label>
-                <input type="date" value={reportForm.date} onChange={e => setReportForm(f => ({ ...f, date: e.target.value }))} />
-              </div>
-              <div className="prosp-field">
-                <label>Nouveau créneau</label>
-                <select value={reportForm.heure} onChange={e => setReportForm(f => ({ ...f, heure: e.target.value }))}>
-                  <option value="">Choisir...</option>
-                  <option value="8h-10h">8h - 10h</option>
-                  <option value="8h-9h30">8h - 9h30</option>
-                  <option value="9h-11h">9h - 11h</option>
-                  <option value="10h-12h">10h - 12h</option>
-                  <option value="10h30-12h30">10h30 - 12h30</option>
-                  <option value="13h-14h30">13h - 14h30</option>
-                  <option value="14h-16h">14h - 16h</option>
-                  <option value="15h-16h30">15h - 16h30</option>
-                </select>
-              </div>
-            </div>
-            <div className="pw-report-actions">
-              <button className="btn btn-outline" onClick={() => setReportTarget(null)}>Annuler</button>
-              <button className="btn btn-primary" onClick={submitReport} disabled={!reportForm.date || !reportForm.heure}>
-                <Calendar size={14} /> Confirmer le report
-              </button>
-            </div>
-          </div>
-        </div>
+        <ReportModal
+          target={reportTarget}
+          form={reportForm}
+          setForm={setReportForm}
+          allInterventions={interventions}
+          onSubmit={submitReport}
+          onClose={() => setReportTarget(null)}
+        />
       )}
 
       {/* Modale ajout */}

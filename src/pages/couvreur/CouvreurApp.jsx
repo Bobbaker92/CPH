@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { MapPin, Clock, ChevronRight, Camera, Navigation, Phone, CheckCircle, Upload, MessageSquare, AlertTriangle } from 'lucide-react'
+import { DATA_SYNC_KEYS, readSyncedData, subscribeSyncedData } from '../../lib/dataSync'
 
 const INTERVENTIONS_JOUR = [
   { id: 1, heure: '8h-10h', client: 'Robert Vidal', adresse: '15 bd Baille, 13005 Marseille', tel: '06 12 34 56 78', panneaux: 12, statut: 'termine' },
@@ -8,12 +9,38 @@ const INTERVENTIONS_JOUR = [
   { id: 3, heure: '14h-16h', client: 'Marie Duval', adresse: '8 av du Prado, 13012 Marseille', tel: '06 11 22 33 44', panneaux: 8, statut: 'a_faire' },
 ]
 
+const TODAY = '2026-05-04'
+
 export default function CouvreurApp() {
   const [view, setView] = useState('liste') // liste | detail | photos
   const [selected, setSelected] = useState(null)
   const [photos, setPhotos] = useState({ avant: false, apres: false, toiture: [] })
   const [notes, setNotes] = useState('')
+  const [planningInterventions, setPlanningInterventions] = useState(() => readSyncedData(DATA_SYNC_KEYS.planningInterventions, []))
   const navigate = useNavigate()
+
+  useEffect(() => {
+    return subscribeSyncedData(DATA_SYNC_KEYS.planningInterventions, () => {
+      setPlanningInterventions(readSyncedData(DATA_SYNC_KEYS.planningInterventions, []))
+    })
+  }, [])
+
+  const interventionsJour = useMemo(() => {
+    if (!planningInterventions.length) return INTERVENTIONS_JOUR
+    const converted = planningInterventions
+      .filter((i) => i.date === TODAY)
+      .sort((a, b) => (a.heureSort || '').localeCompare(b.heureSort || ''))
+      .map((i) => ({
+        id: i.id,
+        heure: i.heure,
+        client: i.client,
+        adresse: i.ville,
+        tel: '04 12 16 06 30',
+        panneaux: i.panneaux,
+        statut: i.statut === 'termine' ? 'termine' : i.statut === 'confirme' ? 'en_cours' : 'a_faire',
+      }))
+    return converted.length ? converted : INTERVENTIONS_JOUR
+  }, [planningInterventions])
 
   if (view === 'liste') {
     return (
@@ -45,7 +72,7 @@ export default function CouvreurApp() {
           </div>
         </div>
 
-        {INTERVENTIONS_JOUR.map(inter => (
+        {interventionsJour.map(inter => (
           <div key={inter.id} className="intervention-card">
             <div className="card-top">
               <div style={{display:'flex', justifyContent:'space-between', alignItems:'start', marginBottom:8}}>

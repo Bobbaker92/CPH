@@ -1,9 +1,11 @@
-import React, { useState, useMemo } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Search, Filter, ChevronDown, ChevronUp, Phone, MapPin, Calendar, Euro,
-  Check, X, Clock, Target, Award, TrendingUp, User, Users, Edit3, Sun
+  Check, X, Clock, Target, Award, TrendingUp, User, Users, Edit3
 } from 'lucide-react'
 import ActionMenu from '../../components/ActionMenu'
+import { DATA_SYNC_KEYS, readSyncedData, subscribeSyncedData, writeSyncedData } from '../../lib/dataSync'
 
 // ─── Données mock ───────────────────────────────────────────
 const PROSPECTRICES_LIST = [
@@ -17,7 +19,7 @@ const RDV_ALL = [
     nom: 'Robert Garcia', tel: '06 12 34 56 78',
     adresse: '15 rue des Lilas, 13012 Marseille',
     dateRdv: '2026-04-18', heureRdv: '10:00',
-    nbPanneaux: 20, typeToiture: 'Tuile canal',
+    typeRdv: 'panneaux', typeToiture: 'Tuile canal',
     notes: 'Toiture ancienne, potentiel travaux faîtage',
     statut: 'planifie', montantHT: null,
     dateCreation: '2026-04-14',
@@ -27,8 +29,8 @@ const RDV_ALL = [
     nom: 'Fatima Aoudia', tel: '07 88 99 00 11',
     adresse: '8 chemin du Roy, 13400 Aubagne',
     dateRdv: '2026-04-17', heureRdv: '14:00',
-    nbPanneaux: 12, typeToiture: 'Tuile romane',
-    notes: 'Intéressée nettoyage + hydrofuge',
+    typeRdv: 'diagnostic', typeToiture: 'Tuile romane',
+    notes: 'Intéressée réfection + hydrofuge',
     statut: 'fait', montantHT: null,
     dateCreation: '2026-04-13',
   },
@@ -37,7 +39,7 @@ const RDV_ALL = [
     nom: 'Marc Lefèvre', tel: '06 44 55 66 77',
     adresse: '22 avenue de la République, 13001 Marseille',
     dateRdv: '2026-04-15', heureRdv: '09:00',
-    nbPanneaux: 24, typeToiture: 'Ardoise',
+    typeRdv: 'diagnostic', typeToiture: 'Ardoise',
     notes: 'Remplacement faîtage complet, gros chantier',
     statut: 'vendu', montantHT: 12500,
     dateCreation: '2026-04-10',
@@ -47,7 +49,7 @@ const RDV_ALL = [
     nom: 'Sophie Martin', tel: '06 22 33 44 55',
     adresse: '3 impasse des Oliviers, 13400 Aubagne',
     dateRdv: '2026-04-14', heureRdv: '16:00',
-    nbPanneaux: 8, typeToiture: 'Tuile plate',
+    typeRdv: 'panneaux', typeToiture: 'Tuile plate',
     notes: 'Pas de budget pour le moment',
     statut: 'pas_vendu', montantHT: null,
     dateCreation: '2026-04-09',
@@ -57,7 +59,7 @@ const RDV_ALL = [
     nom: 'Karim Zaoui', tel: '06 99 88 77 66',
     adresse: '45 bd Michelet, 13008 Marseille',
     dateRdv: '2026-04-12', heureRdv: '11:00',
-    nbPanneaux: 16, typeToiture: 'Tuile canal',
+    typeRdv: 'diagnostic', typeToiture: 'Tuile canal',
     notes: 'Travaux rives + faîtage',
     statut: 'vendu', montantHT: 8500,
     dateCreation: '2026-04-07',
@@ -68,7 +70,7 @@ const RDV_ALL = [
     nom: 'Pierre Dumont', tel: '06 77 88 99 00',
     adresse: '12 cours Mirabeau, 13100 Aix-en-Provence',
     dateRdv: '2026-04-17', heureRdv: '09:30',
-    nbPanneaux: 18, typeToiture: 'Tuile romane',
+    typeRdv: 'diagnostic', typeToiture: 'Tuile romane',
     notes: 'Grand toit, potentiel hydrofuge',
     statut: 'fait', montantHT: null,
     dateCreation: '2026-04-12',
@@ -78,7 +80,7 @@ const RDV_ALL = [
     nom: 'Claire Durand', tel: '06 33 22 11 00',
     adresse: '5 rue Gambetta, 13120 Gardanne',
     dateRdv: '2026-04-16', heureRdv: '14:00',
-    nbPanneaux: 10, typeToiture: 'Bac acier',
+    typeRdv: 'panneaux', typeToiture: 'Bac acier',
     notes: 'Petits travaux zinguerie',
     statut: 'vendu', montantHT: 3200,
     dateCreation: '2026-04-11',
@@ -108,18 +110,42 @@ const STATUT_OPTIONS = [
   { value: 'pas_vendu', label: 'Pas vendu', cls: 'badge-gray' },
 ]
 
+const RDV_TYPE_LABELS = {
+  panneaux: 'Panneaux',
+  diagnostic: 'Diagnostic',
+}
+
 const formatMontant = (n) => n.toLocaleString('fr-FR') + ' €'
 const formatDate = (d) => { const [y, m, day] = d.split('-'); return `${day}/${m}/${y}` }
+const extractVille = (adresse) => {
+  if (!adresse) return ''
+  const chunk = adresse.split(',').pop()?.trim() || ''
+  if (!chunk) return adresse
+  const m = chunk.match(/^(\d{5})\s+(.+)$/)
+  return m ? `${m[2]} ${m[1]}` : chunk
+}
+const estimatePanneaux = (rdv) => (rdv.typeRdv === 'panneaux' ? 10 : 6)
 
 // ─── Composant principal ────────────────────────────────────
 export default function AdminProspection() {
-  const [rdvs, setRdvs] = useState(RDV_ALL)
+  const navigate = useNavigate()
+  const [rdvs, setRdvs] = useState(() => readSyncedData(DATA_SYNC_KEYS.prospectionRdvs, RDV_ALL))
   const [search, setSearch] = useState('')
   const [filterProsp, setFilterProsp] = useState('tous')
   const [filterStatut, setFilterStatut] = useState('tous')
   const [editingId, setEditingId] = useState(null)
   const [editMontant, setEditMontant] = useState('')
   const [expandedId, setExpandedId] = useState(null)
+
+  useEffect(() => {
+    writeSyncedData(DATA_SYNC_KEYS.prospectionRdvs, rdvs)
+  }, [rdvs])
+
+  useEffect(() => {
+    return subscribeSyncedData(DATA_SYNC_KEYS.prospectionRdvs, () => {
+      setRdvs(readSyncedData(DATA_SYNC_KEYS.prospectionRdvs, RDV_ALL))
+    })
+  }, [])
 
   const filtered = useMemo(() => {
     let list = [...rdvs]
@@ -383,6 +409,20 @@ export default function AdminProspection() {
                     <ActionMenu
                       items={[
                         { label: 'Voir détails', icon: '👁️', onClick: () => setExpandedId(expanded ? null : rdv.id) },
+                        {
+                          label: 'Ajouter au planning',
+                          icon: '🗓️',
+                          onClick: () => navigate('/admin/planning', {
+                            state: {
+                              preselected: {
+                                nom: rdv.nom,
+                                tel: rdv.tel,
+                                ville: extractVille(rdv.adresse),
+                                panneaux: estimatePanneaux(rdv),
+                              },
+                            },
+                          }),
+                        },
                         rdv.statut === 'planifie' && { label: 'Marquer RDV fait', icon: '✅', onClick: () => updateStatut(rdv.id, 'fait') },
                         rdv.statut === 'fait' && { label: 'Marquer vendu', icon: '💰', onClick: () => updateStatut(rdv.id, 'vendu') },
                         rdv.statut === 'fait' && { label: 'Marquer pas vendu', icon: '❌', onClick: () => updateStatut(rdv.id, 'pas_vendu') },
@@ -396,7 +436,7 @@ export default function AdminProspection() {
                       <div className="admin-prosp-detail-content">
                         <div className="admin-prosp-detail-grid">
                           <div><strong>Téléphone</strong><br /><a href={`tel:${rdv.tel.replace(/\s/g, '')}`}>{rdv.tel}</a></div>
-                          <div><strong>Panneaux</strong><br />{rdv.nbPanneaux || '—'}</div>
+                          <div><strong>Type de RDV</strong><br />{RDV_TYPE_LABELS[rdv.typeRdv] || 'Diagnostic'}</div>
                           <div><strong>Type toiture</strong><br />{rdv.typeToiture || '—'}</div>
                           <div><strong>Ajouté le</strong><br />{formatDate(rdv.dateCreation)}</div>
                         </div>
