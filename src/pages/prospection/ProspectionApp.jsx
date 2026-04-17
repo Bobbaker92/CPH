@@ -5,67 +5,13 @@ import {
   Clock, Check, X, ChevronDown, ChevronUp, Edit3, Target, Award, House
 } from 'lucide-react'
 import { DATA_SYNC_KEYS, readSyncedData, subscribeSyncedData, writeSyncedData } from '../../lib/dataSync'
+import { MOCK_PROSPECTRICES, MOCK_RDVS } from '../../data/mockRdvs'
 
-// ─── Données mock ───────────────────────────────────────────
-const PROSPECTRICES = {
-  'prospection@cphpaca.fr': {
-    id: 1, nom: 'Nadia Belkacem', tel: '06 55 44 33 22',
-    secteur: 'Marseille Nord / Aubagne',
-  },
-}
+const PROSPECTRICES = Object.fromEntries(
+  MOCK_PROSPECTRICES.map(p => [p.email, { id: p.id, nom: p.nom, tel: p.tel, secteur: p.secteur }])
+)
 
-const RDV_INIT = [
-  {
-    id: 1, prospectrice: 1,
-    nom: 'Robert Garcia', tel: '06 12 34 56 78',
-    adresse: '15 rue des Lilas, 13012 Marseille',
-    dateRdv: '2026-04-18', heureRdv: '10:00',
-    typeRdv: 'panneaux', typeToiture: 'Tuile canal',
-    notes: 'Toiture ancienne, potentiel travaux faîtage',
-    statut: 'planifie', montantHT: null,
-    dateCreation: '2026-04-14',
-  },
-  {
-    id: 2, prospectrice: 1,
-    nom: 'Fatima Aoudia', tel: '07 88 99 00 11',
-    adresse: '8 chemin du Roy, 13400 Aubagne',
-    dateRdv: '2026-04-17', heureRdv: '14:00',
-    typeRdv: 'diagnostic', typeToiture: 'Tuile romane',
-    notes: 'Intéressée réfection + hydrofuge',
-    statut: 'fait', montantHT: null,
-    dateCreation: '2026-04-13',
-  },
-  {
-    id: 3, prospectrice: 1,
-    nom: 'Marc Lefèvre', tel: '06 44 55 66 77',
-    adresse: '22 avenue de la République, 13001 Marseille',
-    dateRdv: '2026-04-15', heureRdv: '09:00',
-    typeRdv: 'diagnostic', typeToiture: 'Ardoise',
-    notes: 'Remplacement faîtage complet, gros chantier',
-    statut: 'vendu', montantHT: 12500,
-    dateCreation: '2026-04-10',
-  },
-  {
-    id: 4, prospectrice: 1,
-    nom: 'Sophie Martin', tel: '06 22 33 44 55',
-    adresse: '3 impasse des Oliviers, 13400 Aubagne',
-    dateRdv: '2026-04-14', heureRdv: '16:00',
-    typeRdv: 'panneaux', typeToiture: 'Tuile plate',
-    notes: 'Pas de budget pour le moment',
-    statut: 'pas_vendu', montantHT: null,
-    dateCreation: '2026-04-09',
-  },
-  {
-    id: 5, prospectrice: 1,
-    nom: 'Karim Zaoui', tel: '06 99 88 77 66',
-    adresse: '45 bd Michelet, 13008 Marseille',
-    dateRdv: '2026-04-12', heureRdv: '11:00',
-    typeRdv: 'diagnostic', typeToiture: 'Tuile canal',
-    notes: 'Travaux rives + faîtage',
-    statut: 'vendu', montantHT: 8500,
-    dateCreation: '2026-04-07',
-  },
-]
+const RDV_INIT = MOCK_RDVS
 
 // ─── Logique commissions ────────────────────────────────────
 const SEUIL_COM = 10000
