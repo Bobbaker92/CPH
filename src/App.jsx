@@ -3,6 +3,7 @@ import './App.css'
 import ScrollToTop from './components/ScrollToTop'
 import Landing from './pages/Landing'
 import Login from './pages/Login'
+import MotDePasseOublie from './pages/MotDePasseOublie'
 import Formulaire from './pages/Formulaire'
 import Reservation from './pages/Reservation'
 import Paiement from './pages/Paiement'
@@ -35,6 +36,7 @@ function App() {
         {/* Public */}
         <Route path="/" element={<Landing />} />
         <Route path="/connexion" element={<Login />} />
+        <Route path="/mot-de-passe-oublie" element={<MotDePasseOublie />} />
         <Route path="/devis" element={<Formulaire />} />
         <Route path="/reservation" element={<Reservation />} />
         <Route path="/paiement" element={<Paiement />} />

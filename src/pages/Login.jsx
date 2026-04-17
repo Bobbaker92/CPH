@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { LogIn, Eye, EyeOff, Shield } from 'lucide-react'
 import { getClientAccount, verifyClientPassword } from '../lib/clientAuth'
 
@@ -146,9 +146,9 @@ export default function Login() {
           </form>
 
           <div style={{ textAlign: 'center', marginTop: 20 }}>
-            <a href="#" style={{ fontSize: 13, color: 'var(--gray-500)' }}>
+            <Link to="/mot-de-passe-oublie" style={{ fontSize: 13, color: 'var(--gray-500)' }}>
               {"Mot de passe oubli\u00E9 ?"}
-            </a>
+            </Link>
           </div>
         </div>
 
