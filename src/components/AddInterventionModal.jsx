@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import {
   X as XIcon, MapPin, Sun, Calendar, Clock, Check, AlertTriangle, Info, Sparkles, User
 } from 'lucide-react'
+import { addIntervention } from '../lib/interventionsStore'
 
 const SEUIL_PETITE = 10
 const CAPACITE_STANDARD = 3
@@ -116,13 +117,14 @@ function scoreDay(dateStr, existingInterventions, newSecteur, newPanneaux) {
 
 export default function AddInterventionModal({
   onClose,
-  onAdd,
+  onPlanned,
   interventions,
   today,
   preselectedVille = '',
   preselectedNom = '',
   preselectedTel = '',
   preselectedPanneaux = '',
+  preselectedDemandeId = null,
 }) {
   const [form, setForm] = useState({
     nom: preselectedNom,
@@ -158,7 +160,7 @@ export default function AddInterventionModal({
   const submit = (e) => {
     e.preventDefault()
     if (!canSubmit) return
-    onAdd({
+    const intervention = addIntervention({
       client: form.nom,
       tel: form.tel,
       ville: form.ville,
@@ -166,7 +168,9 @@ export default function AddInterventionModal({
       date: form.date,
       heure: form.heure,
       jour: buildShortJour(form.date),
+      demandeId: preselectedDemandeId,
     })
+    onPlanned?.(intervention)
   }
 
   return (
