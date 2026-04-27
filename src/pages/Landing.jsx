@@ -119,15 +119,15 @@ export default function Landing() {
                 <User size={16} /> Mon espace
               </Link>
               <div className="mobile-menu-divider" />
-              <a href="#" onClick={() => setMenuOpen(false)} className="mobile-menu-link-sub">
+              <Link to="/mentions-legales" onClick={() => setMenuOpen(false)} className="mobile-menu-link-sub">
                 {"Mentions l\u00E9gales"}
-              </a>
-              <a href="#" onClick={() => setMenuOpen(false)} className="mobile-menu-link-sub">
+              </Link>
+              <Link to="/confidentialite" onClick={() => setMenuOpen(false)} className="mobile-menu-link-sub">
                 {"Politique de confidentialit\u00E9"}
-              </a>
-              <a href="#" onClick={() => setMenuOpen(false)} className="mobile-menu-link-sub">
+              </Link>
+              <Link to="/cgv" onClick={() => setMenuOpen(false)} className="mobile-menu-link-sub">
                 CGV
-              </a>
+              </Link>
             </div>
 
             <div className="mobile-menu-footer">
@@ -506,9 +506,9 @@ export default function Landing() {
             </div>
             <div>
               <h4 style={{color:'white', fontSize:13, fontWeight:700, marginBottom:12}}>{"L\u00E9gal"}</h4>
-              <p><a href="#">{"Mentions l\u00E9gales"}</a></p>
-              <p><a href="#">{"Politique de confidentialit\u00E9"}</a></p>
-              <p><a href="#">CGV</a></p>
+              <p><Link to="/mentions-legales">{"Mentions l\u00E9gales"}</Link></p>
+              <p><Link to="/confidentialite">{"Politique de confidentialit\u00E9"}</Link></p>
+              <p><Link to="/cgv">CGV</Link></p>
             </div>
           </div>
           <div className="footer-bottom">
