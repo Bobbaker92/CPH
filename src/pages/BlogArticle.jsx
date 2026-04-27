@@ -1,5 +1,6 @@
 import { useParams, Link } from 'react-router-dom'
 import { Shield, Calendar, Clock, ArrowLeft, BookOpen, User, Phone, Check, ArrowRight, Sun } from 'lucide-react'
+import useSeo from '../lib/useSeo'
 
 const ARTICLES = {
   'pourquoi-nettoyer-panneaux-solaires': {
@@ -94,6 +95,14 @@ function InlineCTA() {
 export default function BlogArticle() {
   const { slug } = useParams()
   const article = ARTICLES[slug] || DEFAULT
+
+  const firstPara = article.contenu?.find((b) => b.type === 'p')?.text || ''
+  const seoDescription = firstPara.length > 160 ? `${firstPara.slice(0, 157)}...` : firstPara
+  useSeo({
+    title: article.titre,
+    description: seoDescription || article.titre,
+    path: `/blog/${slug}`,
+  })
 
   return (
     <div style={{minHeight:'100vh', background:'var(--white)'}}>

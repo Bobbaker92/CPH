@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+
+# Espaces privés : pas d'indexation
+Disallow: /admin
+Disallow: /admin/
+Disallow: /client
+Disallow: /client/
+Disallow: /couvreur
+Disallow: /prospection
+Disallow: /connexion
+Disallow: /mot-de-passe-oublie
+Disallow: /paiement
+Disallow: /confirmation
+
+Sitemap: https://cphpaca.fr/sitemap.xml
