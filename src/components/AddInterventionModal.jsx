@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react'
 import {
   X as XIcon, MapPin, Sun, Calendar, Clock, Check, AlertTriangle, Info, Sparkles, User
 } from 'lucide-react'
-import { addIntervention } from '../lib/interventionsStore'
+import { addIntervention, COUVREURS_DISPONIBLES } from '../lib/interventionsStore'
 
 const SEUIL_PETITE = 10
 const CAPACITE_STANDARD = 3
@@ -131,9 +131,15 @@ export default function AddInterventionModal({
     tel: preselectedTel,
     ville: preselectedVille,
     panneaux: preselectedPanneaux,
+    couvreurEmail: COUVREURS_DISPONIBLES[0]?.email || 'karim@cphpaca.fr',
     date: '',
     heure: '',
   })
+
+  const couvreurSelectionne = useMemo(
+    () => COUVREURS_DISPONIBLES.find((c) => c.email === form.couvreurEmail) || COUVREURS_DISPONIBLES[0],
+    [form.couvreurEmail]
+  )
 
   const newSecteur = getSecteur(form.ville)
   const newPanneaux = form.panneaux ? parseInt(form.panneaux, 10) : null
@@ -165,6 +171,8 @@ export default function AddInterventionModal({
       tel: form.tel,
       ville: form.ville,
       panneaux: parseInt(form.panneaux, 10),
+      couvreur: couvreurSelectionne?.nom || 'Karim Ziani',
+      couvreurEmail: form.couvreurEmail,
       date: form.date,
       heure: form.heure,
       jour: buildShortJour(form.date),
@@ -205,6 +213,14 @@ export default function AddInterventionModal({
                 <div className="input-group" style={{gridColumn:'1 / -1'}}>
                   <label>Nombre de panneaux *</label>
                   <input type="number" min="1" value={form.panneaux} onChange={e => setForm({...form, panneaux: e.target.value})} required />
+                </div>
+                <div className="input-group" style={{gridColumn:'1 / -1'}}>
+                  <label>Couvreur *</label>
+                  <select value={form.couvreurEmail} onChange={(e) => setForm({ ...form, couvreurEmail: e.target.value })}>
+                    {COUVREURS_DISPONIBLES.map((couvreur) => (
+                      <option key={couvreur.email} value={couvreur.email}>{couvreur.nom}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
