@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Shield, Calendar, Clock, ArrowRight, BookOpen, User } from 'lucide-react'
+import useSeo from '../lib/useSeo'
 
 const ARTICLES = [
   {
@@ -53,6 +54,12 @@ const ARTICLES = [
 ]
 
 export default function Blog() {
+  useSeo({
+    title: 'Blog — Conseils nettoyage et entretien de panneaux solaires',
+    description: "Conseils, retours d'expérience et bonnes pratiques pour entretenir vos panneaux photovoltaïques en PACA. Articles rédigés par des couvreurs.",
+    path: '/blog',
+  })
+
   return (
     <div style={{minHeight:'100vh', background:'var(--white)'}}>
       {/* Navbar */}

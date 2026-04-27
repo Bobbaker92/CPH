@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Phone, Shield, Clock, Star, Award, MapPin, User, BookOpen, ChevronRight, Sun, Droplets, FileCheck, Zap, ArrowRight, Check, Quote, Menu, X } from 'lucide-react'
 import CallbackModal, { CallbackFab } from '../components/CallbackModal'
+import useSeo from '../lib/useSeo'
 
 function AnimatedCounter({ end, suffix = '', duration = 2000 }) {
   const [count, setCount] = useState(0)
@@ -41,6 +42,12 @@ export default function Landing() {
   const [activeTestimonial, setActiveTestimonial] = useState(0)
   const [menuOpen, setMenuOpen] = useState(false)
   const [callbackOpen, setCallbackOpen] = useState(false)
+
+  useSeo({
+    title: null,
+    description: "Nettoyage de panneaux photovoltaïques en région PACA par couvreur certifié. Restaurez jusqu'à 30% de production. Devis gratuit, intervention sous 7 jours, dès 179 € TTC.",
+    path: '/',
+  })
 
   useEffect(() => {
     const interval = setInterval(() => {

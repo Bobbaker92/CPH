@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, Sun, Home, Layers, MapPin, User, Phone, Check, Shield, Building, Building2, HelpCircle, PanelTop, Grid3x3 } from 'lucide-react'
 import CallbackModal from '../components/CallbackModal'
 import { addDemande } from '../lib/demandesStore'
+import useSeo from '../lib/useSeo'
 
 const ETAPES = [
   { id: 'panneaux', label: 'Panneaux', icon: Sun },
@@ -94,6 +95,12 @@ function sessionKeyAbandonFormulaire(tel = '') {
 export default function Formulaire() {
   const navigate = useNavigate()
   const [step, setStep] = useState(0)
+
+  useSeo({
+    title: 'Devis gratuit — Nettoyage de panneaux solaires',
+    description: "Obtenez un devis pour le nettoyage de vos panneaux solaires en PACA. 5 questions, 2 minutes. Intervention dès 179 € TTC.",
+    path: '/devis',
+  })
   const [form, setForm] = useState({
     panneaux: '',
     etage: '',
