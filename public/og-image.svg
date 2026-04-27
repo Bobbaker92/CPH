@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f172a"/>
+      <stop offset="1" stop-color="#1e3a8a"/>
+    </linearGradient>
+    <linearGradient id="sun" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fbbf24"/>
+      <stop offset="1" stop-color="#f59e0b"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="20" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Fond -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Soleil décoratif en bas droite -->
+  <circle cx="1080" cy="540" r="180" fill="url(#sun)" opacity="0.15" filter="url(#glow)"/>
+  <circle cx="1080" cy="540" r="80" fill="url(#sun)" opacity="0.4"/>
+
+  <!-- Bandeau d'accent en haut -->
+  <rect x="0" y="0" width="1200" height="6" fill="url(#sun)"/>
+
+  <!-- Logo + nom -->
+  <g transform="translate(80, 80)">
+    <circle cx="28" cy="28" r="28" fill="url(#sun)"/>
+    <g transform="translate(28,28)" stroke="#0f172a" stroke-width="3" fill="none" stroke-linecap="round">
+      <circle r="9" fill="#0f172a"/>
+      <line x1="0" y1="-18" x2="0" y2="-14"/>
+      <line x1="0" y1="14" x2="0" y2="18"/>
+      <line x1="-18" y1="0" x2="-14" y2="0"/>
+      <line x1="14" y1="0" x2="18" y2="0"/>
+      <line x1="-13" y1="-13" x2="-10" y2="-10"/>
+      <line x1="10" y1="10" x2="13" y2="13"/>
+      <line x1="-13" y1="13" x2="-10" y2="10"/>
+      <line x1="10" y1="-10" x2="13" y2="-13"/>
+    </g>
+    <text x="76" y="24" font-family="-apple-system, system-ui, Inter, sans-serif" font-size="28" font-weight="800" fill="white">CPH Solar</text>
+    <text x="76" y="50" font-family="-apple-system, system-ui, Inter, sans-serif" font-size="14" font-weight="600" fill="#fbbf24" letter-spacing="3">NETTOYAGE PACA</text>
+  </g>
+
+  <!-- Titre principal -->
+  <text x="80" y="280" font-family="-apple-system, system-ui, Inter, sans-serif" font-size="68" font-weight="800" fill="white">
+    <tspan x="80" dy="0">Nettoyage de panneaux</tspan>
+    <tspan x="80" dy="80">solaires en </tspan><tspan fill="#fbbf24" font-weight="800">PACA</tspan>
+  </text>
+
+  <!-- Sous-titre -->
+  <text x="80" y="460" font-family="-apple-system, system-ui, Inter, sans-serif" font-size="26" font-weight="500" fill="rgba(255,255,255,0.75)">
+    Couvreurs certifi&#233;s &#8226; Inspection toiture incluse &#8226; Sous 7 jours
+  </text>
+
+  <!-- Tarif badge -->
+  <g transform="translate(80, 510)">
+    <rect width="200" height="64" rx="32" fill="#fbbf24"/>
+    <text x="100" y="42" text-anchor="middle" font-family="-apple-system, system-ui, Inter, sans-serif" font-size="28" font-weight="800" fill="#0f172a">
+      D&#232;s 179 &#8364;
+    </text>
+  </g>
+
+  <!-- URL -->
+  <text x="300" y="552" font-family="-apple-system, system-ui, Inter, sans-serif" font-size="20" font-weight="600" fill="rgba(255,255,255,0.6)">
+    cphpaca.fr
+  </text>
+</svg>
