@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { Phone, Shield, Clock, Star, Award, MapPin, User, BookOpen, ChevronRight, Sun, Droplets, FileCheck, Zap, ArrowRight, Check, Quote, Menu, X } from 'lucide-react'
 import CallbackModal, { CallbackFab } from '../components/CallbackModal'
 import useSeo from '../lib/useSeo'
+import { CookieReopenLink } from '../components/CookieConsent'
 
 function AnimatedCounter({ end, suffix = '', duration = 2000 }) {
   const [count, setCount] = useState(0)
@@ -520,6 +521,7 @@ export default function Landing() {
           </div>
           <div className="footer-bottom">
             <p>{"© 2026 Contr\u00F4le Provence Habitat. Tous droits r\u00E9serv\u00E9s."}</p>
+            <CookieReopenLink />
           </div>
         </div>
       </footer>

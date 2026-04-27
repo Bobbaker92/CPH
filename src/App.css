@@ -5092,3 +5092,213 @@ tbody tr:last-child td { border-bottom: none; }
 .notfound-back:hover {
   color: #2563eb;
 }
+
+/* === Bandeau cookies CNIL === */
+.cookie-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  background: white;
+  border-top: 3px solid #2563eb;
+  box-shadow: 0 -8px 32px rgba(15, 23, 42, 0.15);
+  padding: 16px 0;
+  animation: cookieSlideUp 280ms ease-out;
+}
+@keyframes cookieSlideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.cookie-banner-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.cookie-banner-icon {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #fef3c7;
+  color: #b45309;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cookie-banner-text {
+  flex: 1;
+  min-width: 240px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #334155;
+}
+.cookie-banner-text strong {
+  display: block;
+  color: #0f172a;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+.cookie-banner-text p {
+  margin: 0;
+}
+.cookie-banner-text a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+.cookie-banner-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.cookie-btn-secondary {
+  border-color: #cbd5e1 !important;
+  color: #475569 !important;
+}
+.cookie-btn-refuse {
+  border-color: #94a3b8 !important;
+  color: #334155 !important;
+}
+.cookie-btn-accept {
+  font-weight: 600;
+}
+@media (max-width: 768px) {
+  .cookie-banner-actions { width: 100%; }
+  .cookie-banner-actions .btn { flex: 1; justify-content: center; }
+}
+
+/* Modale détails cookies */
+.cookie-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10000;
+  background: white;
+  width: min(520px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  border-radius: 14px;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.25);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.cookie-modal-head {
+  padding: 18px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.cookie-modal-head h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: #0f172a;
+}
+.cookie-modal-body {
+  padding: 18px 20px;
+  overflow-y: auto;
+}
+.cookie-modal-intro {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0 0 18px;
+  line-height: 1.55;
+}
+.cookie-category {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+}
+.cookie-category-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.cookie-category-head strong {
+  color: #0f172a;
+  font-size: 14px;
+}
+.cookie-category p {
+  font-size: 12.5px;
+  color: #64748b;
+  line-height: 1.55;
+  margin: 0;
+}
+.cookie-category-required {
+  font-size: 11px;
+  font-weight: 600;
+  color: #16a34a;
+  background: #dcfce7;
+  padding: 3px 9px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.cookie-toggle {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+  cursor: pointer;
+}
+.cookie-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.cookie-toggle-track {
+  position: absolute;
+  inset: 0;
+  background: #cbd5e1;
+  border-radius: 999px;
+  transition: background 180ms;
+}
+.cookie-toggle-track::before {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: white;
+  border-radius: 50%;
+  top: 3px;
+  left: 3px;
+  transition: transform 180ms;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+.cookie-toggle input:checked + .cookie-toggle-track {
+  background: #2563eb;
+}
+.cookie-toggle input:checked + .cookie-toggle-track::before {
+  transform: translateX(18px);
+}
+.cookie-modal-foot {
+  padding: 14px 20px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* Bouton "Gérer mes cookies" en footer */
+.cookie-reopen {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 8px;
+  text-decoration: underline;
+  font-family: inherit;
+}
+.cookie-reopen:hover {
+  color: white;
+}
