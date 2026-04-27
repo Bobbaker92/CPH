@@ -7,7 +7,7 @@ test.describe('PWA manifest', () => {
     await expect(manifest).toHaveAttribute('href', '/manifest.webmanifest')
   })
 
-  test('le manifest est servi et contient les champs PWA essentiels', async ({ page, request }) => {
+  test('le manifest est servi et contient les champs PWA essentiels', async ({ request }) => {
     const res = await request.get('/manifest.webmanifest')
     expect(res.ok()).toBeTruthy()
     const data = await res.json()
