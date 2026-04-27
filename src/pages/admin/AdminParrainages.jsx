@@ -1,60 +1,71 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Gift, Users, TrendingUp, Search, Copy, Download, Check, Trash2, Mail, Send } from 'lucide-react'
 import ActionMenu from '../../components/ActionMenu'
+import { getParrainages, subscribe as subscribeParrainages } from '../../lib/parrainagesStore'
 
 function exportCSV(parrainages) {
-  const header = ['Parrain', 'Filleul', 'Ville', 'Date envoi', 'Statut', 'R\u00E9compense']
-  const rows = parrainages.map(p => [p.parrain, p.filleul, p.ville, p.dateEnvoi, p.statut, p.recompense])
-  const csv = [header, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(';')).join('\n')
+  const header = ['Parrain', 'Filleul', 'Date envoi', 'Statut', 'Bonus']
+  const rows = parrainages.map((p) => [p.parrainNom, p.inviteNom, p.dateEnvoi, p.statut, p.bonus])
+  const csv = [header, ...rows].map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(';')).join('\n')
   const blob = new Blob([`\ufeff${csv}`], { type: 'text/csv;charset=utf-8;' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
-  a.download = `parrainages-cph-${new Date().toISOString().slice(0,10)}.csv`
+  a.download = `parrainages-cph-${new Date().toISOString().slice(0, 10)}.csv`
   a.click()
   URL.revokeObjectURL(url)
 }
 
-const PARRAINAGES = [
-  { id: 1, parrain: 'Jean-Pierre Martin', filleul: 'Pierre Vidal', ville: 'Marseille 13008', dateEnvoi: '10/04/2026', statut: 'inscrit', recompense: 30 },
-  { id: 2, parrain: 'Robert Vidal', filleul: 'Sophie Lambert', ville: 'Aix-en-Provence', dateEnvoi: '08/04/2026', statut: 'convertie', recompense: 30 },
-  { id: 3, parrain: 'Marie Duval', filleul: 'Clara Meunier', ville: 'Marseille 13012', dateEnvoi: '05/04/2026', statut: 'envoye', recompense: 0 },
-  { id: 4, parrain: 'Marc Lefebvre', filleul: 'Julien Roussel', ville: 'Toulon 83000', dateEnvoi: '02/04/2026', statut: 'convertie', recompense: 30 },
-  { id: 5, parrain: 'Nathalie Perrin', filleul: 'Ahmed Mansour', ville: 'Aix 13100', dateEnvoi: '28/03/2026', statut: 'convertie', recompense: 30 },
-  { id: 6, parrain: 'Paul Roche', filleul: '(en attente)', ville: '-', dateEnvoi: '20/03/2026', statut: 'envoye', recompense: 0 },
-]
-
 const STATUT_LABEL = {
-  envoye: { label: 'Lien envoy\u00E9', cls: 'badge-gray' },
+  envoye: { label: 'Lien envoyé', cls: 'badge-gray' },
   inscrit: { label: 'Inscrit', cls: 'badge-blue' },
-  convertie: { label: 'Converti', cls: 'badge-green' },
+  valide: { label: 'Validé', cls: 'badge-green' },
+  paye: { label: 'Payé', cls: 'badge-orange' },
 }
 
-const TOP_PARRAINS = [
-  { nom: 'Robert Vidal', filleuls: 4, gains: 120 },
-  { nom: 'Jean-Pierre Martin', filleuls: 2, gains: 60 },
-  { nom: 'Marc Lefebvre', filleuls: 2, gains: 60 },
-  { nom: 'Nathalie Perrin', filleuls: 1, gains: 30 },
-]
-
 export default function AdminParrainages() {
+  const [parrainages, setParrainages] = useState(() => getParrainages())
   const [search, setSearch] = useState('')
   const [filtre, setFiltre] = useState('tous')
 
+  useEffect(() => {
+    const unsubscribe = subscribeParrainages(() => setParrainages(getParrainages()))
+    return () => unsubscribe()
+  }, [])
+
   const stats = useMemo(() => ({
-    total: PARRAINAGES.length,
-    convertis: PARRAINAGES.filter(p => p.statut === 'convertie').length,
-    gains: PARRAINAGES.reduce((s, p) => s + p.recompense, 0),
-  }), [])
+    total: parrainages.length,
+    convertis: parrainages.filter((p) => p.statut === 'valide' || p.statut === 'paye').length,
+    gains: parrainages.filter((p) => p.statut === 'paye').reduce((s, p) => s + (Number(p.bonus) || 0), 0),
+  }), [parrainages])
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
-    return PARRAINAGES.filter(p => {
+    return parrainages.filter((p) => {
       if (filtre !== 'tous' && p.statut !== filtre) return false
       if (!q) return true
-      return p.parrain.toLowerCase().includes(q) || p.filleul.toLowerCase().includes(q)
+      return p.parrainNom.toLowerCase().includes(q) || p.inviteNom.toLowerCase().includes(q)
     })
-  }, [search, filtre])
+  }, [parrainages, search, filtre])
+
+  const topParrains = useMemo(() => {
+    const map = new Map()
+    parrainages.forEach((p) => {
+      const key = p.parrainNom || '—'
+      const current = map.get(key) || { nom: key, filleuls: 0, gains: 0 }
+      const converti = p.statut === 'valide' || p.statut === 'paye'
+      const gains = p.statut === 'paye' ? Number(p.bonus) || 0 : 0
+      map.set(key, {
+        nom: key,
+        filleuls: current.filleuls + (converti ? 1 : 0),
+        gains: current.gains + gains,
+      })
+    })
+
+    return Array.from(map.values())
+      .sort((a, b) => b.filleuls - a.filleuls || b.gains - a.gains || a.nom.localeCompare(b.nom))
+      .slice(0, 4)
+  }, [parrainages])
 
   return (
     <>
@@ -64,7 +75,7 @@ export default function AdminParrainages() {
             <h1>Parrainages</h1>
             <p>30&nbsp;&euro; offerts au parrain pour chaque filleul converti.</p>
           </div>
-          <div style={{display:'flex', gap:8}}>
+          <div style={{ display: 'flex', gap: 8 }}>
             <button className="btn btn-sm btn-outline" onClick={() => exportCSV(filtered)}><Download size={14} /> Exporter</button>
             <button
               className="btn btn-sm btn-outline"
@@ -91,7 +102,7 @@ export default function AdminParrainages() {
             <Gift size={14} className="stat-icon" />
           </div>
           <div className="stat-value">{stats.convertis}</div>
-          <div className="stat-change">{Math.round(stats.convertis/stats.total*100)}% de conversion</div>
+          <div className="stat-change">{stats.total ? Math.round((stats.convertis / stats.total) * 100) : 0}% de conversion</div>
         </div>
         <div className="stat-card">
           <div className="stat-card-head">
@@ -104,16 +115,16 @@ export default function AdminParrainages() {
       </div>
 
       <div className="parrainage-layout">
-        {/* Liste */}
         <div className="parrainage-main">
           <div className="admin-toolbar">
             <div className="admin-tabs">
               {[
-                { k: 'tous', l: 'Tous', c: PARRAINAGES.length },
-                { k: 'envoye', l: 'Envoy\u00E9s', c: PARRAINAGES.filter(p => p.statut === 'envoye').length },
-                { k: 'inscrit', l: 'Inscrits', c: PARRAINAGES.filter(p => p.statut === 'inscrit').length },
-                { k: 'convertie', l: 'Convertis', c: PARRAINAGES.filter(p => p.statut === 'convertie').length },
-              ].map(t => (
+                { k: 'tous', l: 'Tous', c: parrainages.length },
+                { k: 'envoye', l: 'Envoyés', c: parrainages.filter((p) => p.statut === 'envoye').length },
+                { k: 'inscrit', l: 'Inscrits', c: parrainages.filter((p) => p.statut === 'inscrit').length },
+                { k: 'valide', l: 'Validés', c: parrainages.filter((p) => p.statut === 'valide').length },
+                { k: 'paye', l: 'Payés', c: parrainages.filter((p) => p.statut === 'paye').length },
+              ].map((t) => (
                 <button key={t.k} className={`admin-tab ${filtre === t.k ? 'active' : ''}`} onClick={() => setFiltre(t.k)}>
                   <span>{t.l}</span><span className="admin-tab-count admin-tab-count-gray">{t.c}</span>
                 </button>
@@ -121,7 +132,7 @@ export default function AdminParrainages() {
             </div>
             <div className="admin-search admin-search-inline">
               <Search size={15} />
-              <input type="text" placeholder="Parrain ou filleul&hellip;" value={search} onChange={e => setSearch(e.target.value)} />
+              <input type="text" placeholder="Parrain ou filleul&hellip;" value={search} onChange={(e) => setSearch(e.target.value)} />
             </div>
           </div>
 
@@ -134,25 +145,25 @@ export default function AdminParrainages() {
                   <th>Ville</th>
                   <th>Date</th>
                   <th>Statut</th>
-                  <th className="cell-num">R&eacute;compense</th>
+                  <th className="cell-num">Bonus</th>
                   <th></th>
                 </tr>
               </thead>
               <tbody>
-                {filtered.map(p => (
+                {filtered.map((p) => (
                   <tr key={p.id}>
-                    <td data-label="Parrain"><strong>{p.parrain}</strong></td>
-                    <td data-label="Filleul">{p.filleul}</td>
-                    <td data-label="Ville">{p.ville}</td>
+                    <td data-label="Parrain"><strong>{p.parrainNom}</strong></td>
+                    <td data-label="Filleul">{p.inviteNom}</td>
+                    <td data-label="Ville">{p.inviteVille || '—'}</td>
                     <td data-label="Date">{p.dateEnvoi}</td>
-                    <td data-label="Statut"><span className={`badge ${STATUT_LABEL[p.statut].cls}`}>{STATUT_LABEL[p.statut].label}</span></td>
-                    <td data-label="R&eacute;compense" className="cell-num">
-                      {p.recompense > 0 ? <strong style={{color:'var(--green)'}}>-{p.recompense}&nbsp;&euro;</strong> : <span className="muted">&mdash;</span>}
+                    <td data-label="Statut"><span className={`badge ${STATUT_LABEL[p.statut]?.cls || 'badge-gray'}`}>{STATUT_LABEL[p.statut]?.label || p.statut}</span></td>
+                    <td data-label="Bonus" className="cell-num">
+                      <strong style={{ color: 'var(--green)' }}>-{Number(p.bonus) || 0}&nbsp;&euro;</strong>
                     </td>
                     <td data-label="">
                       <ActionMenu items={[
                         { icon: <Send size={13} />, label: 'Renvoyer le lien' },
-                        { icon: <Check size={13} />, label: 'Marquer converti' },
+                        { icon: <Check size={13} />, label: 'Marquer validé' },
                         { icon: <Mail size={13} />, label: 'Contacter parrain' },
                         { divider: true },
                         { icon: <Trash2 size={13} />, label: 'Supprimer', danger: true },
@@ -165,14 +176,13 @@ export default function AdminParrainages() {
           </div>
         </div>
 
-        {/* Top parrains */}
         <aside className="parrainage-aside">
-          <div className="card" style={{padding:20}}>
-            <h3 style={{fontSize:14, fontWeight:700, marginBottom:16, display:'flex', alignItems:'center', gap:8}}>
-              <Gift size={16} style={{color:'var(--accent)'}} /> Top parrains
+          <div className="card" style={{ padding: 20 }}>
+            <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Gift size={16} style={{ color: 'var(--accent)' }} /> Top parrains
             </h3>
             <ul className="top-list">
-              {TOP_PARRAINS.map((p, i) => (
+              {topParrains.map((p, i) => (
                 <li key={p.nom}>
                   <span className="top-rank">#{i + 1}</span>
                   <div className="top-info">

@@ -1,3 +1,5 @@
+import { findParrainageByInvite, updateParrainage } from './parrainagesStore'
+
 const KEY_CLIENTS = 'cph_clients_v1'
 const KEY_OVERRIDES = 'cph_clients_overrides_v1'
 
@@ -116,6 +118,12 @@ export function findClientByTel(tel) {
   return getClients().find((client) => normalizeTel(client.tel) === telNorm) || null
 }
 
+export function findClientByEmail(email) {
+  const target = String(email || '').trim().toLowerCase()
+  if (!target) return null
+  return getClients().find((client) => String(client.email || '').trim().toLowerCase() === target) || null
+}
+
 export function updateClient(id, patch = {}) {
   const clientId = normalizeId(id)
   const persisted = getPersisted()
@@ -160,10 +168,14 @@ export function addClient(data = {}) {
       patch.ca = Math.max(Number(existingByTel.ca) || 0, defaults.ca)
     }
 
-    if (Object.keys(patch).length > 0) {
-      return updateClient(existingByTel.id, patch) || findClientById(existingByTel.id)
+    const merged = Object.keys(patch).length > 0
+      ? (updateClient(existingByTel.id, patch) || findClientById(existingByTel.id))
+      : existingByTel
+    const parrainage = findParrainageByInvite(merged?.tel || defaults.tel)
+    if (parrainage?.statut === 'envoye') {
+      updateParrainage(parrainage.id, { statut: 'inscrit' })
     }
-    return existingByTel
+    return merged
   }
 
   const newClient = {
@@ -173,6 +185,10 @@ export function addClient(data = {}) {
 
   const persisted = getPersisted()
   setPersisted([newClient, ...persisted])
+  const parrainage = findParrainageByInvite(newClient.tel)
+  if (parrainage?.statut === 'envoye') {
+    updateParrainage(parrainage.id, { statut: 'inscrit' })
+  }
   notify()
   return newClient
 }
