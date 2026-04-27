@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './_helpers'
 
 /**
  * Tests d'accessibilité basiques (sans axe-core pour rester sans deps).
@@ -6,21 +6,18 @@ import { test, expect } from '@playwright/test'
  * commercial public (RGAA niveau de base).
  */
 test.describe('Accessibilité', () => {
-  const PUBLIC_PAGES = ['/', '/blog', '/devis', '/connexion']
+  const PUBLIC_PAGES = ['/', '/blog', '/devis', '/connexion', '/mentions-legales', '/cgv', '/confidentialite']
 
   for (const path of PUBLIC_PAGES) {
-    test(`${path} a un attribut lang sur <html>`, async ({ page }) => {
+    test(`${path} a un attribut lang fr sur <html>`, async ({ page }) => {
       await page.goto(path)
       const lang = await page.locator('html').getAttribute('lang')
-      expect(lang).toBeTruthy()
-      // Sur main aujourd'hui c'est "en" (bug — corrigé dans PR #3 SEO).
-      // Quand PR #3 sera mergée, on pourra durcir ce check à /^fr/.
+      expect(lang).toMatch(/^fr/)
     })
   }
 
-  // Pages avec h1 attendu (Landing, Blog). /devis n'a que des h2 pour le moment
-  // (manque accessibilité à corriger dans une PR follow-up).
-  for (const path of ['/', '/blog']) {
+  // /connexion n'a pas de h1 (page form simple) — exclu volontairement
+  for (const path of ['/', '/blog', '/devis', '/mentions-legales', '/cgv', '/confidentialite']) {
     test(`${path} contient au moins un <h1>`, async ({ page }) => {
       await page.goto(path)
       const h1Count = await page.locator('h1').count()

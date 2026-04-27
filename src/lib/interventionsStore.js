@@ -78,10 +78,9 @@ function normalizeId(id) {
   return String(id)
 }
 
-function extractIdNumber(id) {
-  const str = String(id)
-  const match = str.match(/(\d+)$/)
-  return match ? Number(match[1]) : 0
+function buildUuid() {
+  if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID()
+  return `id-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
 }
 
 function heureToSort(heure = '') {
@@ -103,11 +102,8 @@ export function getInterventions() {
 }
 
 export function addIntervention(data = {}) {
-  const all = getInterventions()
-  const maxId = all.length ? Math.max(...all.map((i) => extractIdNumber(i.id))) : 0
-
   const newIntervention = {
-    id: maxId + 1,
+    id: buildUuid(),
     client: data.client || data.nom || '—',
     tel: data.tel || '—',
     ville: data.ville || '—',

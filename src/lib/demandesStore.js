@@ -117,6 +117,15 @@ function notify() {
   bus.dispatchEvent(new Event('change'))
 }
 
+function normalizeId(id) {
+  return String(id)
+}
+
+function buildUuid() {
+  if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID()
+  return `id-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
+}
+
 function withDefaults(data = {}) {
   return {
     nom: data.nom || '—',
@@ -135,19 +144,21 @@ function withDefaults(data = {}) {
 export function getDemandes() {
   const leads = getLeadsPersistes()
   const overrides = getOverrides()
+  const supprimesSet = new Set(overrides.supprimes.map((id) => normalizeId(id)))
 
   const mocks = DEMANDES_INIT
-    .filter((d) => !overrides.supprimes.includes(d.id))
-    .map((d) => ({ ...d, ...(overrides.modifs[d.id] || {}) }))
+    .filter((d) => !supprimesSet.has(normalizeId(d.id)))
+    .map((d) => {
+      const key = normalizeId(d.id)
+      return { ...d, ...(overrides.modifs[key] || {}) }
+    })
 
   return [...leads, ...mocks]
 }
 
 export function addDemande(data = {}) {
-  const existantes = getDemandes()
-  const maxId = existantes.length ? Math.max(...existantes.map((d) => Number(d.id) || 0)) : 100
   const nouvelleDemande = {
-    id: maxId + 1,
+    id: buildUuid(),
     ...withDefaults(data),
     dateRecu: 'À l\'instant',
     statut: data.statut || 'nouveau',
@@ -161,9 +172,9 @@ export function addDemande(data = {}) {
 }
 
 export function updateDemande(id, patch = {}) {
-  const demandeId = Number(id)
+  const demandeId = normalizeId(id)
   const leads = getLeadsPersistes()
-  const idx = leads.findIndex((d) => Number(d.id) === demandeId)
+  const idx = leads.findIndex((d) => normalizeId(d.id) === demandeId)
 
   if (idx >= 0) {
     const next = [...leads]
@@ -173,7 +184,7 @@ export function updateDemande(id, patch = {}) {
     return
   }
 
-  const existeDansMocks = DEMANDES_INIT.some((d) => Number(d.id) === demandeId)
+  const existeDansMocks = DEMANDES_INIT.some((d) => normalizeId(d.id) === demandeId)
   if (!existeDansMocks) return
 
   const overrides = getOverrides()
@@ -184,22 +195,22 @@ export function updateDemande(id, patch = {}) {
 }
 
 export function removeDemande(id) {
-  const demandeId = Number(id)
+  const demandeId = normalizeId(id)
   const leads = getLeadsPersistes()
-  const idx = leads.findIndex((d) => Number(d.id) === demandeId)
+  const idx = leads.findIndex((d) => normalizeId(d.id) === demandeId)
 
   if (idx >= 0) {
-    const next = leads.filter((d) => Number(d.id) !== demandeId)
+    const next = leads.filter((d) => normalizeId(d.id) !== demandeId)
     setLeadsPersistes(next)
     notify()
     return
   }
 
-  const existeDansMocks = DEMANDES_INIT.some((d) => Number(d.id) === demandeId)
+  const existeDansMocks = DEMANDES_INIT.some((d) => normalizeId(d.id) === demandeId)
   if (!existeDansMocks) return
 
   const overrides = getOverrides()
-  if (!overrides.supprimes.includes(demandeId)) {
+  if (!overrides.supprimes.some((idValue) => normalizeId(idValue) === demandeId)) {
     overrides.supprimes.push(demandeId)
   }
   delete overrides.modifs[demandeId]
