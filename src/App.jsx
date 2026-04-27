@@ -27,6 +27,9 @@ import AdminParrainages from './pages/admin/AdminParrainages'
 import AdminProspection from './pages/admin/AdminProspection'
 import CouvreurApp from './pages/couvreur/CouvreurApp'
 import ProspectionApp from './pages/prospection/ProspectionApp'
+import MentionsLegales from './pages/legal/MentionsLegales'
+import CGV from './pages/legal/CGV'
+import Confidentialite from './pages/legal/Confidentialite'
 
 function App() {
   return (
@@ -43,6 +46,9 @@ function App() {
         <Route path="/confirmation" element={<Confirmation />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:slug" element={<BlogArticle />} />
+        <Route path="/mentions-legales" element={<MentionsLegales />} />
+        <Route path="/cgv" element={<CGV />} />
+        <Route path="/confidentialite" element={<Confidentialite />} />
 
         {/* Espace Client */}
         <Route path="/client" element={<ClientDashboard />}>
