@@ -5428,6 +5428,218 @@ tbody tr:last-child td { border-bottom: none; }
   outline-offset: 2px;
 }
 
+/* === Calculateur ROI (landing) === */
+.roi-section {
+  padding: 80px 0;
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+  color: white;
+}
+.roi-head {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto 44px;
+}
+.roi-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #fbbf24;
+  margin-bottom: 12px;
+}
+.roi-head h2 {
+  font-size: 30px;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 10px;
+  line-height: 1.25;
+}
+.roi-head p {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 15px;
+  margin: 0;
+}
+.roi-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  max-width: 960px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 32px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.roi-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+.roi-control label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.roi-control small {
+  display: block;
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 12.5px;
+}
+.roi-slider-wrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.roi-slider-wrap input[type="range"] {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.15);
+  outline: none;
+}
+.roi-slider-wrap input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fbbf24;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(251, 191, 36, 0.4);
+}
+.roi-slider-wrap input[type="range"]::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fbbf24;
+  border: 0;
+  cursor: pointer;
+}
+.roi-value {
+  min-width: 70px;
+  text-align: right;
+  font-weight: 700;
+  font-size: 16px;
+  color: #fbbf24;
+}
+.roi-pills {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.roi-pill {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.85);
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 160ms;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: inherit;
+}
+.roi-pill strong {
+  font-size: 13px;
+  color: white;
+}
+.roi-pill span {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 600;
+}
+.roi-pill:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.roi-pill.active {
+  background: rgba(251, 191, 36, 0.15);
+  border-color: #fbbf24;
+}
+.roi-pill.active span { color: #fbbf24; }
+
+.roi-result {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.roi-stat {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 22px 24px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.roi-stat-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.65);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+.roi-stat-value {
+  display: block;
+  font-size: 38px;
+  font-weight: 800;
+  color: #fbbf24;
+  line-height: 1.1;
+}
+.roi-stat-sub {
+  display: block;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 6px;
+}
+.roi-stat-secondary .roi-stat-value {
+  font-size: 28px;
+  color: white;
+}
+.roi-roi {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 14px 18px;
+  background: rgba(251, 191, 36, 0.08);
+  border-left: 3px solid #fbbf24;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.85);
+}
+.roi-roi svg {
+  flex-shrink: 0;
+  color: #fbbf24;
+  margin-top: 2px;
+}
+.roi-roi strong {
+  color: white;
+}
+.roi-cta {
+  margin-top: 4px;
+  justify-content: center;
+}
+@media (max-width: 768px) {
+  .roi-section { padding: 56px 0; }
+  .roi-grid { grid-template-columns: 1fr; padding: 22px; gap: 24px; }
+  .roi-head h2 { font-size: 22px; }
+  .roi-stat-value { font-size: 30px; }
+  .roi-stat-secondary .roi-stat-value { font-size: 24px; }
+}
+
 /* === Fallback de chargement (React.lazy + Suspense) === */
 .lazy-fallback {
   min-height: 60vh;
