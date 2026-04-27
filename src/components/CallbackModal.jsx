@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { X, Phone, Clock, Check, Loader2, Shield } from 'lucide-react'
+import { addDemande } from '../lib/demandesStore'
 
 /**
  * Modal de demande de rappel — capture lead minimale (nom + tel)
@@ -23,6 +24,31 @@ export default function CallbackModal({ onClose }) {
     e.preventDefault()
     if (!canSubmit || loading) return
     setLoading(true)
+
+    const noteDispo = form.dispo === 'matin'
+      ? 'Dispo : matin'
+      : form.dispo === 'apresmidi'
+        ? 'Dispo : après-midi'
+        : 'Dispo : dès que possible'
+    const noteComplete = form.note.trim()
+      ? `${noteDispo}. ${form.note.trim()}`
+      : noteDispo
+
+    addDemande({
+      nom: form.nom.trim(),
+      tel: form.tel.trim(),
+      dispo: form.dispo,
+      note: noteComplete,
+      source: 'Rappel demandé',
+      email: '—',
+      ville: '—',
+      panneaux: '—',
+      tuile: '—',
+      integration: 'unknown',
+      etage: '—',
+      adresse: '—',
+    })
+
     // Simu capture lead côté backend
     setTimeout(() => {
       setLoading(false)

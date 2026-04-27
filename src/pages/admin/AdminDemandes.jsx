@@ -1,84 +1,19 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Search, Phone, Calendar, X as XIcon, MapPin, Sun, Layers,
-  Clock, MessageCircle, ChevronRight, Filter, Plus, Download, Edit3, Copy,
+  Clock, MessageCircle, ChevronRight, Filter, Plus, Download, Copy,
   Trash2, Check
 } from 'lucide-react'
 import ActionMenu from '../../components/ActionMenu'
-
-const DEMANDES_INIT = [
-  {
-    id: 107, nom: 'Louise Arnaud', tel: '06 98 12 34 56', email: '—',
-    ville: 'Marseille 13006', adresse: '—',
-    panneaux: '—', tuile: '—', integration: 'unknown', etage: '—',
-    dateRecu: 'Aujourd\'hui 11:14', statut: 'nouveau', source: 'Rappel demand\u00E9', notes: 'Dispo\u00A0: apr\u00E8s-midi. Source\u00A0: bouton flottant landing.',
-  },
-  {
-    id: 108, nom: 'Mathieu Gilles', tel: '07 44 55 66 77', email: 'mgilles@free.fr',
-    ville: 'Aubagne 13400', adresse: '—',
-    panneaux: '16-24', tuile: 'canal', integration: 'integre', etage: 'etage',
-    dateRecu: 'Aujourd\'hui 10:05', statut: 'nouveau', source: 'Paiement abandonn\u00E9', notes: 'Arriv\u00E9 jusqu\'\u00E0 la CB. Cr\u00E9neau choisi\u00A0: 12 mai 10h-12h. N\'a pas finalis\u00E9.',
-  },
-  {
-    id: 101, nom: 'Pierre Vidal', tel: '06 12 34 56 78', email: 'p.vidal@free.fr',
-    ville: 'Marseille 13008', adresse: '12 rue Paradis',
-    panneaux: '10-16', tuile: 'romane', integration: 'surimposition', etage: 'plain-pied',
-    dateRecu: 'Aujourd\'hui 10:42', statut: 'nouveau', source: 'Formulaire', notes: '',
-  },
-  {
-    id: 102, nom: 'Sophie Lambert', tel: '07 88 21 45 90', email: 'sophie.l@gmail.com',
-    ville: 'Aix-en-Provence', adresse: '5 chemin des Pinsons',
-    panneaux: '16-24', tuile: 'canal', integration: 'integre', etage: 'etage',
-    dateRecu: 'Aujourd\'hui 09:15', statut: 'nouveau', source: 'Formulaire',
-    notes: 'Panneaux int\u00E9gr\u00E9s, attention \u00E9tanch\u00E9it\u00E9',
-  },
-  {
-    id: 103, nom: 'St\u00E9phane Bennani', tel: '06 45 78 12 03', email: 's.bennani@orange.fr',
-    ville: 'Aubagne 13400', adresse: '28 avenue de la Libert\u00E9',
-    panneaux: '6-10', tuile: 'redland', integration: 'surimposition', etage: 'plain-pied',
-    dateRecu: 'Hier 16:30', statut: 'a-rappeler', source: 'Formulaire',
-    notes: 'Pas de r\u00E9ponse au 1er appel',
-  },
-  {
-    id: 104, nom: 'Isabelle Morel', tel: '06 77 44 22 11', email: 'imorel@yahoo.fr',
-    ville: 'Gardanne 13120', adresse: '3 all\u00E9e des Oliviers',
-    panneaux: '24+', tuile: 'plate', integration: 'unknown', etage: 'immeuble',
-    dateRecu: 'Hier 14:08', statut: 'planifie', source: 'T\u00E9l\u00E9phone',
-    notes: 'RDV le 18 mai 8h-10h avec Karim',
-  },
-  {
-    id: 105, nom: 'Julien Roussel', tel: '06 22 11 00 77', email: 'j.roussel@laposte.net',
-    ville: 'Toulon 83000', adresse: '45 rue Anatole France',
-    panneaux: '10-16', tuile: 'canal', integration: 'surimposition', etage: 'etage',
-    dateRecu: 'Il y a 2 jours', statut: 'planifie', source: 'Formulaire',
-    notes: '',
-  },
-  {
-    id: 106, nom: 'Carla Neves', tel: '07 01 23 45 67', email: 'carla.n@hotmail.fr',
-    ville: 'Nice 06000', adresse: '8 boulevard Gambetta',
-    panneaux: '6-10', tuile: 'bac-acier', integration: 'surimposition', etage: 'plain-pied',
-    dateRecu: 'Il y a 3 jours', statut: 'refuse', source: 'Formulaire',
-    notes: 'Client a choisi un autre prestataire',
-  },
-  {
-    id: 109, nom: 'Sabrina Cohen', tel: '06 01 02 03 04', email: 'scohen@yahoo.fr',
-    ville: 'Aix 13100', adresse: '—',
-    panneaux: '10-16', tuile: '—', integration: 'unknown', etage: '—',
-    dateRecu: 'Il y a 4 jours', statut: 'a-rappeler', source: 'Formulaire abandonn\u00E9',
-    notes: 'A rempli 3 \u00E9tapes sur 5 (panneaux, maison, toiture) puis quitt\u00E9. Tel saisi \u00E0 l\'\u00E9tape 5.',
-  },
-]
-
-// Couleurs + icône par source pour différencier un lead chaud d'un froid
-const SOURCE_META = {
-  'Formulaire': { cls: 'source-form', icon: '📝' },
-  'T\u00E9l\u00E9phone': { cls: 'source-phone', icon: '📞' },
-  'Manuel': { cls: 'source-manual', icon: '👤' },
-  'Rappel demand\u00E9': { cls: 'source-callback', icon: '📞' },
-  'Formulaire abandonn\u00E9': { cls: 'source-abandon', icon: '⚠️' },
-  'Paiement abandonn\u00E9': { cls: 'source-hot', icon: '🔥' },
-}
+import {
+  SOURCE_META,
+  getDemandes,
+  addDemande as addDemandeStore,
+  updateDemande,
+  removeDemande as removeDemandeStore,
+  subscribe,
+} from '../../lib/demandesStore'
 
 const STATUTS = [
   { key: 'tous', label: 'Toutes', color: 'gray' },
@@ -122,11 +57,18 @@ function panneauxToNumber(val) {
 
 export default function AdminDemandes() {
   const navigate = useNavigate()
-  const [demandes, setDemandes] = useState(DEMANDES_INIT)
+  const [demandes, setDemandes] = useState(() => getDemandes())
   const [filtre, setFiltre] = useState('tous')
   const [search, setSearch] = useState('')
   const [selected, setSelected] = useState(null)
   const [newOpen, setNewOpen] = useState(false)
+
+  useEffect(() => {
+    const unsubscribe = subscribe(() => {
+      setDemandes(getDemandes())
+    })
+    return unsubscribe
+  }, [])
 
   const counts = useMemo(() => {
     const c = { tous: demandes.length }
@@ -149,7 +91,7 @@ export default function AdminDemandes() {
   }, [filtre, search, demandes])
 
   const changeStatut = (id, statut) => {
-    setDemandes(ds => ds.map(d => d.id === id ? { ...d, statut } : d))
+    updateDemande(id, { statut })
   }
 
   const planifier = (d) => {
@@ -165,10 +107,14 @@ export default function AdminDemandes() {
       }
     })
   }
-  const removeDemande = (id) => setDemandes(ds => ds.filter(d => d.id !== id))
+  const removeDemande = (id) => removeDemandeStore(id)
+
   const addDemande = (data) => {
-    const id = Math.max(...demandes.map(d => d.id)) + 1
-    setDemandes(ds => [{ id, ...data, dateRecu: 'À l\'instant', source: 'Manuel', statut: 'nouveau' }, ...ds])
+    addDemandeStore({
+      ...data,
+      source: 'Manuel',
+      statut: 'nouveau',
+    })
     setNewOpen(false)
   }
 
