@@ -3,7 +3,43 @@ import { useNavigate, Link } from 'react-router-dom'
 import { Phone, Shield, Clock, Star, Award, MapPin, User, BookOpen, ChevronRight, Sun, Droplets, FileCheck, Zap, ArrowRight, Check, Quote, Menu, X } from 'lucide-react'
 import CallbackModal, { CallbackFab } from '../components/CallbackModal'
 import useSeo from '../lib/useSeo'
+import useJsonLd from '../lib/useJsonLd'
 import { CookieReopenLink } from '../components/CookieConsent'
+
+const FAQ = [
+  {
+    q: 'Combien coûte un nettoyage de panneaux solaires ?',
+    r: '199 € TTC par intervention pour les installations jusqu’à 24 panneaux. Tarif réduit à 179 € TTC quand vous choisissez un créneau recommandé sur un secteur déjà programmé. Aucune avance n’est demandée — paiement en ligne ou à l’intervention.',
+  },
+  {
+    q: 'En combien de temps intervenez-vous ?',
+    r: 'Sous 7 jours en moyenne sur toute la région PACA. Pour les zones les plus demandées (Marseille, Aix, Aubagne, Toulon), souvent sous 48-72h. Vous choisissez votre créneau directement en ligne.',
+  },
+  {
+    q: 'Sur quelles zones intervenez-vous ?',
+    r: 'Toute la région Provence-Alpes-Côte d’Azur : Bouches-du-Rhône (13), Var (83), Alpes-Maritimes (06), Vaucluse (84), Alpes-de-Haute-Provence (04) et Hautes-Alpes (05).',
+  },
+  {
+    q: 'Quelle est la différence avec un nettoyeur classique ?',
+    r: 'Nous sommes des couvreurs certifiés Qualibat, pas des nettoyeurs. À chaque intervention, nous inspectons aussi votre toiture (fixations, tuiles, étanchéité, faîtage). Si une tuile est cassée ou un solin descellé, vous le savez avant de descendre du toit.',
+  },
+  {
+    q: 'Quels produits utilisez-vous ?',
+    r: 'Uniquement de l’eau déminéralisée, sans produit chimique, sans détergent. C’est ce qui permet d’obtenir un séchage sans trace et de préserver le revêtement antireflet de vos panneaux.',
+  },
+  {
+    q: 'Êtes-vous assurés ?',
+    r: 'Oui, nous sommes couverts par une assurance responsabilité civile professionnelle et une garantie décennale. CPH (Contrôle Provence Habitat) est immatriculée au RNE sous le numéro 933 929 051.',
+  },
+  {
+    q: 'Faut-il être présent le jour de l’intervention ?',
+    r: 'Pas nécessairement, dès lors que nous avons accès à la toiture. Vous recevez sous 24h un rapport photo avant/après ainsi qu’un état détaillé de votre toiture.',
+  },
+  {
+    q: 'Puis-je payer après l’intervention ?',
+    r: 'Oui. Vous avez le choix entre payer en ligne par carte au moment de la réservation, ou régler le couvreur à la fin de l’intervention par carte, chèque ou espèces.',
+  },
+]
 
 function AnimatedCounter({ end, suffix = '', duration = 2000 }) {
   const [count, setCount] = useState(0)
@@ -48,6 +84,17 @@ export default function Landing() {
     title: null,
     description: "Nettoyage de panneaux photovoltaïques en région PACA par couvreur certifié. Restaurez jusqu'à 30% de production. Devis gratuit, intervention sous 7 jours, dès 179 € TTC.",
     path: '/',
+  })
+
+  // FAQPage JSON-LD : éligible aux rich snippets Google FAQ
+  useJsonLd('landing-faq', {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: FAQ.map(({ q, r }) => ({
+      '@type': 'Question',
+      name: q,
+      acceptedAnswer: { '@type': 'Answer', text: r },
+    })),
   })
 
   useEffect(() => {
@@ -480,6 +527,27 @@ export default function Landing() {
             <a href="tel:0412160630" className="btn btn-outline-white btn-lg">
               <Phone size={16} /> 04 12 16 06 30
             </a>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="faq-section" id="faq">
+        <div className="container">
+          <div className="faq-head">
+            <span className="faq-eyebrow">Questions fr&eacute;quentes</span>
+            <h2>Tout ce qu&rsquo;il faut savoir avant de r&eacute;server</h2>
+          </div>
+          <div className="faq-list">
+            {FAQ.map(({ q, r }, i) => (
+              <details key={i} className="faq-item">
+                <summary>
+                  <span>{q}</span>
+                  <span className="faq-toggle" aria-hidden="true">+</span>
+                </summary>
+                <p>{r}</p>
+              </details>
+            ))}
           </div>
         </div>
       </section>
