@@ -49,3 +49,8 @@ coverage/
 # Misc
 .cache/
 .parcel-cache/
+
+# Test runners (Playwright, etc.)
+test-results/
+playwright-report/
+playwright/.cache/
