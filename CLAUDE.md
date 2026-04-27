@@ -92,10 +92,10 @@ src/
 
 - **Hébergeur** : o2switch (pas AWS/GCP/Azure — voir memory)
 - **DNS** : Cloudflare en DNS-only
-- **Email transactionnel** : Brevo (gratuit 300/jour) puis IONOS
-- **SMS** : optionnel, payant (~0,06 €/SMS FR via Brevo)
+- **Email transactionnel** : IONOS Mail Pro (avec nom de domaine `cphpaca.fr` acheté chez IONOS) — décision Fares 2026-04-27, Brevo écarté
+- **SMS** : optionnel, payant (~0,06 €/SMS FR — prestataire FR à choisir au moment de l'activation, OVH SMS plausible)
 - **Paiement** : Stripe
-- **CMS blog** : WordPress headless (wp-json) sur même domaine dans /wp/, à l'image de nephants.fr
+- **CMS blog** : WordPress (Fares confirme 2026-04-27 : "WP c'est mieux pour le SEO"). Headless via `/wp-json/wp/v2/posts` sur même domaine dans `/wp/`, à l'image de nephants.fr. Yoast SEO + Wordfence + 2FA.
 - **SEO** : prerender build-time (type `vite-plugin-prerender-spa` ou `vite-ssg`) + meta + JSON-LD
 
 Voir `docs/INTEGRATIONS.md` pour les détails.

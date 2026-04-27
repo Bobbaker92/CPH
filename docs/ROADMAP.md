@@ -55,7 +55,7 @@
     - Synchrone avec `localStorage` (dev) puis API (prod)
     - Résout le problème "les pages ne se parlent pas" de la maquette
 12. **[Auth]** Remplacer `Login.jsx` mock par vraie auth
-    - Option simple : auth par lien magique (Brevo envoie le lien login)
+    - Option simple : auth par lien magique (IONOS SMTP envoie le lien login)
     - Option classique : bcrypt + JWT sessions
 13. **[Backend]** Setup Node + Express + SQLite sur o2switch
     - Routes : `/api/auth`, `/api/demandes`, `/api/interventions`, `/api/clients`, etc.
@@ -69,9 +69,9 @@
 
 ### Phase 5 — Emails (0,5 jour)
 
-18. **[Brevo]** Compte Brevo + domaine vérifié SPF/DKIM/DMARC
+18. **[IONOS]** Pack IONOS Mail Pro + nom de domaine `cphpaca.fr` + SPF/DKIM/DMARC configurés
 19. **[Templates]** Créer les 5 templates email (voir `INTEGRATIONS.md`)
-20. **[Brancher]** Tous les emails trigger-é côté backend
+20. **[Brancher]** Tous les emails trigger-é côté backend via SMTP IONOS authentifié
 
 ### Phase 6 — Blog WP (1 jour)
 

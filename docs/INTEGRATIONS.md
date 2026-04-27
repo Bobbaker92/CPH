@@ -11,7 +11,7 @@
   panneau cPanel familier, PHP + Node.js dispo.
 - **Rejeté** : AWS/GCP/Azure (surdimensionné, complexité inutile à ce stade)
 - **DNS** : Cloudflare en mode DNS-only (pas de proxy — évite cache agressif sur formulaires)
-- **Email entrant** : IONOS d'abord, Brevo SMTP ensuite
+- **Email entrant ET transactionnel** : IONOS Mail Pro avec le nom de domaine `cphpaca.fr` (décision Fares — Brevo écarté)
 
 ## Paiement : Stripe
 
@@ -73,14 +73,15 @@ GET /wp-json/wp/v2/pages                        ← Mentions légales, CGV, etc
   - Sitemap.xml généré au build
 - **Blog** : chaque article prerender-é individuellement avec son contenu depuis WP
 
-## Email transactionnel : Brevo
+## Email transactionnel : IONOS
 
-### Décisions
+### Décisions (mises à jour 2026-04-27)
 
-- **Brevo** (ex-Sendinblue) — gratuit 300 emails/jour = largement suffisant pour un démarrage
-- Envoi via API HTTP (pas SMTP) pour pouvoir tracker l'événement
-- Domaine d'envoi : `contact@cphpaca.fr` (à configurer SPF + DKIM + DMARC sur o2switch)
-- **Pas Mailchimp** (plus cher, overkill pour du transactionnel)
+- **IONOS Mail Pro** avec le nom de domaine `cphpaca.fr` (acheté chez IONOS).
+- Envoi via SMTP authentifié depuis le backend Node sur o2switch.
+- Domaine d'envoi : `contact@cphpaca.fr`. Configurer SPF + DKIM + DMARC chez IONOS DNS (ou Cloudflare DNS si on garde Cloudflare en DNS-only).
+- **Brevo écarté** par décision Fares — IONOS suffit, pas besoin d'un 2ème prestataire pour le démarrage.
+- **Pas Mailchimp** (plus cher, overkill pour du transactionnel).
 
 ### Emails à coder
 
@@ -94,14 +95,15 @@ GET /wp-json/wp/v2/pages                        ← Mentions légales, CGV, etc
 
 Tous en MJML + variables Handlebars.
 
-## SMS : Brevo SMS (option)
+## SMS (option)
 
 ### Décisions
 
-- **Coût réel** : ~0,06 €/SMS FR (Brevo, Twilio, OVH — similaires)
+- **Coût réel** : ~0,06 €/SMS FR (OVH SMS, Twilio, prestataires français — similaires)
 - Pas de SMS "gratuit" transactionnel possible en France légalement
 - **Proposé au client en option** (case à cocher, actuellement marquée "Offert" mais en prod coûte 0,06 € à l'entreprise)
 - À activer SI le taux de no-show dépasse 15% (SMS = meilleure ouverture)
+- Prestataire à choisir au moment de l'activation (pas tranché — OVH SMS plausible vu qu'on reste FR)
 
 ### SMS à coder (si activé)
 
