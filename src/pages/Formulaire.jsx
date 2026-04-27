@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, Sun, Home, Layers, MapPin, User, Phone, Check, Shield, Building, Building2, HelpCircle, PanelTop, Grid3x3 } from 'lucide-react'
 import CallbackModal from '../components/CallbackModal'
+import { addDemande } from '../lib/demandesStore'
 
 const ETAPES = [
   { id: 'panneaux', label: 'Panneaux', icon: Sun },
@@ -73,6 +74,23 @@ const TileVisuals = {
   ),
 }
 
+function telValide(tel = '') {
+  return tel.replace(/\D/g, '').length >= 9
+}
+
+function hashTel(tel = '') {
+  const digits = tel.replace(/\D/g, '')
+  let hash = 0
+  for (let i = 0; i < digits.length; i += 1) {
+    hash = ((hash * 31) + digits.charCodeAt(i)) >>> 0
+  }
+  return hash.toString(36)
+}
+
+function sessionKeyAbandonFormulaire(tel = '') {
+  return `cph_lead_abandon_formulaire_${hashTel(tel)}`
+}
+
 export default function Formulaire() {
   const navigate = useNavigate()
   const [step, setStep] = useState(0)
@@ -90,6 +108,24 @@ export default function Formulaire() {
   })
   const [cpLookup, setCpLookup] = useState({ loading: false, error: '', options: [] })
   const [callbackOpen, setCallbackOpen] = useState(false)
+  const formRef = useRef(form)
+  const stepRef = useRef(step)
+  const step5StartRef = useRef(null)
+  const submitClickedRef = useRef(false)
+  const abandonCapturedRef = useRef(false)
+
+  useEffect(() => {
+    formRef.current = form
+  }, [form])
+
+  useEffect(() => {
+    stepRef.current = step
+    if (step === 4) {
+      step5StartRef.current = Date.now()
+    } else {
+      step5StartRef.current = null
+    }
+  }, [step])
 
   // Auto-remplissage ville depuis code postal (API geo.api.gouv.fr)
   useEffect(() => {
@@ -131,6 +167,51 @@ export default function Formulaire() {
     return () => { cancelled = true; controller.abort() }
   }, [form.codePostal])
 
+  useEffect(() => {
+    const captureAbandon = () => {
+      if (abandonCapturedRef.current) return
+      if (submitClickedRef.current) return
+      if (stepRef.current !== 4) return
+      if (!step5StartRef.current) return
+
+      const duree = Date.now() - step5StartRef.current
+      if (duree <= 15000) return
+
+      const valeurs = formRef.current
+      if (!telValide(valeurs.tel)) return
+
+      const key = sessionKeyAbandonFormulaire(valeurs.tel)
+      if (sessionStorage.getItem(key)) return
+
+      addDemande({
+        nom: valeurs.nom || '—',
+        tel: valeurs.tel || '—',
+        email: valeurs.email || '—',
+        ville: valeurs.ville || '—',
+        adresse: valeurs.adresse || '—',
+        panneaux: valeurs.panneaux || '—',
+        tuile: valeurs.tuile || '—',
+        integration: valeurs.integration || 'unknown',
+        etage: valeurs.etage || '—',
+        source: 'Formulaire abandonné',
+        notes: 'A rempli 5 étapes sur 5 puis quitté sans valider.',
+      })
+      sessionStorage.setItem(key, '1')
+      abandonCapturedRef.current = true
+    }
+
+    const onPageHide = () => {
+      captureAbandon()
+    }
+
+    window.addEventListener('pagehide', onPageHide)
+
+    return () => {
+      window.removeEventListener('pagehide', onPageHide)
+      captureAbandon()
+    }
+  }, [])
+
   const canNext = () => {
     switch (step) {
       case 0: return !!form.panneaux
@@ -168,7 +249,24 @@ export default function Formulaire() {
   const handleNext = () => {
     if (!canNext()) return
     if (step < ETAPES.length - 1) setStep(step + 1)
-    else navigate('/reservation', { state: { devis: form } })
+    else {
+      if (submitClickedRef.current) return
+      submitClickedRef.current = true
+
+      addDemande({
+        nom: form.nom,
+        tel: form.tel,
+        email: form.email,
+        ville: form.ville,
+        adresse: form.adresse || '—',
+        panneaux: form.panneaux,
+        tuile: form.tuile,
+        integration: form.integration,
+        etage: form.etage,
+        source: 'Formulaire',
+      })
+      navigate('/reservation', { state: { devis: form } })
+    }
   }
 
   const handleBack = () => {

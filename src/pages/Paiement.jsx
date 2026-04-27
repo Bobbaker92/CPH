@@ -1,10 +1,11 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import {
   ChevronLeft, CreditCard, Calendar, Shield, Check, Lock, Mail, MessageSquare,
   Clock, MapPin, Info, Loader2, Phone
 } from 'lucide-react'
 import CallbackModal from '../components/CallbackModal'
+import { addDemande } from '../lib/demandesStore'
 
 const JOURS_LONG = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi']
 const MOIS = ['janvier', 'f\u00E9vrier', 'mars', 'avril', 'mai', 'juin', 'juillet', 'ao\u00FBt', 'septembre', 'octobre', 'novembre', 'd\u00E9cembre']
@@ -34,6 +35,23 @@ function detectBrand(num) {
   return ''
 }
 
+function telValide(tel = '') {
+  return tel.replace(/\D/g, '').length >= 9
+}
+
+function hashTel(tel = '') {
+  const digits = tel.replace(/\D/g, '')
+  let hash = 0
+  for (let i = 0; i < digits.length; i += 1) {
+    hash = ((hash * 31) + digits.charCodeAt(i)) >>> 0
+  }
+  return hash.toString(36)
+}
+
+function sessionKeyAbandonPaiement(tel = '') {
+  return `cph_lead_abandon_paiement_${hashTel(tel)}`
+}
+
 export default function Paiement() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -48,6 +66,11 @@ export default function Paiement() {
   const clientEmail = devis.email || 'pierre.vidal@free.fr'
   const clientTel = devis.tel || '06 12 34 56 78'
   const clientNom = [devis.prenom, devis.nom].filter(Boolean).join(' ').trim()
+  const clientAdresse = devis.adresse || '—'
+  const clientPanneaux = devis.panneaux || '—'
+  const clientTuile = devis.tuile || '—'
+  const clientIntegration = devis.integration || 'unknown'
+  const clientEtage = devis.etage || '—'
 
   const [methode, setMethode] = useState('carte') // 'carte' | 'intervention'
   const [notif, setNotif] = useState({ email: true, sms: false })
@@ -55,6 +78,13 @@ export default function Paiement() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [callbackOpen, setCallbackOpen] = useState(false)
+  const submitClickedRef = useRef(false)
+  const enterAtRef = useRef(0)
+  const abandonCapturedRef = useRef(false)
+
+  useEffect(() => {
+    enterAtRef.current = Date.now()
+  }, [])
 
   const brand = useMemo(() => detectBrand(card.number), [card.number])
   const cardComplete = useMemo(() => {
@@ -67,6 +97,7 @@ export default function Paiement() {
   const handleSubmit = (e) => {
     e.preventDefault()
     if (!canSubmit || loading) return
+    submitClickedRef.current = true
     setError('')
     setLoading(true)
 
@@ -88,6 +119,50 @@ export default function Paiement() {
       })
     }, 1400)
   }
+
+  useEffect(() => {
+    const enteredAt = enterAtRef.current
+    const captureAbandon = () => {
+      if (abandonCapturedRef.current) return
+      if (submitClickedRef.current) return
+
+      const duree = Date.now() - enteredAt
+      if (duree <= 20000) return
+      if (!telValide(clientTel)) return
+
+      const key = sessionKeyAbandonPaiement(clientTel)
+      if (sessionStorage.getItem(key)) return
+
+      const notes = `Arrivé jusqu'à la CB. Créneau choisi : ${dateStr} ${creneau}. N'a pas finalisé.`
+
+      addDemande({
+        nom: clientNom || '—',
+        tel: clientTel,
+        email: clientEmail || '—',
+        ville: ville || '—',
+        adresse: clientAdresse,
+        panneaux: clientPanneaux,
+        tuile: clientTuile,
+        integration: clientIntegration,
+        etage: clientEtage,
+        source: 'Paiement abandonné',
+        notes,
+      })
+      sessionStorage.setItem(key, '1')
+      abandonCapturedRef.current = true
+    }
+
+    const onPageHide = () => {
+      captureAbandon()
+    }
+
+    window.addEventListener('pagehide', onPageHide)
+
+    return () => {
+      window.removeEventListener('pagehide', onPageHide)
+      captureAbandon()
+    }
+  }, [clientAdresse, clientEmail, clientEtage, clientIntegration, clientNom, clientPanneaux, clientTel, clientTuile, creneau, dateStr, ville])
 
   return (
     <div className="paiement-page">
