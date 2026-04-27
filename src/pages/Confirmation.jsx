@@ -34,6 +34,7 @@ export default function Confirmation() {
   const notif = state.notif || { email: true, sms: false }
   const email = state.email || 'pierre.vidal@free.fr'
   const tel = state.tel || '06 12 34 56 78'
+  const clientId = state.clientId || null
 
   const [copied, setCopied] = useState('')
   const [showEmailPreview, setShowEmailPreview] = useState(false)
@@ -168,6 +169,11 @@ export default function Confirmation() {
           <button className="btn btn-primary confirm-cta" onClick={() => navigate('/connexion')}>
             Me connecter &agrave; mon espace <ArrowRight size={16} />
           </button>
+          {clientId && (
+            <div style={{ marginTop: 10 }}>
+              <Link to="/client" className="confirm-link-inline">Voir mon espace client</Link>
+            </div>
+          )}
         </div>
 
         {/* Aperçu maquette de l'email — uniquement si nouveau compte */}

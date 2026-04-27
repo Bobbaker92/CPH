@@ -1,21 +1,12 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
   Search, MapPin, Phone, Mail, Plus, Users, Repeat, TrendingUp, X as XIcon,
-  Calendar, FileText, Star, MessageCircle, Edit3, Trash2, Copy, Download, Gift, Sun, Key, Check, Send
+  Calendar, FileText, MessageCircle, Edit3, Trash2, Copy, Download, Sun, Key, Check, Send
 } from 'lucide-react'
 import ActionMenu from '../../components/ActionMenu'
 import { resetClientPasswordByAdmin } from '../../lib/clientAuth'
-
-const CLIENTS = [
-  { id: 1, nom: 'Jean-Pierre Martin', tel: '06 12 34 56 78', email: 'jp.martin@free.fr', ville: 'Marseille 13008', adresse: '12 rue Paradis', interventions: 3, ca: 597, derniere: '12/03/2026', statut: 'actif', notes: 'Client r\u00E9gulier, 2 panneaux suppl\u00E9mentaires pr\u00E9vus.' },
-  { id: 2, nom: 'Marie Duval', tel: '06 98 76 54 32', email: 'm.duval@gmail.com', ville: 'Marseille 13012', adresse: '8 bd National', interventions: 2, ca: 398, derniere: '04/02/2026', statut: 'actif', notes: '' },
-  { id: 3, nom: 'Robert Vidal', tel: '06 11 22 33 44', email: 'rvidal@orange.fr', ville: 'Marseille 13005', adresse: '45 rue de Rome', interventions: 4, ca: 3397, derniere: '28/03/2026', statut: 'vip', notes: 'Signataire d\'un contrat couverture 3200\u00A0\u20AC en mars.' },
-  { id: 4, nom: 'Sophie Blanc', tel: '07 88 99 00 11', email: 's.blanc@yahoo.fr', ville: 'Marseille 13004', adresse: '3 avenue du Prado', interventions: 1, ca: 199, derniere: '15/01/2026', statut: 'nouveau', notes: '' },
-  { id: 5, nom: 'Paul Roche', tel: '06 55 44 33 22', email: 'paul.r@laposte.net', ville: 'Aubagne 13400', adresse: '28 chemin des Oliviers', interventions: 2, ca: 398, derniere: '22/03/2026', statut: 'actif', notes: '' },
-  { id: 6, nom: 'Ahmed Mansour', tel: '07 22 33 44 55', email: 'a.mansour@gmail.com', ville: 'Aix 13100', adresse: '14 cours Mirabeau', interventions: 1, ca: 199, derniere: '18/05/2026', statut: 'nouveau', notes: 'Contact par t\u00E9l\u00E9phone suite pub locale.' },
-  { id: 7, nom: 'Nathalie Perrin', tel: '06 77 88 99 00', email: 'n.perrin@free.fr', ville: 'Aix 13090', adresse: '5 avenue Malacrida', interventions: 3, ca: 1797, derniere: '10/03/2026', statut: 'actif', notes: '' },
-  { id: 8, nom: 'Marc Lefebvre', tel: '06 33 22 11 00', email: 'marc.l@orange.fr', ville: 'Toulon 83000', adresse: '22 rue Picot', interventions: 2, ca: 4399, derniere: '05/04/2026', statut: 'vip', notes: 'Gros contrat rives + fa\u00EEtage sign\u00E9.' },
-]
+import { getClients, subscribe as subscribeClients } from '../../lib/clientsStore'
+import { getInterventions, subscribe as subscribeInterventions } from '../../lib/interventionsStore'
 
 const STATUT_BADGE = {
   nouveau: { label: 'Nouveau', cls: 'badge-blue' },
@@ -23,39 +14,83 @@ const STATUT_BADGE = {
   vip: { label: 'VIP', cls: 'badge-orange' },
 }
 
-const MOCK_TIMELINE = [
-  { date: '28/03/2026', type: 'intervention', titre: 'Nettoyage 16 panneaux', desc: 'Karim Z. &mdash; 199\u00A0\u20AC &mdash; Rapport envoy\u00E9' },
-  { date: '15/03/2026', type: 'devis', titre: 'Devis couverture accept\u00E9', desc: 'Fa\u00EEtage closoir &mdash; 2\u00A0800\u00A0\u20AC' },
-  { date: '10/03/2026', type: 'note', titre: 'Note interne', desc: '2 tuiles fissur\u00E9es rep\u00E9r\u00E9es pan Sud' },
-  { date: '02/02/2026', type: 'intervention', titre: 'Nettoyage 16 panneaux', desc: 'Karim Z. &mdash; 199\u00A0\u20AC &mdash; Rapport envoy\u00E9' },
-  { date: '14/10/2025', type: 'intervention', titre: 'Premi\u00E8re intervention', desc: 'Karim Z. &mdash; 199\u00A0\u20AC &mdash; Client acquis' },
-]
+function normalizeId(id) {
+  return String(id)
+}
+
+function formatDateFr(iso) {
+  if (!iso) return '—'
+  const d = new Date(`${iso}T00:00:00`)
+  if (Number.isNaN(d.getTime())) return '—'
+  return d.toLocaleDateString('fr-FR')
+}
 
 function exportCSV(clients) {
-  const header = ['Nom', 'T\u00E9l\u00E9phone', 'Email', 'Ville', 'Interventions', 'CA', 'Derni\u00E8re', 'Statut']
-  const rows = clients.map(c => [c.nom, c.tel, c.email, c.ville, c.interventions, c.ca, c.derniere, c.statut])
-  const csv = [header, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(';')).join('\n')
+  const header = ['Nom', 'Téléphone', 'Email', 'Ville', 'Interventions', 'CA', 'Dernière', 'Statut']
+  const rows = clients.map((c) => [c.nom, c.tel, c.email, c.ville, c.interventions, c.ca, c.derniere, c.statut])
+  const csv = [header, ...rows].map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(';')).join('\n')
   const blob = new Blob([`\ufeff${csv}`], { type: 'text/csv;charset=utf-8;' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
-  a.download = `clients-cph-${new Date().toISOString().slice(0,10)}.csv`
+  a.download = `clients-cph-${new Date().toISOString().slice(0, 10)}.csv`
   a.click()
   URL.revokeObjectURL(url)
 }
 
 export default function AdminClients() {
+  const [clients, setClients] = useState(() => getClients())
+  const [interventions, setInterventions] = useState(() => getInterventions())
   const [search, setSearch] = useState('')
   const [statut, setStatut] = useState('tous')
-  const [selected, setSelected] = useState(null)
+  const [selectedId, setSelectedId] = useState(null)
   const [tab, setTab] = useState('infos')
   const [pwdReset, setPwdReset] = useState(null) // { client, password, sent }
   const [copied, setCopied] = useState('')
+
+  useEffect(() => {
+    const unsubscribeClients = subscribeClients(() => setClients(getClients()))
+    const unsubscribeInterventions = subscribeInterventions(() => setInterventions(getInterventions()))
+    return () => {
+      unsubscribeClients()
+      unsubscribeInterventions()
+    }
+  }, [])
+
+  const interventionsByClientId = useMemo(() => {
+    const map = {}
+    interventions.forEach((intervention) => {
+      if (!intervention.clientId) return
+      const key = normalizeId(intervention.clientId)
+      if (!map[key]) map[key] = []
+      map[key].push(intervention)
+    })
+    Object.keys(map).forEach((key) => {
+      map[key].sort((a, b) => b.date.localeCompare(a.date) || String(a.heureSort || '').localeCompare(String(b.heureSort || '')))
+    })
+    return map
+  }, [interventions])
+
+  const clientsEnrichis = useMemo(() => {
+    return clients.map((client) => {
+      const linked = interventionsByClientId[normalizeId(client.id)] || []
+      const interventionsCount = linked.length > 0 ? linked.length : Number(client.interventions) || 0
+      const ca = linked.length > 0 ? linked.reduce((sum) => sum + 199, 0) : Number(client.ca) || 0
+      const derniere = linked.length > 0 ? formatDateFr(linked[0].date) : (client.derniere || '—')
+      return {
+        ...client,
+        interventions: interventionsCount,
+        ca,
+        derniere,
+      }
+    })
+  }, [clients, interventionsByClientId])
 
   const openPwdReset = (client) => {
     const { password } = resetClientPasswordByAdmin(client.email, { nom: client.nom, tel: client.tel })
     setPwdReset({ client, password, sent: false })
   }
+
   const copy = (value, key) => {
     navigator.clipboard?.writeText(value)
     setCopied(key)
@@ -63,21 +98,34 @@ export default function AdminClients() {
   }
 
   const stats = useMemo(() => ({
-    total: CLIENTS.length,
-    recurrents: CLIENTS.filter(c => c.interventions > 1).length,
-    ca: CLIENTS.reduce((s, c) => s + c.ca, 0),
-  }), [])
+    total: clientsEnrichis.length,
+    recurrents: clientsEnrichis.filter((c) => c.interventions > 1).length,
+    ca: clientsEnrichis.reduce((sum, c) => sum + (Number(c.ca) || 0), 0),
+  }), [clientsEnrichis])
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
-    return CLIENTS.filter(c => {
+    return clientsEnrichis.filter((c) => {
       if (statut !== 'tous' && c.statut !== statut) return false
       if (!q) return true
-      return c.nom.toLowerCase().includes(q) || c.ville.toLowerCase().includes(q) || c.tel.includes(q)
+      return c.nom.toLowerCase().includes(q) || c.ville.toLowerCase().includes(q) || c.tel.includes(q) || c.email.toLowerCase().includes(q)
     })
-  }, [search, statut])
+  }, [clientsEnrichis, search, statut])
 
-  const openClient = (c) => { setSelected(c); setTab('infos') }
+  const selected = useMemo(() => {
+    if (!selectedId) return null
+    return clientsEnrichis.find((client) => normalizeId(client.id) === normalizeId(selectedId)) || null
+  }, [clientsEnrichis, selectedId])
+
+  const selectedHistorique = useMemo(() => {
+    if (!selected) return []
+    return interventionsByClientId[normalizeId(selected.id)] || []
+  }, [interventionsByClientId, selected])
+
+  const openClient = (client) => {
+    setSelectedId(client.id)
+    setTab('infos')
+  }
 
   return (
     <>
@@ -85,7 +133,7 @@ export default function AdminClients() {
         <div className="page-header-row">
           <div>
             <h1>Clients</h1>
-            <p>Base client consolid&eacute;e avec historique d&apos;interventions.</p>
+            <p>Base client consolidée avec historique d'interventions.</p>
           </div>
           <div className="page-header-actions">
             <button className="btn btn-sm btn-outline" onClick={() => exportCSV(filtered)}><Download size={14} /> Exporter</button>
@@ -105,18 +153,18 @@ export default function AdminClients() {
         </div>
         <div className="stat-card">
           <div className="stat-card-head">
-            <div className="stat-label">Clients r&eacute;currents</div>
+            <div className="stat-label">Clients récurrents</div>
             <Repeat size={14} className="stat-icon" />
           </div>
           <div className="stat-value">{stats.recurrents}</div>
-          <div className="stat-change">{Math.round(stats.recurrents/stats.total*100)}% de la base</div>
+          <div className="stat-change">{stats.total ? Math.round((stats.recurrents / stats.total) * 100) : 0}% de la base</div>
         </div>
         <div className="stat-card">
           <div className="stat-card-head">
-            <div className="stat-label">CA cumul&eacute;</div>
+            <div className="stat-label">CA cumulé</div>
             <TrendingUp size={14} className="stat-icon" />
           </div>
-          <div className="stat-value">{stats.ca.toLocaleString('fr-FR')}&nbsp;&euro;</div>
+          <div className="stat-value">{stats.ca.toLocaleString('fr-FR')} €</div>
           <div className="stat-change">Depuis 2025</div>
         </div>
       </div>
@@ -124,11 +172,11 @@ export default function AdminClients() {
       <div className="admin-toolbar">
         <div className="admin-tabs">
           {[
-            { k: 'tous', l: 'Tous', c: CLIENTS.length },
-            { k: 'nouveau', l: 'Nouveaux', c: CLIENTS.filter(c => c.statut === 'nouveau').length },
-            { k: 'actif', l: 'Actifs', c: CLIENTS.filter(c => c.statut === 'actif').length },
-            { k: 'vip', l: 'VIP', c: CLIENTS.filter(c => c.statut === 'vip').length },
-          ].map(t => (
+            { k: 'tous', l: 'Tous', c: clientsEnrichis.length },
+            { k: 'nouveau', l: 'Nouveaux', c: clientsEnrichis.filter((c) => c.statut === 'nouveau').length },
+            { k: 'actif', l: 'Actifs', c: clientsEnrichis.filter((c) => c.statut === 'actif').length },
+            { k: 'vip', l: 'VIP', c: clientsEnrichis.filter((c) => c.statut === 'vip').length },
+          ].map((t) => (
             <button key={t.k} className={`admin-tab ${statut === t.k ? 'active' : ''}`} onClick={() => setStatut(t.k)}>
               <span>{t.l}</span><span className="admin-tab-count admin-tab-count-gray">{t.c}</span>
             </button>
@@ -136,7 +184,7 @@ export default function AdminClients() {
         </div>
         <div className="admin-search admin-search-inline">
           <Search size={15} />
-          <input type="text" placeholder="Nom, ville, t&eacute;l&eacute;phone&hellip;" value={search} onChange={e => setSearch(e.target.value)} />
+          <input type="text" placeholder="Nom, ville, téléphone…" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
       </div>
 
@@ -149,40 +197,40 @@ export default function AdminClients() {
               <th>Contact</th>
               <th className="cell-num">Interv.</th>
               <th className="cell-num">CA</th>
-              <th>Derni&egrave;re</th>
+              <th>Dernière</th>
               <th>Statut</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
-            {filtered.map(c => (
-              <tr key={c.id} onClick={() => openClient(c)}>
+            {filtered.map((client) => (
+              <tr key={client.id} onClick={() => openClient(client)}>
                 <td data-label="Client">
                   <div className="cell-client">
-                    <span className="avatar-sm">{c.nom.split(' ').map(s => s[0]).slice(0,2).join('')}</span>
-                    <strong>{c.nom}</strong>
+                    <span className="avatar-sm">{client.nom.split(' ').map((s) => s[0]).slice(0, 2).join('')}</span>
+                    <strong>{client.nom}</strong>
                   </div>
                 </td>
-                <td data-label="Ville"><span className="cell-with-icon"><MapPin size={12} /> {c.ville}</span></td>
+                <td data-label="Ville"><span className="cell-with-icon"><MapPin size={12} /> {client.ville}</span></td>
                 <td data-label="Contact">
                   <div className="cell-contact">
-                    <a href={`tel:${c.tel.replace(/\s/g, '')}`} onClick={e => e.stopPropagation()}><Phone size={12} /> {c.tel}</a>
-                    <a href={`mailto:${c.email}`} className="muted" onClick={e => e.stopPropagation()}><Mail size={12} /> {c.email}</a>
+                    <a href={`tel:${client.tel.replace(/\s/g, '')}`} onClick={(e) => e.stopPropagation()}><Phone size={12} /> {client.tel}</a>
+                    <a href={`mailto:${client.email}`} className="muted" onClick={(e) => e.stopPropagation()}><Mail size={12} /> {client.email}</a>
                   </div>
                 </td>
-                <td data-label="Interventions" className="cell-num"><strong>{c.interventions}</strong></td>
-                <td data-label="CA" className="cell-num"><strong>{c.ca.toLocaleString('fr-FR')}&nbsp;&euro;</strong></td>
-                <td data-label="Derni&egrave;re">{c.derniere}</td>
-                <td data-label="Statut"><span className={`badge ${STATUT_BADGE[c.statut].cls}`}>{STATUT_BADGE[c.statut].label}</span></td>
-                <td data-label="" onClick={e => e.stopPropagation()}>
+                <td data-label="Interventions" className="cell-num"><strong>{client.interventions}</strong></td>
+                <td data-label="CA" className="cell-num"><strong>{client.ca.toLocaleString('fr-FR')} €</strong></td>
+                <td data-label="Dernière">{client.derniere}</td>
+                <td data-label="Statut"><span className={`badge ${STATUT_BADGE[client.statut]?.cls || 'badge-gray'}`}>{STATUT_BADGE[client.statut]?.label || client.statut}</span></td>
+                <td data-label="" onClick={(e) => e.stopPropagation()}>
                   <ActionMenu items={[
-                    { icon: <FileText size={13} />, label: 'Voir la fiche', onClick: () => openClient(c) },
+                    { icon: <FileText size={13} />, label: 'Voir la fiche', onClick: () => openClient(client) },
                     { icon: <Edit3 size={13} />, label: 'Modifier' },
                     { icon: <Calendar size={13} />, label: 'Planifier une intervention' },
-                    { icon: <FileText size={13} />, label: 'Cr\u00E9er un devis' },
+                    { icon: <FileText size={13} />, label: 'Créer un devis' },
                     { divider: true },
-                    { icon: <Key size={13} />, label: 'R\u00E9initialiser le mot de passe', onClick: () => openPwdReset(c) },
-                    { icon: <Copy size={13} />, label: 'Copier l\'email', onClick: () => navigator.clipboard?.writeText(c.email) },
+                    { icon: <Key size={13} />, label: 'Réinitialiser le mot de passe', onClick: () => openPwdReset(client) },
+                    { icon: <Copy size={13} />, label: 'Copier l\'email', onClick: () => navigator.clipboard?.writeText(client.email) },
                     { divider: true },
                     { icon: <Trash2 size={13} />, label: 'Supprimer', danger: true },
                   ]} />
@@ -193,27 +241,25 @@ export default function AdminClients() {
         </table>
       </div>
 
-      {/* Drawer fiche client */}
       {selected && (
         <>
-          <div className="admin-drawer-backdrop" onClick={() => setSelected(null)} />
+          <div className="admin-drawer-backdrop" onClick={() => setSelectedId(null)} />
           <aside className="admin-detail-drawer admin-detail-drawer-wide">
             <div className="admin-detail-head">
               <div className="admin-detail-head-client">
-                <span className="avatar-sm" style={{width:40, height:40, fontSize:14}}>
-                  {selected.nom.split(' ').map(s => s[0]).slice(0,2).join('')}
+                <span className="avatar-sm" style={{ width: 40, height: 40, fontSize: 14 }}>
+                  {selected.nom.split(' ').map((s) => s[0]).slice(0, 2).join('')}
                 </span>
                 <div>
                   <h2>{selected.nom}</h2>
-                  <p>Client #{selected.id} &bull; <span className={`badge ${STATUT_BADGE[selected.statut].cls}`}>{STATUT_BADGE[selected.statut].label}</span></p>
+                  <p>Client #{selected.id} • <span className={`badge ${STATUT_BADGE[selected.statut]?.cls || 'badge-gray'}`}>{STATUT_BADGE[selected.statut]?.label || selected.statut}</span></p>
                 </div>
               </div>
-              <button className="admin-drawer-close" onClick={() => setSelected(null)}>
+              <button className="admin-drawer-close" onClick={() => setSelectedId(null)}>
                 <XIcon size={20} />
               </button>
             </div>
 
-            {/* Tabs */}
             <div className="admin-detail-tabs">
               <button className={`admin-detail-tab ${tab === 'infos' ? 'active' : ''}`} onClick={() => setTab('infos')}>Infos</button>
               <button className={`admin-detail-tab ${tab === 'historique' ? 'active' : ''}`} onClick={() => setTab('historique')}>Historique</button>
@@ -225,7 +271,7 @@ export default function AdminClients() {
                 <>
                   <section className="admin-detail-section">
                     <h4>Contact</h4>
-                    <div className="admin-detail-row"><span>T&eacute;l&eacute;phone</span><a href={`tel:${selected.tel.replace(/\s/g, '')}`}>{selected.tel}</a></div>
+                    <div className="admin-detail-row"><span>Téléphone</span><a href={`tel:${selected.tel.replace(/\s/g, '')}`}>{selected.tel}</a></div>
                     <div className="admin-detail-row"><span>Email</span><a href={`mailto:${selected.email}`}>{selected.email}</a></div>
                     <div className="admin-detail-row"><span>Adresse</span><strong>{selected.adresse}</strong></div>
                     <div className="admin-detail-row"><span>Ville</span><strong>{selected.ville}</strong></div>
@@ -234,8 +280,8 @@ export default function AdminClients() {
                     <h4>Statistiques</h4>
                     <div className="mini-stats">
                       <div><span>{selected.interventions}</span><em>Interventions</em></div>
-                      <div><span>{selected.ca.toLocaleString('fr-FR')}&nbsp;&euro;</span><em>CA total</em></div>
-                      <div><span>{selected.derniere}</span><em>Derni&egrave;re</em></div>
+                      <div><span>{selected.ca.toLocaleString('fr-FR')} €</span><em>CA total</em></div>
+                      <div><span>{selected.derniere}</span><em>Dernière</em></div>
                     </div>
                   </section>
                 </>
@@ -243,25 +289,27 @@ export default function AdminClients() {
 
               {tab === 'historique' && (
                 <section className="admin-detail-section">
-                  <h4>Historique d&apos;activit&eacute;</h4>
-                  <ul className="detail-timeline">
-                    {MOCK_TIMELINE.map((item, i) => (
-                      <li key={i} className={`detail-timeline-item detail-timeline-${item.type}`}>
-                        <span className="detail-timeline-dot">
-                          {item.type === 'intervention' && <Sun size={11} />}
-                          {item.type === 'devis' && <FileText size={11} />}
-                          {item.type === 'note' && <MessageCircle size={11} />}
-                        </span>
-                        <div>
-                          <div className="detail-timeline-head">
-                            <strong>{item.titre}</strong>
-                            <span>{item.date}</span>
+                  <h4>Historique d'activité</h4>
+                  {selectedHistorique.length === 0 ? (
+                    <p className="muted" style={{ fontSize: 13 }}>Aucune intervention liée à ce client.</p>
+                  ) : (
+                    <ul className="detail-timeline">
+                      {selectedHistorique.map((item) => (
+                        <li key={item.id} className="detail-timeline-item detail-timeline-intervention">
+                          <span className="detail-timeline-dot"><Sun size={11} /></span>
+                          <div>
+                            <div className="detail-timeline-head">
+                              <strong>Intervention {item.heure}</strong>
+                              <span>{formatDateFr(item.date)}</span>
+                            </div>
+                            <p>
+                              {item.ville} — {item.panneaux} panneaux — {item.statut === 'confirme' ? 'Confirmée' : item.statut === 'a-confirmer' ? 'À confirmer' : item.statut}
+                            </p>
                           </div>
-                          <p dangerouslySetInnerHTML={{ __html: item.desc }} />
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </section>
               )}
 
@@ -270,36 +318,31 @@ export default function AdminClients() {
                   <h4>Notes internes</h4>
                   {selected.notes
                     ? <p className="admin-detail-note">{selected.notes}</p>
-                    : <p className="muted" style={{fontSize:13}}>Aucune note pour ce client.</p>}
-                  <textarea
-                    className="notes-field"
-                    placeholder="Ajouter une note&hellip;"
-                    style={{marginTop:12}}
-                  />
+                    : <p className="muted" style={{ fontSize: 13 }}>Aucune note pour ce client.</p>}
+                  <textarea className="notes-field" placeholder="Ajouter une note…" style={{ marginTop: 12 }} />
                 </section>
               )}
             </div>
 
             <div className="admin-detail-foot">
-              <button className="btn btn-outline btn-sm" onClick={() => setSelected(null)}>Fermer</button>
+              <button className="btn btn-outline btn-sm" onClick={() => setSelectedId(null)}>Fermer</button>
               <button className="btn btn-primary btn-sm"><Calendar size={14} /> Planifier</button>
             </div>
           </aside>
         </>
       )}
 
-      {/* Modale r\u00e9initialisation mot de passe */}
       {pwdReset && (
         <div className="pw-report-backdrop" onClick={() => setPwdReset(null)}>
-          <div className="pw-report-modal admin-pwd-reset-modal" onClick={e => e.stopPropagation()}>
+          <div className="pw-report-modal admin-pwd-reset-modal" onClick={(e) => e.stopPropagation()}>
             <div className="pw-report-head">
-              <h3>R&eacute;initialiser le mot de passe</h3>
+              <h3>Réinitialiser le mot de passe</h3>
               <button onClick={() => setPwdReset(null)}><XIcon size={20} /></button>
             </div>
 
             <div className="admin-pwd-reset-body">
               <div className="admin-pwd-reset-client">
-                <span className="avatar-sm">{pwdReset.client.nom.split(' ').map(s => s[0]).slice(0, 2).join('')}</span>
+                <span className="avatar-sm">{pwdReset.client.nom.split(' ').map((s) => s[0]).slice(0, 2).join('')}</span>
                 <div>
                   <strong>{pwdReset.client.nom}</strong>
                   <span>{pwdReset.client.email}</span>
@@ -309,8 +352,8 @@ export default function AdminClients() {
               <div className="admin-pwd-reset-info">
                 <Key size={14} />
                 <div>
-                  <strong>Nouveau mot de passe g&eacute;n&eacute;r&eacute;</strong>
-                  <span>Communiquez-le au client. Son ancien mot de passe est d&eacute;sormais invalide.</span>
+                  <strong>Nouveau mot de passe généré</strong>
+                  <span>Communiquez-le au client. Son ancien mot de passe est désormais invalide.</span>
                 </div>
               </div>
 
@@ -323,13 +366,13 @@ export default function AdminClients() {
               </div>
 
               {!pwdReset.sent ? (
-                <button className="btn btn-primary admin-pwd-reset-send" onClick={() => setPwdReset(p => ({ ...p, sent: true }))}>
-                  <Send size={14} /> Envoyer par email &agrave; {pwdReset.client.email}
+                <button className="btn btn-primary admin-pwd-reset-send" onClick={() => setPwdReset((p) => ({ ...p, sent: true }))}>
+                  <Send size={14} /> Envoyer par email à {pwdReset.client.email}
                 </button>
               ) : (
                 <div className="admin-pwd-reset-sent">
                   <Check size={16} />
-                  <span>Email envoy&eacute; &agrave; <strong>{pwdReset.client.email}</strong> (simul&eacute; en maquette).</span>
+                  <span>Email envoyé à <strong>{pwdReset.client.email}</strong> (simulé en maquette).</span>
                 </div>
               )}
             </div>
