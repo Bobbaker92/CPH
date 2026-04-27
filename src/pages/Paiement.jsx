@@ -6,6 +6,7 @@ import {
 } from 'lucide-react'
 import CallbackModal from '../components/CallbackModal'
 import { addDemande } from '../lib/demandesStore'
+import { addClient } from '../lib/clientsStore'
 
 const JOURS_LONG = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi']
 const MOIS = ['janvier', 'f\u00E9vrier', 'mars', 'avril', 'mai', 'juin', 'juillet', 'ao\u00FBt', 'septembre', 'octobre', 'novembre', 'd\u00E9cembre']
@@ -104,6 +105,13 @@ export default function Paiement() {
     // Simule un appel Stripe
     setTimeout(() => {
       setLoading(false)
+      const client = addClient({
+        nom: clientNom || devis.nom || '—',
+        tel: clientTel,
+        email: clientEmail,
+        ville,
+        adresse: devis.adresse || '—',
+      })
       navigate('/confirmation', {
         state: {
           date: dateStr,
@@ -115,6 +123,7 @@ export default function Paiement() {
           email: clientEmail,
           tel: clientTel,
           nom: clientNom,
+          clientId: client?.id || null,
         }
       })
     }, 1400)

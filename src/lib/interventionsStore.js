@@ -1,4 +1,5 @@
-import { updateDemande } from './demandesStore'
+import { getDemandes, updateDemande } from './demandesStore'
+import { addClient } from './clientsStore'
 
 const KEY_INTERVENTIONS = 'cph_interventions_v1'
 const KEY_OVERRIDES = 'cph_interventions_overrides_v1'
@@ -87,6 +88,17 @@ function heureToSort(heure = '') {
   return heure.replace(/h/, ':').replace(/-.*/, '').replace(/^(\d):/, '0$1:').slice(0, 5)
 }
 
+function notBlank(value) {
+  if (value == null) return false
+  const str = String(value).trim()
+  return str !== '' && str !== '—'
+}
+
+function findDemande(demandeId) {
+  const key = normalizeId(demandeId)
+  return getDemandes().find((demande) => normalizeId(demande.id) === key) || null
+}
+
 export function getInterventions() {
   const persisted = getPersisted()
   const overrides = getOverrides()
@@ -102,11 +114,31 @@ export function getInterventions() {
 }
 
 export function addIntervention(data = {}) {
+  const demande = data.demandeId != null ? findDemande(data.demandeId) : null
+  const nomClient = data.client || data.nom || demande?.nom || '—'
+  const telClient = data.tel || demande?.tel || '—'
+  const emailClient = data.email || demande?.email || '—'
+  const villeClient = data.ville || demande?.ville || '—'
+  const adresseClient = data.adresse || demande?.adresse || '—'
+
+  const linkedClient =
+    notBlank(telClient) || notBlank(emailClient)
+      ? addClient({
+          nom: nomClient,
+          tel: telClient,
+          email: emailClient,
+          ville: villeClient,
+          adresse: adresseClient,
+        })
+      : null
+
   const newIntervention = {
     id: buildUuid(),
-    client: data.client || data.nom || '—',
-    tel: data.tel || '—',
-    ville: data.ville || '—',
+    client: nomClient,
+    tel: telClient,
+    email: emailClient,
+    ville: villeClient,
+    adresse: adresseClient,
     panneaux: Number(data.panneaux) || 0,
     date: data.date || new Date().toISOString().slice(0, 10),
     heure: data.heure || '8h-10h',
@@ -114,6 +146,7 @@ export function addIntervention(data = {}) {
     couvreur: data.couvreur || COUVREUR_UNIQUE,
     statut: data.statut || 'a-confirmer',
     demandeId: data.demandeId ?? null,
+    clientId: data.clientId ?? linkedClient?.id ?? null,
     jour: data.jour || '',
   }
 
