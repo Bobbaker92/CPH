@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './_helpers'
 
 // Émule iPhone via viewport + isMobile sans dépendre de WebKit
 // (qui n'est pas installé en CI minimal — chromium suffit).

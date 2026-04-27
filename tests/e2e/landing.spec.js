@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './_helpers'
 
 test.describe('Landing /', () => {
   test('charge la page et affiche le hero', async ({ page }) => {

@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './_helpers'
 
 test.describe('Funnel /devis', () => {
   test('charge l\'étape 1 (panneaux) et le stepper visible', async ({ page }) => {
