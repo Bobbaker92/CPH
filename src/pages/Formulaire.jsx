@@ -54,12 +54,12 @@ function ChoiceCard({ selected, onClick, icon, label, description, visual }) {
 
 // Photos de tuiles
 const TileVisuals = {
-  canal: <img src="/tuiles/canal.webp" alt="Tuile canal" />,
-  romane: <img src="/tuiles/romane.webp" alt="Tuile romane" />,
-  redland: <img src="/tuiles/redland.webp" alt="Tuile Redland" />,
-  plate: <img src="/tuiles/plate.webp" alt="Tuile plate" />,
-  mecanique: <img src="/tuiles/romane.webp" alt="Tuile m\u00E9canique" />,
-  bacAcier: <img src="/tuiles/bac-acier.webp" alt="Bac acier" />,
+  canal: <img loading="lazy" decoding="async" src="/tuiles/canal.webp" alt="Tuile canal" />,
+  romane: <img loading="lazy" decoding="async" src="/tuiles/romane.webp" alt="Tuile romane" />,
+  redland: <img loading="lazy" decoding="async" src="/tuiles/redland.webp" alt="Tuile Redland" />,
+  plate: <img loading="lazy" decoding="async" src="/tuiles/plate.webp" alt="Tuile plate" />,
+  mecanique: <img loading="lazy" decoding="async" src="/tuiles/romane.webp" alt="Tuile m\u00E9canique" />,
+  bacAcier: <img loading="lazy" decoding="async" src="/tuiles/bac-acier.webp" alt="Bac acier" />,
   autre: (
     <svg viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
       <defs>
