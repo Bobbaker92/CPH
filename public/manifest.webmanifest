@@ -1,0 +1,35 @@
+{
+  "name": "CPH Solar — Nettoyage de panneaux solaires en PACA",
+  "short_name": "CPH Solar",
+  "description": "Nettoyage et entretien de panneaux photovoltaïques par couvreur certifié, partout en région PACA. Devis gratuit, intervention sous 7 jours.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "lang": "fr-FR",
+  "dir": "ltr",
+  "categories": ["business", "utilities"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Demander un devis",
+      "short_name": "Devis",
+      "description": "Obtenir un devis en 2 minutes",
+      "url": "/devis"
+    },
+    {
+      "name": "Mon espace client",
+      "short_name": "Espace client",
+      "url": "/connexion"
+    }
+  ]
+}
