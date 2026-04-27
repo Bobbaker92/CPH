@@ -5,6 +5,7 @@ import CallbackModal, { CallbackFab } from '../components/CallbackModal'
 import useSeo from '../lib/useSeo'
 import useJsonLd from '../lib/useJsonLd'
 import { CookieReopenLink } from '../components/CookieConsent'
+import RoiCalculator from '../components/RoiCalculator'
 
 const FAQ = [
   {
@@ -530,6 +531,9 @@ export default function Landing() {
           </div>
         </div>
       </section>
+
+      {/* Calculateur ROI */}
+      <RoiCalculator />
 
       {/* FAQ */}
       <section className="faq-section" id="faq">
