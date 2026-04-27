@@ -4,10 +4,11 @@ import {
   LayoutDashboard, Inbox, Calendar, Users, UserCheck, Gift, Target, LogOut, Sun,
   Search, Bell, ChevronDown, Menu, X, Settings
 } from 'lucide-react'
+import { getDemandes, subscribe } from '../../lib/demandesStore'
 
 const NAV_ITEMS = [
   { to: '/admin', icon: LayoutDashboard, label: 'Tableau de bord', short: 'Accueil', end: true },
-  { to: '/admin/demandes', icon: Inbox, label: 'Demandes', short: 'Demandes', badge: 3 },
+  { to: '/admin/demandes', icon: Inbox, label: 'Demandes', short: 'Demandes' },
   { to: '/admin/planning', icon: Calendar, label: 'Planning', short: 'Planning' },
   { to: '/admin/clients', icon: Users, label: 'Clients', short: 'Clients' },
   { to: '/admin/couvreurs', icon: UserCheck, label: 'Couvreurs', short: 'Couvreurs' },
@@ -30,6 +31,7 @@ export default function AdminDashboard() {
   const [userOpen, setUserOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [badgeDemandes, setBadgeDemandes] = useState(0)
   const searchRef = useRef(null)
 
   // Cmd+K pour focus recherche
@@ -56,7 +58,19 @@ export default function AdminDashboard() {
     return () => document.removeEventListener('mousedown', onClick)
   }, [])
 
-  const totalBadges = NAV_ITEMS.reduce((s, it) => s + (it.badge || 0), 0)
+  useEffect(() => {
+    const refreshBadgeDemandes = () => {
+      const nouvelles = getDemandes().filter((demande) => demande.statut === 'nouveau').length
+      setBadgeDemandes(nouvelles)
+    }
+
+    refreshBadgeDemandes()
+    const unsubscribe = subscribe(refreshBadgeDemandes)
+    return unsubscribe
+  }, [])
+
+  const getBadge = (item) => (item.to === '/admin/demandes' ? badgeDemandes : (item.badge || 0))
+  const totalBadges = NAV_ITEMS.reduce((sum, item) => sum + getBadge(item), 0)
 
   return (
     <div className="admin-shell">
@@ -80,7 +94,7 @@ export default function AdminDashboard() {
             >
               <item.icon size={18} />
               <span>{item.label}</span>
-              {item.badge ? <span className="admin-sidebar-badge">{item.badge}</span> : null}
+              {getBadge(item) ? <span className="admin-sidebar-badge">{getBadge(item)}</span> : null}
             </NavLink>
           ))}
         </nav>
@@ -120,7 +134,7 @@ export default function AdminDashboard() {
                 >
                   <item.icon size={18} />
                   <span>{item.label}</span>
-                  {item.badge ? <span className="admin-sidebar-badge">{item.badge}</span> : null}
+                  {getBadge(item) ? <span className="admin-sidebar-badge">{getBadge(item)}</span> : null}
                 </NavLink>
               ))}
             </nav>
@@ -256,7 +270,7 @@ export default function AdminDashboard() {
             >
               <div className="admin-bottomnav-icon">
                 <item.icon size={20} />
-                {item.badge ? <span className="admin-bottomnav-badge">{item.badge}</span> : null}
+                {getBadge(item) ? <span className="admin-bottomnav-badge">{getBadge(item)}</span> : null}
               </div>
               <span>{item.short}</span>
             </NavLink>
