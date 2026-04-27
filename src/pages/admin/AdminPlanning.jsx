@@ -7,35 +7,12 @@ import {
 } from 'lucide-react'
 import ActionMenu from '../../components/ActionMenu'
 import AddInterventionModal from '../../components/AddInterventionModal'
-import { DATA_SYNC_KEYS, readSyncedData, subscribeSyncedData, writeSyncedData } from '../../lib/dataSync'
-
-const COUVREUR_UNIQUE = 'Karim Ziani'
-
-const ALL_INTERVENTIONS_INIT = [
-  { id: 'i1', date: '2026-05-04', heure: '8h-10h', heureSort: '08:00', client: 'Robert Vidal', ville: 'Marseille 13005', couvreur: COUVREUR_UNIQUE, panneaux: 12, statut: 'confirme' },
-  { id: 'i2', date: '2026-05-04', heure: '10h30-12h30', heureSort: '10:30', client: 'Jean-Pierre Martin', ville: 'Marseille 13008', couvreur: COUVREUR_UNIQUE, panneaux: 16, statut: 'confirme' },
-  { id: 'i3', date: '2026-05-04', heure: '14h-16h', heureSort: '14:00', client: 'Marie Duval', ville: 'Marseille 13012', couvreur: COUVREUR_UNIQUE, panneaux: 8, statut: 'confirme' },
-  { id: 'i6', date: '2026-05-05', heure: '9h-11h', heureSort: '09:00', client: 'Claire Dubois', ville: 'Aix 13100', couvreur: COUVREUR_UNIQUE, panneaux: 10, statut: 'confirme' },
-  { id: 'i8', date: '2026-05-05', heure: '14h-16h', heureSort: '14:00', client: 'Isabelle Morel', ville: 'Gardanne 13120', couvreur: COUVREUR_UNIQUE, panneaux: 16, statut: 'confirme' },
-  { id: 'i13', date: '2026-05-07', heure: '8h-10h', heureSort: '08:00', client: 'Thomas Roux', ville: 'Aubagne 13400', couvreur: COUVREUR_UNIQUE, panneaux: 14, statut: 'a-confirmer' },
-  { id: 'i14', date: '2026-05-07', heure: '10h-12h', heureSort: '10:00', client: 'Nadia Khelif', ville: 'Aubagne 13400', couvreur: COUVREUR_UNIQUE, panneaux: 10, statut: 'confirme' },
-  { id: 'i15', date: '2026-05-08', heure: '9h-11h', heureSort: '09:00', client: 'Alain Bernard', ville: 'Aix 13100', couvreur: COUVREUR_UNIQUE, panneaux: 20, statut: 'a-confirmer' },
-  { id: 'i16', date: '2026-05-09', heure: '8h-10h', heureSort: '08:00', client: 'Sylvie Mercier', ville: 'Marseille 13004', couvreur: COUVREUR_UNIQUE, panneaux: 8, statut: 'confirme' },
-  { id: 'i17', date: '2026-05-09', heure: '10h-12h', heureSort: '10:00', client: 'Bruno Costa', ville: 'Marseille 13006', couvreur: COUVREUR_UNIQUE, panneaux: 12, statut: 'confirme' },
-  { id: 'i18', date: '2026-05-09', heure: '14h-16h', heureSort: '14:00', client: 'Fatima Aoudi', ville: 'Marseille 13010', couvreur: COUVREUR_UNIQUE, panneaux: 6, statut: 'confirme' },
-  { id: 'i19', date: '2026-05-10', heure: '8h-10h', heureSort: '08:00', client: 'Patrick Leroy', ville: 'Toulon 83000', couvreur: COUVREUR_UNIQUE, panneaux: 10, statut: 'a-confirmer' },
-  { id: 'i9', date: '2026-05-12', heure: '8h-9h30', heureSort: '08:00', client: 'Laurent Petit', ville: 'Toulon 83000', couvreur: COUVREUR_UNIQUE, panneaux: 8, statut: 'confirme' },
-  { id: 'i10', date: '2026-05-12', heure: '10h-11h30', heureSort: '10:00', client: 'Sophie Blanc', ville: 'Toulon 83200', couvreur: COUVREUR_UNIQUE, panneaux: 10, statut: 'confirme' },
-  { id: 'i11', date: '2026-05-12', heure: '13h-14h30', heureSort: '13:00', client: 'Nicolas Fabre', ville: 'Toulon 83500', couvreur: COUVREUR_UNIQUE, panneaux: 6, statut: 'a-confirmer' },
-  { id: 'i12', date: '2026-05-12', heure: '15h-16h30', heureSort: '15:00', client: 'Claire Vasseur', ville: 'Toulon 83100', couvreur: COUVREUR_UNIQUE, panneaux: 8, statut: 'confirme' },
-  { id: 'i20', date: '2026-05-13', heure: '9h-11h', heureSort: '09:00', client: 'Michel Dupont', ville: 'Nice 06000', couvreur: COUVREUR_UNIQUE, panneaux: 18, statut: 'confirme' },
-  { id: 'i21', date: '2026-05-13', heure: '14h-16h', heureSort: '14:00', client: 'Sandra Ricci', ville: 'Nice 06300', couvreur: COUVREUR_UNIQUE, panneaux: 12, statut: 'confirme' },
-  { id: 'i22', date: '2026-05-15', heure: '8h-10h', heureSort: '08:00', client: 'Yves Garnier', ville: 'Marseille 13001', couvreur: COUVREUR_UNIQUE, panneaux: 14, statut: 'confirme' },
-  { id: 'i23', date: '2026-05-16', heure: '9h-11h', heureSort: '09:00', client: 'Lucie Blanc', ville: 'Aix 13100', couvreur: COUVREUR_UNIQUE, panneaux: 10, statut: 'a-confirmer' },
-  { id: 'i24', date: '2026-05-19', heure: '8h-10h', heureSort: '08:00', client: 'Rachid Bouzid', ville: 'Marseille 13003', couvreur: COUVREUR_UNIQUE, panneaux: 8, statut: 'confirme' },
-  { id: 'i25', date: '2026-05-20', heure: '10h-12h', heureSort: '10:00', client: 'Chantal Morin', ville: 'Toulon 83000', couvreur: COUVREUR_UNIQUE, panneaux: 16, statut: 'a-confirmer' },
-  { id: 'i26', date: '2026-05-22', heure: '8h-10h', heureSort: '08:00', client: 'Henri Faure', ville: 'Nice 06000', couvreur: COUVREUR_UNIQUE, panneaux: 12, statut: 'confirme' },
-]
+import {
+  getInterventions,
+  updateIntervention,
+  removeIntervention as removeInterventionStore,
+  subscribe,
+} from '../../lib/interventionsStore'
 
 const STATUT_LABEL = { 'confirme': 'Confirmé', 'a-confirmer': 'À confirmer', 'termine': 'Terminée', 'annulee': 'Annulée' }
 const CAPACITE_STANDARD = 3
@@ -327,7 +304,7 @@ function ReportModal({ target, form, setForm, allInterventions, onSubmit, onClos
 export default function AdminPlanning() {
   const location = useLocation()
   const navigate = useNavigate()
-  const [interventions, setInterventions] = useState(() => readSyncedData(DATA_SYNC_KEYS.planningInterventions, ALL_INTERVENTIONS_INIT))
+  const [interventions, setInterventions] = useState(() => getInterventions())
   const [view, setView] = useState('semaine') // jour | semaine | mois
   const [currentDate, setCurrentDate] = useState('2026-05-04') // date pivot
   const initialPreselected = location.state?.preselected ?? null
@@ -343,17 +320,13 @@ export default function AdminPlanning() {
   }, [location, navigate])
 
   useEffect(() => {
-    writeSyncedData(DATA_SYNC_KEYS.planningInterventions, interventions)
-  }, [interventions])
-
-  useEffect(() => {
-    return subscribeSyncedData(DATA_SYNC_KEYS.planningInterventions, () => {
-      setInterventions(readSyncedData(DATA_SYNC_KEYS.planningInterventions, ALL_INTERVENTIONS_INIT))
+    return subscribe(() => {
+      setInterventions(getInterventions())
     })
   }, [])
 
-  const changeStatut = (id, statut) => setInterventions(list => list.map(i => i.id === id ? { ...i, statut } : i))
-  const removeIntervention = (id) => setInterventions(list => list.filter(i => i.id !== id))
+  const changeStatut = (id, statut) => updateIntervention(id, { statut })
+  const removeIntervention = (id) => removeInterventionStore(id)
 
   const openReport = (inter) => {
     setReportTarget(inter)
@@ -362,11 +335,7 @@ export default function AdminPlanning() {
   const submitReport = () => {
     if (!reportForm.date || !reportForm.heure) return
     const heureSort = reportForm.heure.replace(/h/, ':').replace(/-.*/, '').replace(/^(\d):/, '0$1:').padStart(5, '0')
-    setInterventions(list => list.map(i =>
-      i.id === reportTarget.id
-        ? { ...i, date: reportForm.date, heure: reportForm.heure, heureSort }
-        : i
-    ))
+    updateIntervention(reportTarget.id, { date: reportForm.date, heure: reportForm.heure, heureSort })
     setReportTarget(null)
     setCurrentDate(reportForm.date)
   }
@@ -617,14 +586,8 @@ export default function AdminPlanning() {
           preselectedTel={preselected?.tel || ''}
           preselectedVille={preselected?.ville || ''}
           preselectedPanneaux={preselected?.panneaux || ''}
-          onAdd={(data) => {
-            const id = 'new-' + Date.now()
-            setInterventions(list => [...list, {
-              id, ...data,
-              heureSort: data.heure.replace(/h/, ':').replace(/-.*/, '').padStart(5, '0'),
-              couvreur: COUVREUR_UNIQUE,
-              statut: 'a-confirmer',
-            }])
+          preselectedDemandeId={preselected?.demandeId || null}
+          onPlanned={(data) => {
             setAddOpen(false)
             setPreselected(null)
             setCurrentDate(data.date)
