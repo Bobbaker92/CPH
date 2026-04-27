@@ -5427,3 +5427,26 @@ tbody tr:last-child td { border-bottom: none; }
   outline: 3px solid white;
   outline-offset: 2px;
 }
+
+/* === Fallback de chargement (React.lazy + Suspense) === */
+.lazy-fallback {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: #64748b;
+  font-size: 14px;
+}
+.lazy-fallback-spinner {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 3px solid #e5e7eb;
+  border-top-color: #2563eb;
+  animation: lazySpinner 720ms linear infinite;
+}
+@keyframes lazySpinner {
+  to { transform: rotate(360deg); }
+}
