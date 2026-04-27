@@ -120,7 +120,7 @@ export default function Blog() {
       </div>
 
       {/* Articles */}
-      <div className="container" style={{maxWidth:800, padding:'48px 24px'}}>
+      <div className="container" id="main-content" tabIndex="-1" style={{maxWidth:800, padding:'48px 24px'}}>
         {ARTICLES.map((article, i) => (
           <Link to={`/blog/${article.slug}`} key={i} style={{display:'block', marginBottom:24}}>
             <article className="card" style={{

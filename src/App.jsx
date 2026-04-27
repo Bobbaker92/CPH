@@ -32,10 +32,12 @@ import CGV from './pages/legal/CGV'
 import Confidentialite from './pages/legal/Confidentialite'
 import NotFound from './pages/NotFound'
 import CookieConsent from './components/CookieConsent'
+import SkipLink from './components/SkipLink'
 
 function App() {
   return (
     <BrowserRouter>
+      <SkipLink />
       <ScrollToTop />
       <CookieConsent />
       <Routes>
