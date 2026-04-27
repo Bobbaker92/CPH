@@ -5016,3 +5016,79 @@ tbody tr:last-child td { border-bottom: none; }
 .legal-page-footer a:hover {
   color: white;
 }
+
+/* === Page 404 === */
+.notfound-root {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f7f8fb 0%, #e0e7ff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  color: #1a1f2e;
+}
+.notfound-inner {
+  max-width: 520px;
+  text-align: center;
+  background: white;
+  padding: 48px 32px;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(15, 23, 42, 0.08);
+}
+.notfound-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+  font-size: 14px;
+}
+.notfound-code {
+  font-size: 88px;
+  font-weight: 800;
+  line-height: 1;
+  background: linear-gradient(135deg, #2563eb, #f59e0b);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 8px;
+}
+.notfound-inner h1 {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 12px;
+  color: #0f172a;
+}
+.notfound-inner > p {
+  color: #64748b;
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0 0 28px;
+}
+.notfound-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.notfound-help {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0 0 20px;
+}
+.notfound-help a {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 500;
+}
+.notfound-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #94a3b8;
+  text-decoration: none;
+}
+.notfound-back:hover {
+  color: #2563eb;
+}

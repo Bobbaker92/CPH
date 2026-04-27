@@ -30,6 +30,7 @@ import ProspectionApp from './pages/prospection/ProspectionApp'
 import MentionsLegales from './pages/legal/MentionsLegales'
 import CGV from './pages/legal/CGV'
 import Confidentialite from './pages/legal/Confidentialite'
+import NotFound from './pages/NotFound'
 
 function App() {
   return (
@@ -76,6 +77,9 @@ function App() {
 
         {/* Espace Couvreur */}
         <Route path="/couvreur" element={<CouvreurApp />} />
+
+        {/* 404 catch-all */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   )
