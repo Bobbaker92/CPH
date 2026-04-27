@@ -198,7 +198,7 @@ export default function Landing() {
       )}
 
       {/* Hero */}
-      <section className="hero-section">
+      <section className="hero-section" id="main-content" tabIndex="-1">
         <div className="hero-bg"></div>
         <div className="hero-overlay"></div>
         <div className="hero-inner">

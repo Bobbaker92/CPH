@@ -284,7 +284,7 @@ export default function BlogArticle() {
 
       {/* Article layout with sidebar */}
       <div className="article-layout">
-        <article className="article-main">
+        <article className="article-main" id="main-content" tabIndex="-1">
           {/* Back */}
           <Link to="/blog" style={{
             display:'inline-flex', alignItems:'center', gap:6,
