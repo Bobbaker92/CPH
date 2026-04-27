@@ -31,11 +31,13 @@ import MentionsLegales from './pages/legal/MentionsLegales'
 import CGV from './pages/legal/CGV'
 import Confidentialite from './pages/legal/Confidentialite'
 import NotFound from './pages/NotFound'
+import CookieConsent from './components/CookieConsent'
 
 function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
+      <CookieConsent />
       <Routes>
         {/* Public */}
         <Route path="/" element={<Landing />} />
