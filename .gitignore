@@ -54,3 +54,6 @@ coverage/
 test-results/
 playwright-report/
 playwright/.cache/
+
+# Sitemap (généré au build via scripts/generate-sitemap.mjs)
+public/sitemap.xml
