@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom'
 import { Shield, Calendar, Clock, ArrowRight, BookOpen, User } from 'lucide-react'
 import useSeo from '../lib/useSeo'
+import useJsonLd from '../lib/useJsonLd'
+
+const SITE = 'https://cphpaca.fr'
 
 const ARTICLES = [
   {
@@ -58,6 +61,28 @@ export default function Blog() {
     title: 'Blog — Conseils nettoyage et entretien de panneaux solaires',
     description: "Conseils, retours d'expérience et bonnes pratiques pour entretenir vos panneaux photovoltaïques en PACA. Articles rédigés par des couvreurs.",
     path: '/blog',
+  })
+
+  // ItemList JSON-LD : aide Google à comprendre la liste des articles
+  useJsonLd('blog-itemlist', {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: ARTICLES.map((a, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: a.titre,
+      url: `${SITE}/blog/${a.slug}`,
+    })),
+  })
+
+  // Breadcrumb : Accueil > Blog
+  useJsonLd('blog-breadcrumb', {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Accueil', item: `${SITE}/` },
+      { '@type': 'ListItem', position: 2, name: 'Blog', item: `${SITE}/blog` },
+    ],
   })
 
   return (

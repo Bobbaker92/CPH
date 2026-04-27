@@ -1,6 +1,9 @@
 import { useParams, Link } from 'react-router-dom'
 import { Shield, Calendar, Clock, ArrowLeft, BookOpen, User, Phone, Check, ArrowRight, Sun } from 'lucide-react'
 import useSeo from '../lib/useSeo'
+import useJsonLd from '../lib/useJsonLd'
+
+const SITE = 'https://cphpaca.fr'
 
 const ARTICLES = {
   'pourquoi-nettoyer-panneaux-solaires': {
@@ -102,6 +105,33 @@ export default function BlogArticle() {
     title: article.titre,
     description: seoDescription || article.titre,
     path: `/blog/${slug}`,
+  })
+
+  // Breadcrumb JSON-LD : Accueil > Blog > Article
+  useJsonLd(`breadcrumb-${slug}`, {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Accueil', item: `${SITE}/` },
+      { '@type': 'ListItem', position: 2, name: 'Blog', item: `${SITE}/blog` },
+      { '@type': 'ListItem', position: 3, name: article.titre, item: `${SITE}/blog/${slug}` },
+    ],
+  })
+
+  // Article JSON-LD : pour rich snippet article (date, auteur, titre)
+  useJsonLd(`article-${slug}`, {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: article.titre,
+    datePublished: article.date,
+    author: { '@type': 'Organization', name: 'CPH Solar' },
+    publisher: {
+      '@type': 'Organization',
+      name: 'CPH Solar',
+      logo: { '@type': 'ImageObject', url: `${SITE}/favicon.svg` },
+    },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE}/blog/${slug}` },
+    articleSection: article.categorie,
   })
 
   return (
