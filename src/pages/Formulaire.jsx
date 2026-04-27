@@ -285,6 +285,7 @@ export default function Formulaire() {
 
   return (
     <div className="funnel-page">
+      <h1 className="sr-only">Devis nettoyage de panneaux solaires en r&eacute;gion PACA</h1>
       {/* Header */}
       <div className="funnel-header">
         <div className="funnel-header-inner">
