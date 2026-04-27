@@ -1,5 +1,6 @@
 import { getDemandes, updateDemande } from './demandesStore'
 import { addClient } from './clientsStore'
+import { findParrainageByInvite, updateParrainage } from './parrainagesStore'
 
 const KEY_INTERVENTIONS = 'cph_interventions_v1'
 const KEY_OVERRIDES = 'cph_interventions_overrides_v1'
@@ -152,6 +153,15 @@ export function addIntervention(data = {}) {
 
   const persisted = getPersisted()
   setPersisted([...persisted, newIntervention])
+
+  const parrainageLie = findParrainageByInvite(linkedClient?.tel || telClient)
+  if (parrainageLie?.statut === 'inscrit') {
+    updateParrainage(parrainageLie.id, {
+      statut: 'valide',
+      interventionId: newIntervention.id,
+      dateConversion: new Date().toLocaleDateString('fr-FR'),
+    })
+  }
 
   if (newIntervention.demandeId != null) {
     updateDemande(newIntervention.demandeId, { statut: 'planifie' })
