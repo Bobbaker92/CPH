@@ -1,6 +1,7 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './_helpers'
 
 test.describe('Modale "Être rappelé"', () => {
+
   test('s\'ouvre via le bouton flottant', async ({ page }) => {
     await page.goto('/')
     await page.locator('button.callback-fab').click()

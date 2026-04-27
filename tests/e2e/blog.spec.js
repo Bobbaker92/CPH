@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './_helpers'
 
 test.describe('Blog', () => {
   test('/blog liste plusieurs articles', async ({ page }) => {
