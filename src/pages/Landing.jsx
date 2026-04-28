@@ -8,6 +8,7 @@ import { CookieReopenLink } from '../components/CookieConsent'
 import RoiCalculator from '../components/RoiCalculator'
 import SeasonBanner from '../components/SeasonBanner'
 import BeforeAfterSlider from '../components/BeforeAfterSlider'
+import NewsletterSignup from '../components/NewsletterSignup'
 
 const FAQ = [
   {
@@ -641,6 +642,13 @@ export default function Landing() {
       {/* Bouton rappel flottant + modal */}
       <CallbackFab onClick={() => setCallbackOpen(true)} />
       {callbackOpen && <CallbackModal onClose={() => setCallbackOpen(false)} context="landing" />}
+
+      {/* Newsletter */}
+      <section className="newsletter-section">
+        <div className="container">
+          <NewsletterSignup />
+        </div>
+      </section>
 
       {/* Footer */}
       <footer className="footer">

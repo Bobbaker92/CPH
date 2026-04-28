@@ -6542,6 +6542,92 @@ tbody tr:last-child td { border-bottom: none; }
   font-size: 13px;
   color: #64748b;
 }
+
+/* === Newsletter signup (footer landing) === */
+.newsletter-section {
+  background: #f8fafc;
+  padding: 40px 0;
+}
+.newsletter-card {
+  max-width: 720px;
+  margin: 0 auto;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
+}
+.newsletter-head {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.newsletter-head svg {
+  color: #2563eb;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.newsletter-head strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+.newsletter-head span {
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.5;
+}
+.newsletter-input-row {
+  display: flex;
+  gap: 10px;
+}
+.newsletter-input-row input {
+  flex: 1;
+  padding: 11px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 160ms;
+}
+.newsletter-input-row input:focus {
+  border-color: #2563eb;
+}
+.newsletter-input-row .btn {
+  background: #2563eb;
+  color: white;
+  border: 0;
+  padding: 11px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.newsletter-input-row .btn:hover { background: #1d4ed8; }
+.newsletter-input-row .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.newsletter-thanks {
+  flex-direction: row;
+  align-items: center;
+  border-color: #86efac;
+  background: #dcfce7;
+}
+.newsletter-thanks svg { color: #16a34a; flex-shrink: 0; }
+.newsletter-thanks strong { display: block; color: #15803d; font-size: 14px; margin-bottom: 2px; }
+.newsletter-thanks span { font-size: 13px; color: #166534; }
+@media (max-width: 600px) {
+  .newsletter-input-row { flex-direction: column; }
+  .newsletter-input-row .btn { justify-content: center; }
+}
 @media (max-width: 768px) {
   .landing-ba-section { padding: 56px 0; }
   .landing-ba-head h2 { font-size: 22px; }
