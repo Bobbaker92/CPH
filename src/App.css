@@ -6345,6 +6345,54 @@ tbody tr:last-child td { border-bottom: none; }
   line-height: 1.5;
 }
 
+/* === Season banner (top of landing) === */
+.season-banner {
+  background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
+  color: #422006;
+  padding: 8px 0;
+  font-size: 13px;
+  font-weight: 500;
+  position: relative;
+  z-index: 60;
+}
+.season-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.season-banner-emoji { font-size: 18px; flex-shrink: 0; }
+.season-banner-message { flex: 1; line-height: 1.4; }
+.season-banner-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #422006;
+  color: #fef3c7;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: background 160ms;
+}
+.season-banner-cta:hover { background: #1c0a0a; color: white; }
+.season-banner-close {
+  background: none;
+  border: 0;
+  color: #422006;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.season-banner-close:hover { background: rgba(66, 32, 6, 0.1); }
+@media (max-width: 768px) {
+  .season-banner-content { flex-wrap: wrap; }
+  .season-banner-message { width: 100%; order: -1; font-size: 12.5px; }
+  .season-banner-cta { font-size: 12px; padding: 5px 12px; }
+}
+
 /* === ClientRapport — layout type rapport pro === */
 .rapport-print-header {
   display: none; /* visible uniquement à l'impression */
