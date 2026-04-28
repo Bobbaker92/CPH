@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { to: '/admin/couvreurs', icon: UserCheck, label: 'Couvreurs', short: 'Couvreurs' },
   { to: '/admin/parrainages', icon: Gift, label: 'Parrainages', short: 'Parrain.' },
   { to: '/admin/prospection', icon: Target, label: 'Prospection', short: 'Prosp.' },
+  { to: '/admin/parametres', icon: Settings, label: 'Paramètres', short: 'Réglages' },
 ]
 
 const MOBILE_NAV = NAV_ITEMS.slice(0, 5) // 5 items max en bottom nav
