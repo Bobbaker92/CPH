@@ -101,6 +101,41 @@ export default function Confirmation() {
           </div>
         </div>
 
+        {/* Timeline prochaines étapes */}
+        <div className="confirm-card">
+          <h2>Et maintenant&nbsp;?</h2>
+          <ol className="confirm-timeline">
+            <li className="confirm-timeline-step done">
+              <span className="confirm-timeline-marker"><Check size={12} /></span>
+              <div>
+                <strong>R&eacute;servation enregistr&eacute;e</strong>
+                <span>{`N° ${reservationId} — confirmation envoy&eacute;e par email`}</span>
+              </div>
+            </li>
+            <li className="confirm-timeline-step">
+              <span className="confirm-timeline-marker">2</span>
+              <div>
+                <strong>Rappel la veille</strong>
+                <span>SMS &agrave; J-1, 18h, avec le nom du couvreur et son t&eacute;l&eacute;phone direct.</span>
+              </div>
+            </li>
+            <li className="confirm-timeline-step">
+              <span className="confirm-timeline-marker">3</span>
+              <div>
+                <strong>Intervention par Karim</strong>
+                <span>Cr&eacute;neau {creneau} le {formatDateLisible(dateStr)}. Pas besoin d&rsquo;&ecirc;tre pr&eacute;sent si la toiture est accessible.</span>
+              </div>
+            </li>
+            <li className="confirm-timeline-step">
+              <span className="confirm-timeline-marker">4</span>
+              <div>
+                <strong>Rapport sous 24h</strong>
+                <span>Photos avant/apr&egrave;s + &eacute;tat de votre toiture, dans votre espace client.</span>
+              </div>
+            </li>
+          </ol>
+        </div>
+
         {/* Canaux envoyés */}
         <div className="confirm-card">
           <h2>Confirmation envoy&eacute;e</h2>
