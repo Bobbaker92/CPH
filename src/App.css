@@ -6159,3 +6159,47 @@ tbody tr:last-child td { border-bottom: none; }
   .about-cta-actions { width: 100%; }
   .about-cta-actions .btn { flex: 1; justify-content: center; }
 }
+
+/* === Blog — boutons de partage social === */
+.blog-share {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  margin-bottom: 24px;
+  border-top: 1px solid var(--gray-200, #e5e7eb);
+  border-bottom: 1px solid var(--gray-200, #e5e7eb);
+}
+.blog-share-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gray-500, #64748b);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.blog-share-buttons {
+  display: flex;
+  gap: 8px;
+}
+.blog-share-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: #f1f5f9;
+  color: #475569;
+  border: 0;
+  cursor: pointer;
+  transition: all 160ms;
+  text-decoration: none;
+}
+.blog-share-btn:hover {
+  background: #2563eb;
+  color: white;
+  transform: translateY(-1px);
+}
