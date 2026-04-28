@@ -207,7 +207,11 @@ export default function Login() {
           </div>
         </div>
 
-        {/* Demo accounts */}
+        {/* Demo accounts — UNIQUEMENT en dev (vite import.meta.env.DEV).
+            En build de prod, ce bloc est éliminé via dead code elimination.
+            Sécurité : les mots de passe en clair ne doivent JAMAIS atterrir
+            en prod. Pour tester en prod, créer de vrais comptes admin. */}
+        {import.meta.env.DEV && (
         <div style={{
           marginTop: 24, background: 'rgba(255,255,255,0.06)', borderRadius: 'var(--radius)',
           padding: 20,
@@ -247,6 +251,7 @@ export default function Login() {
             </button>
           ))}
         </div>
+        )}
 
         {/* Back */}
         <div style={{ textAlign: 'center', marginTop: 24 }}>

@@ -1,0 +1,79 @@
+# ─── CPH Solar — config Apache pour o2switch ─────────────────────
+# Headers de sécurité, redirection HTTPS, gzip, cache, blocage fichiers
+# sensibles. Validé sur o2switch (mod_rewrite + mod_headers + mod_deflate).
+
+# ─── Forcer HTTPS ────────────────────────────────────────────────
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTPS} !=on
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # SPA : toutes les routes inconnues servent index.html (React Router)
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_URI} !^/wp/        # ne pas casser WordPress quand installé
+  RewriteCond %{REQUEST_URI} !^/api/       # ne pas casser le futur backend
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+# ─── Headers de sécurité ─────────────────────────────────────────
+<IfModule mod_headers.c>
+  # HSTS : force HTTPS pour 1 an y compris sous-domaines
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+  # Empêche le clickjacking (iframe sur autre site)
+  Header always set X-Frame-Options "SAMEORIGIN"
+
+  # Empêche le MIME sniffing
+  Header always set X-Content-Type-Options "nosniff"
+
+  # Limite ce que Referer expose
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+  # Permissions browser (pas de caméra/micro/géoloc demandés par le site)
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+
+  # CSP : restreint sources de scripts, styles, images, etc.
+  # 'unsafe-inline' sur styles à cause du CSS-in-JS de Vite ; on ne l'autorise pas pour les scripts.
+  # geo.api.gouv.fr autorisé pour l'auto-fill ville depuis CP.
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://geo.api.gouv.fr; frame-ancestors 'self'; base-uri 'self'; form-action 'self'"
+</IfModule>
+
+# ─── Compression gzip ────────────────────────────────────────────
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json image/svg+xml application/xml
+</IfModule>
+
+# ─── Cache assets statiques (1 an) ───────────────────────────────
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType font/woff2 "access plus 1 year"
+  # HTML pas en cache (sinon les nouvelles versions du site n'arrivent jamais)
+  ExpiresByType text/html "access plus 0 seconds"
+</IfModule>
+
+# ─── Blocage fichiers sensibles ──────────────────────────────────
+<FilesMatch "\.(env|git|gitignore|gitattributes|htaccess|htpasswd|md|json|lock|log|sql)$">
+  Order allow,deny
+  Deny from all
+</FilesMatch>
+
+# Empêche aussi l'accès direct à package.json, vite.config.js, etc.
+<Files "package.json">
+  Order allow,deny
+  Deny from all
+</Files>
+<Files "vite.config.js">
+  Order allow,deny
+  Deny from all
+</Files>
+
+# ─── Pages d'erreur ──────────────────────────────────────────────
+ErrorDocument 404 /index.html
+ErrorDocument 403 /index.html
