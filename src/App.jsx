@@ -39,6 +39,7 @@ const AdminCouvreurs = lazy(() => import('./pages/admin/AdminCouvreurs'))
 const AdminParrainages = lazy(() => import('./pages/admin/AdminParrainages'))
 const AdminProspection = lazy(() => import('./pages/admin/AdminProspection'))
 const AdminParametres = lazy(() => import('./pages/admin/AdminParametres'))
+const AdminAide = lazy(() => import('./pages/admin/AdminAide'))
 const CouvreurApp = lazy(() => import('./pages/couvreur/CouvreurApp'))
 const ProspectionApp = lazy(() => import('./pages/prospection/ProspectionApp'))
 
@@ -95,6 +96,7 @@ function App() {
             <Route path="parrainages" element={<AdminParrainages />} />
             <Route path="prospection" element={<AdminProspection />} />
             <Route path="parametres" element={<AdminParametres />} />
+            <Route path="aide" element={<AdminAide />} />
           </Route>
 
           {/* Espace Prospection */}
