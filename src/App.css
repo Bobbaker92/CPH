@@ -6387,6 +6387,59 @@ tbody tr:last-child td { border-bottom: none; }
   flex-shrink: 0;
 }
 .season-banner-close:hover { background: rgba(66, 32, 6, 0.1); }
+
+/* === Landing — démo BeforeAfter section === */
+.landing-ba-section {
+  padding: 80px 0;
+  background: white;
+}
+.landing-ba-head {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto 36px;
+}
+.landing-ba-eyebrow {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #2563eb;
+  margin-bottom: 12px;
+}
+.landing-ba-head h2 {
+  font-size: 30px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 12px;
+  line-height: 1.25;
+}
+.landing-ba-head p {
+  font-size: 15px;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.55;
+}
+.landing-ba-frame {
+  max-width: 880px;
+  margin: 0 auto;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(15, 23, 42, 0.15);
+}
+.landing-ba-note {
+  max-width: 720px;
+  margin: 24px auto 0;
+  text-align: center;
+  font-size: 14px;
+  color: #475569;
+  line-height: 1.55;
+}
+.landing-ba-note strong { color: #16a34a; font-size: 18px; }
+@media (max-width: 768px) {
+  .landing-ba-section { padding: 56px 0; }
+  .landing-ba-head h2 { font-size: 22px; }
+}
 @media (max-width: 768px) {
   .season-banner-content { flex-wrap: wrap; }
   .season-banner-message { width: 100%; order: -1; font-size: 12.5px; }

@@ -7,6 +7,7 @@ import useJsonLd from '../lib/useJsonLd'
 import { CookieReopenLink } from '../components/CookieConsent'
 import RoiCalculator from '../components/RoiCalculator'
 import SeasonBanner from '../components/SeasonBanner'
+import BeforeAfterSlider from '../components/BeforeAfterSlider'
 
 const FAQ = [
   {
@@ -590,6 +591,31 @@ export default function Landing() {
 
       {/* Calculateur ROI */}
       <RoiCalculator />
+
+      {/* Démo avant / après */}
+      <section className="landing-ba-section">
+        <div className="container">
+          <div className="landing-ba-head">
+            <span className="landing-ba-eyebrow">D&eacute;monstration</span>
+            <h2>L&rsquo;effet visible d&rsquo;un nettoyage CPH</h2>
+            <p>
+              Glissez le curseur de gauche &agrave; droite pour comparer un panneau encrass&eacute;
+              en r&eacute;gion PACA et le m&ecirc;me panneau apr&egrave;s notre intervention.
+            </p>
+          </div>
+          <div className="landing-ba-frame">
+            <BeforeAfterSlider
+              beforeSrc="/photos/avant-mock.svg"
+              afterSrc="/photos/apres-mock.svg"
+              beforeAlt="Panneaux solaires encrass&eacute;s par la poussi&egrave;re et le pollen"
+              afterAlt="Panneaux solaires propres et brillants apr&egrave;s nettoyage CPH"
+            />
+          </div>
+          <div className="landing-ba-note">
+            <strong>+15 &agrave; 25%</strong> de production retrouv&eacute;e en moyenne sur des panneaux qui n&rsquo;avaient pas &eacute;t&eacute; nettoy&eacute;s depuis 2 ans.
+          </div>
+        </div>
+      </section>
 
       {/* FAQ */}
       <section className="faq-section" id="faq">
