@@ -58,3 +58,4 @@ playwright/.cache/
 
 # Sitemap (généré au build via scripts/generate-sitemap.mjs)
 public/sitemap.xml
+tests/e2e/_smoke-screenshots/

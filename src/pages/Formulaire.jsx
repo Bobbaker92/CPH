@@ -654,12 +654,13 @@ export default function Formulaire() {
                 />
               </div>
               <div className="input-group">
-                <label>Email</label>
+                <label>Email *</label>
                 <input
                   type="email"
                   placeholder="votre@email.com"
                   value={form.email}
                   onChange={e => setForm({...form, email: e.target.value})}
+                  required
                 />
               </div>
             </div>
