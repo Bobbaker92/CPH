@@ -6289,6 +6289,62 @@ tbody tr:last-child td { border-bottom: none; }
   color: white;
 }
 
+/* === Confirmation — timeline prochaines étapes === */
+.confirm-timeline {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.confirm-timeline-step {
+  display: flex;
+  gap: 14px;
+  padding: 12px 0;
+  position: relative;
+}
+.confirm-timeline-step::after {
+  content: '';
+  position: absolute;
+  left: 13px;
+  top: 38px;
+  bottom: -16px;
+  width: 2px;
+  background: #e2e8f0;
+}
+.confirm-timeline-step:last-child::after { display: none; }
+.confirm-timeline-marker {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  position: relative;
+  z-index: 1;
+}
+.confirm-timeline-step.done .confirm-timeline-marker {
+  background: #16a34a;
+  color: white;
+}
+.confirm-timeline-step strong {
+  display: block;
+  font-size: 14px;
+  color: #0f172a;
+  margin-bottom: 2px;
+}
+.confirm-timeline-step span {
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.5;
+}
+
 /* === ClientRapport — layout type rapport pro === */
 .rapport-print-header {
   display: none; /* visible uniquement à l'impression */
