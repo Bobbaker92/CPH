@@ -25,15 +25,18 @@ export default function Confirmation() {
   const location = useLocation()
   const state = location.state || {}
 
-  // Fallback
+  // Fallback uniquement pour les valeurs dont l'absence casserait l'affichage.
+  // L'email NE DOIT PAS avoir de fallback hardcodé : si l'utilisateur n'en a
+  // pas saisi, on adapte l'UI (cf. notif.email plus bas).
   const dateStr = state.date || '2026-05-04'
   const creneau = state.creneau || '10h-12h'
   const ville = state.ville || 'Marseille'
   const prix = state.prix || 199
   const paiement = state.paiement || { mode: 'intervention' }
-  const notif = state.notif || { email: true, sms: false }
-  const email = state.email || 'pierre.vidal@free.fr'
-  const tel = state.tel || '06 12 34 56 78'
+  const email = (state.email || '').trim()
+  const tel = (state.tel || '').trim()
+  // Notifications activées uniquement si on a réellement le canal
+  const notif = state.notif || { email: !!email, sms: !!tel }
   const clientId = state.clientId || null
 
   const [copied, setCopied] = useState('')
@@ -109,7 +112,7 @@ export default function Confirmation() {
               <span className="confirm-timeline-marker"><Check size={12} /></span>
               <div>
                 <strong>R&eacute;servation enregistr&eacute;e</strong>
-                <span>{`N° ${reservationId} — confirmation envoy&eacute;e par email`}</span>
+                <span>{`N° ${reservationId}${email ? ' — confirmation envoyée par email' : ''}`}</span>
               </div>
             </li>
             <li className="confirm-timeline-step">
