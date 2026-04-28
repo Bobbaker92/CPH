@@ -675,6 +675,7 @@ export default function Landing() {
               <p><Link to="/blog">Blog</Link></p>
               <p><Link to="/a-propos">À propos</Link></p>
               <p><Link to="/tarifs">Tarifs</Link></p>
+              <p><Link to="/zones">Zones d&apos;intervention</Link></p>
             </div>
             <div>
               <h4 style={{color:'white', fontSize:13, fontWeight:700, marginBottom:12}}>Contact</h4>
