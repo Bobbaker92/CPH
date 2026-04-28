@@ -14,7 +14,14 @@ import {
   subscribe,
 } from '../../lib/interventionsStore'
 
-const STATUT_LABEL = { 'confirme': 'Confirmé', 'a-confirmer': 'À confirmer', 'termine': 'Terminée', 'annulee': 'Annulée' }
+const STATUT_LABEL = {
+  'confirme': 'Confirmé',
+  'a-confirmer': 'À confirmer',
+  'en-cours': 'En cours',
+  'termine': 'Terminée',
+  'terminee': 'Terminée',
+  'annulee': 'Annulée',
+}
 const CAPACITE_STANDARD = 3
 const CAPACITE_ETENDUE = 4
 const SEUIL_PETITE_INSTALLATION = 10
@@ -99,7 +106,15 @@ function formatDateLong(isoStr) {
 
 // ── Shared card component ───────────────────────────────────
 function InterventionCard({ inter, changeStatut, removeIntervention, onReport, compact = false }) {
-  const badgeColor = inter.statut === 'confirme' ? 'green' : inter.statut === 'a-confirmer' ? 'orange' : 'gray'
+  const badgeColor = inter.statut === 'confirme'
+    ? 'green'
+    : inter.statut === 'a-confirmer'
+      ? 'orange'
+      : inter.statut === 'en-cours'
+        ? 'blue'
+        : inter.statut === 'terminee' || inter.statut === 'termine'
+          ? 'green'
+          : 'gray'
   return (
     <div className={`pw-card pw-card-${badgeColor} ${compact ? 'pw-card-compact' : ''}`}>
       <div className="pw-card-time"><Clock size={11} /><span>{inter.heure}</span></div>
@@ -113,7 +128,7 @@ function InterventionCard({ inter, changeStatut, removeIntervention, onReport, c
           <ActionMenu items={[
             { icon: <Check size={13} />, label: 'Confirmé', onClick: () => changeStatut(inter.id, 'confirme') },
             { icon: <Clock size={13} />, label: 'À confirmer', onClick: () => changeStatut(inter.id, 'a-confirmer') },
-            { icon: <Check size={13} />, label: 'Terminée', onClick: () => changeStatut(inter.id, 'termine') },
+            { icon: <Check size={13} />, label: 'Terminée', onClick: () => changeStatut(inter.id, 'terminee') },
             { divider: true },
             { icon: <Calendar size={13} />, label: 'Reporter', onClick: () => onReport(inter) },
             { icon: <XIcon size={13} />, label: 'Annuler', onClick: () => changeStatut(inter.id, 'annulee') },
@@ -548,7 +563,10 @@ export default function AdminPlanning() {
                   </div>
                   <div className="pw-month-cell-body">
                     {dayInts.slice(0, 3).map(inter => (
-                      <div key={inter.id} className={`pw-month-pill pw-month-pill-${inter.statut === 'confirme' ? 'green' : inter.statut === 'a-confirmer' ? 'orange' : 'gray'}`}>
+                      <div
+                        key={inter.id}
+                        className={`pw-month-pill pw-month-pill-${inter.statut === 'confirme' || inter.statut === 'terminee' || inter.statut === 'termine' ? 'green' : inter.statut === 'a-confirmer' ? 'orange' : inter.statut === 'en-cours' ? 'blue' : 'gray'}`}
+                      >
                         <span className="pw-month-pill-time">{inter.heure.split('-')[0]}</span>
                         <span className="pw-month-pill-name">{inter.client.split(' ')[0]}</span>
                       </div>
