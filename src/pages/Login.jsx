@@ -10,10 +10,17 @@ const COMPTES = {
   'prospection@cphpaca.fr': { password: 'prospection123', role: 'prospectrice', nom: 'Nadia Belkacem' },
 }
 
+const REMEMBERED_EMAIL_KEY = 'cph_login_remembered_email'
+
 export default function Login() {
   const navigate = useNavigate()
-  const [email, setEmail] = useState('')
+  const [email, setEmail] = useState(() => {
+    try { return localStorage.getItem(REMEMBERED_EMAIL_KEY) || '' } catch { return '' }
+  })
   const [password, setPassword] = useState('')
+  const [remember, setRemember] = useState(() => {
+    try { return !!localStorage.getItem(REMEMBERED_EMAIL_KEY) } catch { return false }
+  })
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -37,6 +44,8 @@ export default function Login() {
           return
         }
         localStorage.setItem('user', JSON.stringify({ email: key, role: 'client', nom: existingClient.nom || compte?.nom || 'Client' }))
+        if (remember) localStorage.setItem(REMEMBERED_EMAIL_KEY, key)
+        else localStorage.removeItem(REMEMBERED_EMAIL_KEY)
         navigate('/client')
         return
       }
@@ -53,6 +62,8 @@ export default function Login() {
           bootstrapClientAccount({ email: key, password, nom: compte.nom })
         }
         localStorage.setItem('user', JSON.stringify({ email: key, role: compte.role, nom: compte.nom }))
+        if (remember) localStorage.setItem(REMEMBERED_EMAIL_KEY, key)
+        else localStorage.removeItem(REMEMBERED_EMAIL_KEY)
         if (compte.role === 'admin') navigate('/admin')
         else if (compte.role === 'couvreur') navigate('/couvreur')
         else if (compte.role === 'prospectrice') navigate('/prospection')
@@ -160,6 +171,15 @@ export default function Login() {
               </div>
             )}
 
+            <label className="login-remember">
+              <input
+                type="checkbox"
+                checked={remember}
+                onChange={(e) => setRemember(e.target.checked)}
+              />
+              <span>Se souvenir de mon adresse email</span>
+            </label>
+
             <button
               type="submit"
               className="btn btn-primary"
@@ -176,6 +196,13 @@ export default function Login() {
           <div style={{ textAlign: 'center', marginTop: 20 }}>
             <Link to="/mot-de-passe-oublie" style={{ fontSize: 13, color: 'var(--gray-500)' }}>
               {"Mot de passe oubli\u00E9 ?"}
+            </Link>
+          </div>
+
+          <div className="login-cta-devis">
+            <span>Pas encore client&nbsp;?</span>
+            <Link to="/devis" className="btn btn-outline btn-sm">
+              R&eacute;server une intervention
             </Link>
           </div>
         </div>
