@@ -1,17 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { TrendingUp, MapPin, Calendar, ArrowRight, MoreVertical, Phone, FileText, Plus, Euro, AlertCircle } from 'lucide-react'
-import { DATA_SYNC_KEYS, readSyncedData, subscribeSyncedData } from '../../lib/dataSync'
-
-const PIVOT_DATE = '2026-05-04'
-
-const INTERVENTIONS_FALLBACK = [
-  { id: 'f1', client: 'Jean-Pierre Martin', ville: 'Marseille 13008', date: '2026-05-04', heure: '10h-12h', couvreur: 'Karim Z.', statut: 'confirme' },
-  { id: 'f2', client: 'Marie Duval', ville: 'Marseille 13012', date: '2026-05-04', heure: '14h-16h', couvreur: 'Karim Z.', statut: 'confirme' },
-  { id: 'f3', client: 'Paul Roche', ville: 'Aubagne 13400', date: '2026-05-05', heure: '8h-10h', couvreur: 'Karim Z.', statut: 'confirme' },
-  { id: 'f4', client: 'Sophie Blanc', ville: 'Marseille 13004', date: '2026-05-12', heure: '10h-12h', couvreur: 'Karim Z.', statut: 'confirme' },
-  { id: 'f5', client: 'Ahmed Mansour', ville: 'Aix 13100', date: '2026-05-18', heure: '8h-10h', couvreur: 'Karim Z.', statut: 'confirme' },
-]
+import { TrendingUp, MapPin, Calendar, ArrowRight, MoreVertical, Euro, AlertCircle, Users, Gift, PhoneCall } from 'lucide-react'
+import { getDemandes, subscribe as subDemandes, SOURCE_META } from '../../lib/demandesStore'
+import { getInterventions, subscribe as subInterventions } from '../../lib/interventionsStore'
+import { getClients, subscribe as subClients } from '../../lib/clientsStore'
+import { getParrainages, subscribe as subParrainages } from '../../lib/parrainagesStore'
 
 function formatDateFR(iso) {
   if (!iso) return ''
@@ -26,13 +19,88 @@ function shortCouvreur(full) {
   return `${parts[0]} ${parts[parts.length - 1][0]}.`
 }
 
-const LEADS_COUVERTURE = [
-  { client: 'Robert Vidal', ville: 'Marseille 13005', prestation: 'Fa\u00EEtage closoir 8ml', montant: 2800, statut: 'Devis envoy\u00E9' },
-  { client: 'Nathalie Perrin', ville: 'Aix 13090', prestation: 'Hydrofuge toiture 80m\u00B2', montant: 1400, statut: 'En attente' },
-  { client: 'Marc Lefebvre', ville: 'Toulon 83000', prestation: 'Rives + fa\u00EEtage', montant: 4200, statut: 'Sign\u00E9' },
-]
+function getStartOfWeek(date = new Date()) {
+  const d = new Date(date)
+  d.setHours(0, 0, 0, 0)
+  const day = d.getDay()
+  const diff = day === 0 ? -6 : 1 - day
+  d.setDate(d.getDate() + diff)
+  return d
+}
 
-// Mini sparkline inline
+function getEndOfWeek(date = new Date()) {
+  const start = getStartOfWeek(date)
+  const end = new Date(start)
+  end.setDate(end.getDate() + 6)
+  end.setHours(23, 59, 59, 999)
+  return end
+}
+
+function pickSemaineReference(interventions, now = new Date()) {
+  const currentStart = getStartOfWeek(now)
+  const currentEnd = getEndOfWeek(now)
+
+  const inCurrent = interventions.filter((i) => {
+    if (!i.date) return false
+    const d = new Date(`${i.date}T12:00:00`)
+    return d >= currentStart && d <= currentEnd
+  })
+  if (inCurrent.length > 0) return { start: currentStart, end: currentEnd }
+
+  const upcoming = interventions
+    .filter((i) => i.date)
+    .map((i) => new Date(`${i.date}T12:00:00`))
+    .filter((d) => d >= new Date(now.getFullYear(), now.getMonth(), now.getDate()))
+    .sort((a, b) => a - b)
+
+  if (upcoming.length === 0) return { start: currentStart, end: currentEnd }
+
+  const nextStart = getStartOfWeek(upcoming[0])
+  const nextEnd = getEndOfWeek(upcoming[0])
+  return { start: nextStart, end: nextEnd }
+}
+
+function parseDateRecu(value) {
+  const now = new Date()
+  const text = String(value || '').trim().toLowerCase()
+
+  if (!text) return new Date(0)
+  if (text.includes('à l\'instant')) return new Date(now.getTime() + 1)
+
+  const timeMatch = text.match(/(\d{1,2}):(\d{2})/)
+  const hh = timeMatch ? Number(timeMatch[1]) : 12
+  const mm = timeMatch ? Number(timeMatch[2]) : 0
+
+  if (text.includes('aujourd')) {
+    const d = new Date(now)
+    d.setHours(hh, mm, 0, 0)
+    return d
+  }
+
+  if (text.includes('hier')) {
+    const d = new Date(now)
+    d.setDate(d.getDate() - 1)
+    d.setHours(hh, mm, 0, 0)
+    return d
+  }
+
+  const daysAgo = text.match(/il y a\s+(\d+)\s+jours?/)
+  if (daysAgo) {
+    const d = new Date(now)
+    d.setDate(d.getDate() - Number(daysAgo[1]))
+    d.setHours(hh, mm, 0, 0)
+    return d
+  }
+
+  const classic = text.match(/(\d{2})\/(\d{2})\/(\d{4})/)
+  if (classic) {
+    const d = new Date(Number(classic[3]), Number(classic[2]) - 1, Number(classic[1]), hh, mm, 0, 0)
+    return d
+  }
+
+  return new Date(0)
+}
+
 function Sparkline({ points, color = 'var(--green)' }) {
   const max = Math.max(...points)
   const min = Math.min(...points)
@@ -53,21 +121,84 @@ function Sparkline({ points, color = 'var(--green)' }) {
 
 export default function AdminHome() {
   const navigate = useNavigate()
-  const [planning, setPlanning] = useState(() => readSyncedData(DATA_SYNC_KEYS.planningInterventions, []))
+  const [demandes, setDemandes] = useState(() => getDemandes())
+  const [interventions, setInterventions] = useState(() => getInterventions())
+  const [clients, setClients] = useState(() => getClients())
+  const [parrainages, setParrainages] = useState(() => getParrainages())
 
   useEffect(() => {
-    return subscribeSyncedData(DATA_SYNC_KEYS.planningInterventions, () => {
-      setPlanning(readSyncedData(DATA_SYNC_KEYS.planningInterventions, []))
-    })
+    const unsubDemandes = subDemandes(() => setDemandes(getDemandes()))
+    const unsubInterventions = subInterventions(() => setInterventions(getInterventions()))
+    const unsubClients = subClients(() => setClients(getClients()))
+    const unsubParrainages = subParrainages(() => setParrainages(getParrainages()))
+
+    return () => {
+      unsubDemandes()
+      unsubInterventions()
+      unsubClients()
+      unsubParrainages()
+    }
   }, [])
 
+  const kpis = useMemo(() => {
+    const now = new Date()
+    const weekRef = pickSemaineReference(interventions, now)
+    const year = now.getFullYear()
+    const month = now.getMonth()
+
+    const nouvellesDemandes = demandes.filter((d) => d.statut === 'nouveau').length
+    const aRappeler = demandes.filter((d) => d.statut === 'a-rappeler').length
+
+    const interventionsSemaine = interventions.filter((i) => {
+      if (!i.date) return false
+      const d = new Date(`${i.date}T12:00:00`)
+      return d >= weekRef.start && d <= weekRef.end
+    }).length
+
+    const interventionsMoisCA = interventions.filter((i) => {
+      if (!i.date) return false
+      const d = new Date(`${i.date}T12:00:00`)
+      return d.getFullYear() === year
+        && d.getMonth() === month
+        && (i.statut === 'planifie' || i.statut === 'terminee' || i.statut === 'termine')
+    }).length
+
+    const caEstimeMois = interventionsMoisCA * 199
+    const clientsTotal = clients.length
+    const parrainagesActifs = parrainages.filter((p) => p.statut === 'envoye' || p.statut === 'inscrit').length
+
+    return {
+      nouvellesDemandes,
+      aRappeler,
+      interventionsSemaine,
+      caEstimeMois,
+      clientsTotal,
+      parrainagesActifs,
+    }
+  }, [clients, demandes, interventions, parrainages])
+
   const prochaines = useMemo(() => {
-    const source = planning.length ? planning : INTERVENTIONS_FALLBACK
-    return [...source]
-      .filter(i => i.date >= PIVOT_DATE && i.statut !== 'termine' && i.statut !== 'annule')
-      .sort((a, b) => a.date.localeCompare(b.date) || (a.heureSort || a.heure || '').localeCompare(b.heureSort || b.heure || ''))
+    const now = new Date()
+    return [...interventions]
+      .filter((i) => {
+        if (!i.date) return false
+        if (i.statut === 'annulee') return false
+        const d = new Date(`${i.date}T00:00:00`)
+        return d >= new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1)
+      })
+      .sort((a, b) => {
+        const aKey = `${a.date || ''} ${a.heureSort || ''}`
+        const bKey = `${b.date || ''} ${b.heureSort || ''}`
+        return aKey.localeCompare(bKey)
+      })
+      .slice(0, 3)
+  }, [interventions])
+
+  const derniersLeads = useMemo(() => {
+    return [...demandes]
+      .sort((a, b) => parseDateRecu(b.dateRecu) - parseDateRecu(a.dateRecu))
       .slice(0, 5)
-  }, [planning])
+  }, [demandes])
 
   return (
     <>
@@ -75,76 +206,98 @@ export default function AdminHome() {
         <div className="page-header-row">
           <div>
             <h1>Bonjour Fares 👋</h1>
-            <p>Voici votre activit&eacute; du moment, mercredi 15 avril 2026.</p>
+            <p>Vue en temps réel de votre activité commerciale et opérationnelle.</p>
           </div>
           <div className="page-header-actions">
             <button className="btn btn-sm btn-outline" onClick={() => navigate('/admin/planning')}><Calendar size={14} /> Planning</button>
-            <button className="btn btn-sm btn-primary"><Plus size={14} /> Nouvelle intervention</button>
+            <button className="btn btn-sm btn-primary" onClick={() => navigate('/admin/demandes')}><ArrowRight size={14} /> Voir demandes</button>
           </div>
         </div>
       </div>
 
-      {/* Alerte demandes */}
       <Link to="/admin/demandes" className="admin-alert">
         <span className="admin-alert-icon"><AlertCircle size={18} /></span>
         <div className="admin-alert-body">
-          <strong>3 nouvelles demandes &agrave; traiter</strong>
-          <span>Pierre Vidal, Sophie Lambert&hellip; Le plus ancien attend depuis 2 heures.</span>
+          <strong>{kpis.nouvellesDemandes} nouvelles demandes à traiter</strong>
+          <span>{kpis.aRappeler} demande(s) à rappeler.</span>
         </div>
         <span className="admin-alert-cta">Voir les demandes <ArrowRight size={14} /></span>
       </Link>
 
-      {/* Stats */}
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-card-head">
             <div>
-              <div className="stat-label">Interventions ce mois</div>
-              <div className="stat-value">18</div>
+              <div className="stat-label">Nouvelles demandes</div>
+              <div className="stat-value">{kpis.nouvellesDemandes}</div>
             </div>
-            <Sparkline points={[8,12,9,14,11,15,18]} />
+            <Sparkline points={[0, 1, 2, 2, 3, 3, kpis.nouvellesDemandes || 0]} color="var(--orange)" />
           </div>
-          <div className="stat-change"><TrendingUp size={12} /> +28% vs mars</div>
+          <div className="stat-change"><PhoneCall size={12} /> Leads entrants</div>
         </div>
+
         <div className="stat-card">
           <div className="stat-card-head">
             <div>
-              <div className="stat-label">CA nettoyage</div>
-              <div className="stat-value">3&nbsp;582&nbsp;&euro;</div>
+              <div className="stat-label">À rappeler</div>
+              <div className="stat-value">{kpis.aRappeler}</div>
             </div>
-            <Sparkline points={[1200,1800,1500,2200,2000,2800,3582]} color="var(--accent)" />
+            <Sparkline points={[0, 1, 1, 2, 1, 2, kpis.aRappeler || 0]} color="var(--blue)" />
           </div>
-          <div className="stat-change"><Euro size={12} /> 18 &times; 199&nbsp;&euro;</div>
+          <div className="stat-change">Priorité commerciale</div>
         </div>
+
         <div className="stat-card">
           <div className="stat-card-head">
             <div>
-              <div className="stat-label">Leads couverture</div>
-              <div className="stat-value">7</div>
+              <div className="stat-label">Interventions cette semaine</div>
+              <div className="stat-value">{kpis.interventionsSemaine}</div>
             </div>
-            <Sparkline points={[2,3,4,3,5,6,7]} color="var(--blue)" />
+            <Sparkline points={[0, 1, 2, 3, 4, 4, kpis.interventionsSemaine || 0]} />
           </div>
-          <div className="stat-change">39% des interventions</div>
+          <div className="stat-change"><TrendingUp size={12} /> Charge terrain</div>
         </div>
+
         <div className="stat-card stat-card-highlight">
           <div className="stat-card-head">
             <div>
-              <div className="stat-label">CA couverture potentiel</div>
-              <div className="stat-value">12&nbsp;400&nbsp;&euro;</div>
+              <div className="stat-label">CA estimé du mois</div>
+              <div className="stat-value">{kpis.caEstimeMois.toLocaleString('fr-FR')}&nbsp;&euro;</div>
             </div>
-            <Sparkline points={[3000,4500,6000,7000,9000,10500,12400]} color="var(--green)" />
+            <Sparkline points={[199, 398, 597, 995, 1592, 1990, kpis.caEstimeMois || 0]} color="var(--green)" />
           </div>
-          <div className="stat-change">3 devis sign&eacute;s</div>
+          <div className="stat-change"><Euro size={12} /> Base 199 € / intervention</div>
+        </div>
+
+        <div className="stat-card">
+          <div className="stat-card-head">
+            <div>
+              <div className="stat-label">Clients total</div>
+              <div className="stat-value">{kpis.clientsTotal}</div>
+            </div>
+            <Sparkline points={[2, 3, 4, 5, 6, 7, kpis.clientsTotal || 0]} color="var(--accent)" />
+          </div>
+          <div className="stat-change"><Users size={12} /> Base clients active</div>
+        </div>
+
+        <div className="stat-card">
+          <div className="stat-card-head">
+            <div>
+              <div className="stat-label">Parrainages actifs</div>
+              <div className="stat-value">{kpis.parrainagesActifs}</div>
+            </div>
+            <Sparkline points={[0, 1, 1, 2, 2, 3, kpis.parrainagesActifs || 0]} color="var(--blue)" />
+          </div>
+          <div className="stat-change"><Gift size={12} /> Envoyés + inscrits</div>
         </div>
       </div>
 
       <div className="home-grid">
-        {/* Prochaines interventions */}
         <div className="table-card admin-list-card">
           <div className="table-header">
             <div>
               <h3>Prochaines interventions</h3>
-              <p className="table-header-sub">Les 5 plus proches</p>
+              <p className="table-header-sub">Les 3 plus proches</p>
             </div>
             <Link to="/admin/planning" className="btn btn-sm btn-ghost">Tout voir <ArrowRight size={12} /></Link>
           </div>
@@ -154,27 +307,27 @@ export default function AdminHome() {
                 <th>Client</th>
                 <th>Ville</th>
                 <th>Date</th>
-                <th>Cr&eacute;neau</th>
+                <th>Créneau</th>
                 <th>Couvreur</th>
-                <th>Couverture</th>
+                <th>Statut</th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
               {prochaines.length === 0 && (
-                <tr><td colSpan={7} style={{textAlign:'center', color:'var(--gray-500)', padding:'20px 0'}}>Aucune intervention planifi&eacute;e.</td></tr>
+                <tr><td colSpan={7} style={{ textAlign: 'center', color: 'var(--gray-500)', padding: '20px 0' }}>Aucune intervention planifiée.</td></tr>
               )}
-              {prochaines.map(i => (
-                <tr key={i.id}>
+              {prochaines.map((i) => (
+                <tr key={i.id} onClick={() => navigate('/admin/planning')} style={{ cursor: 'pointer' }}>
                   <td data-label="Client"><strong>{i.client}</strong></td>
                   <td data-label="Ville"><span className="cell-with-icon"><MapPin size={12} /> {i.ville}</span></td>
                   <td data-label="Date">{formatDateFR(i.date)}</td>
-                  <td data-label="Cr&eacute;neau"><span className="cell-chip">{i.heure}</span></td>
+                  <td data-label="Créneau"><span className="cell-chip">{i.heure}</span></td>
                   <td data-label="Couvreur">{shortCouvreur(i.couvreur)}</td>
-                  <td data-label="Couverture">
-                    {i.potentiel && i.potentiel !== '-'
-                      ? <span className="badge badge-orange">{i.potentiel}</span>
-                      : <span className="muted">&mdash;</span>}
+                  <td data-label="Statut">
+                    <span className={`badge ${i.statut === 'terminee' || i.statut === 'termine' ? 'badge-green' : i.statut === 'a-confirmer' ? 'badge-orange' : i.statut === 'en-cours' ? 'badge-blue' : 'badge-gray'}`}>
+                      {i.statut}
+                    </span>
                   </td>
                   <td data-label=""><button className="icon-btn" onClick={() => navigate('/admin/planning')}><MoreVertical size={16} /></button></td>
                 </tr>
@@ -183,33 +336,30 @@ export default function AdminHome() {
           </table>
         </div>
 
-        {/* Leads couverture */}
         <div className="table-card admin-list-card">
           <div className="table-header">
             <div>
-              <h3>Leads couverture</h3>
-              <p className="table-header-sub">G&eacute;n&eacute;r&eacute;s par nos nettoyages</p>
+              <h3>Derniers leads</h3>
+              <p className="table-header-sub">5 plus récents</p>
             </div>
-            <span className="badge badge-green">3 ce mois</span>
+            <span className="badge badge-green">{kpis.nouvellesDemandes} nouveaux</span>
           </div>
           <div className="leads-list">
-            {LEADS_COUVERTURE.map((l, i) => (
-              <div key={i} className="lead-item">
+            {derniersLeads.map((lead) => (
+              <div key={lead.id} className="lead-item" onClick={() => navigate('/admin/demandes')} style={{ cursor: 'pointer' }}>
                 <div className="lead-item-main">
                   <div className="lead-item-head">
-                    <strong>{l.client}</strong>
-                    <span className={`badge ${l.statut === 'Sign\u00E9' ? 'badge-green' : l.statut === 'Devis envoy\u00E9' ? 'badge-blue' : 'badge-orange'}`}>
-                      {l.statut}
+                    <strong>{lead.nom}</strong>
+                    <span className={`badge ${lead.statut === 'nouveau' ? 'badge-red' : lead.statut === 'a-rappeler' ? 'badge-orange' : lead.statut === 'planifie' ? 'badge-blue' : 'badge-gray'}`}>
+                      {lead.statut}
                     </span>
                   </div>
-                  <p className="lead-item-ville"><MapPin size={11} /> {l.ville}</p>
-                  <p className="lead-item-desc">{l.prestation}</p>
+                  <p className="lead-item-ville"><MapPin size={11} /> {lead.ville}</p>
+                  <p className="lead-item-desc">{lead.dateRecu}</p>
                 </div>
                 <div className="lead-item-side">
-                  <div className="lead-item-amount">{l.montant.toLocaleString('fr-FR')}&nbsp;&euro;</div>
-                  <div className="lead-item-actions">
-                    <button className="icon-btn" title="Appeler"><Phone size={14} /></button>
-                    <button className="icon-btn" title="Devis"><FileText size={14} /></button>
+                  <div className={`badge ${SOURCE_META[lead.source]?.cls || 'badge-gray'}`} style={{ whiteSpace: 'nowrap' }}>
+                    {SOURCE_META[lead.source]?.icon || ''} {lead.source}
                   </div>
                 </div>
               </div>
