@@ -373,6 +373,30 @@ export default function BlogArticle() {
               </Link>
             </div>
           </div>
+
+          {/* Articles à lire ensuite */}
+          {(() => {
+            const others = Object.entries(ARTICLES)
+              .filter(([s]) => s !== slug)
+              .slice(0, 3)
+            if (!others.length) return null
+            return (
+              <section className="related-articles">
+                <h3>{"\u00C0 lire ensuite"}</h3>
+                <div className="related-articles-grid">
+                  {others.map(([s, a]) => (
+                    <Link key={s} to={`/blog/${s}`} className="related-article-card">
+                      <span className="related-article-cat">{a.categorie}</span>
+                      <h4>{a.titre}</h4>
+                      <span className="related-article-meta">
+                        <Clock size={11} /> {a.temps}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )
+          })()}
         </article>
 
         {/* Sticky sidebar desktop */}
