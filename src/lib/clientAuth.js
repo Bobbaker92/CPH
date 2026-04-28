@@ -1,9 +1,36 @@
-const ACCOUNTS_KEY = 'cph_client_accounts_v1'
+// v2 : bump pour forcer ré-hash après amélioration de hashPassword (salt + rounds)
+const ACCOUNTS_KEY = 'cph_client_accounts_v2'
+
+/**
+ * ⚠️ AVERTISSEMENT SÉCURITÉ — MAQUETTE UNIQUEMENT
+ *
+ * Cette fonction de hash est volontairement basique (FNV-1a 32 bits avec
+ * salt fixe) car nous sommes en mode maquette FRONT-ONLY : aucun mot de
+ * passe ne quitte le navigateur de l'utilisateur, tout reste en
+ * localStorage. Le hash sert uniquement à éviter de stocker le mdp en clair
+ * dans localStorage en cas d'inspection visuelle.
+ *
+ * EN PRODUCTION (Phase 3 roadmap, backend Node) :
+ *   - REMPLACER ce hash par bcrypt ou argon2 côté serveur
+ *   - JAMAIS hasher côté client
+ *   - Stocker le hash en DB serveur, pas en localStorage
+ *   - Auth via sessions ou JWT en cookie httpOnly Secure SameSite=Strict
+ *
+ * Le salt fixe ('cph-mockup-v1') évite les rainbow tables triviales mais
+ * ne protège pas contre un attaquant qui aurait le code source (open
+ * source / DevTools).
+ */
+const SALT = 'cph-mockup-v1'
 
 function hashPassword(pwd) {
+  const input = SALT + String(pwd)
   let h = 0x811c9dc5
-  for (let i = 0; i < pwd.length; i++) {
-    h ^= pwd.charCodeAt(i)
+  for (let i = 0; i < input.length; i++) {
+    h ^= input.charCodeAt(i)
+    h = (h + ((h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24))) >>> 0
+  }
+  // Plusieurs rounds pour ralentir un bruteforce trivial (cosmétique)
+  for (let r = 0; r < 1000; r++) {
     h = (h + ((h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24))) >>> 0
   }
   return h.toString(16).padStart(8, '0')
