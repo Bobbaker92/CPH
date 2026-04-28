@@ -6,9 +6,12 @@ on:
   pull_request:
     branches: [main]
 
+# Annule les runs en cours UNIQUEMENT sur les PR (chaque push de PR
+# déclenche un nouveau run, on ne garde que le dernier).
+# Sur main : on laisse tous les runs finir (chaque merge a sa CI).
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ci-${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   lint:
