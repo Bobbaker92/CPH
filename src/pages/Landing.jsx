@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Phone, Shield, Clock, Star, Award, MapPin, User, BookOpen, ChevronRight, Sun, Droplets, FileCheck, Zap, ArrowRight, Check, Quote, Menu, X, LogOut } from 'lucide-react'
+import { Phone, Shield, Clock, Star, Award, MapPin, User, BookOpen, ChevronRight, Sun, Droplets, FileCheck, Zap, ArrowRight, Check, Quote, Menu, X, LogOut, Tag } from 'lucide-react'
 import CallbackModal, { CallbackFab } from '../components/CallbackModal'
 import useSeo from '../lib/useSeo'
 import useJsonLd from '../lib/useJsonLd'
@@ -155,6 +155,9 @@ export default function Landing() {
             <a href="tel:0412160630" className="nav-phone">
               <Phone size={14} /> 04 12 16 06 30
             </a>
+            <Link to="/tarifs" className="nav-link">
+              <Tag size={14} /> Tarifs
+            </Link>
             <Link to="/blog" className="nav-link">
               <BookOpen size={14} /> Blog
             </Link>
@@ -212,6 +215,9 @@ export default function Landing() {
               <a href="#form-section" onClick={() => { setMenuOpen(false); setTimeout(() => navigate('/devis'), 100) }} className="mobile-menu-link">
                 {"R\u00E9server mon nettoyage"}
               </a>
+              <Link to="/tarifs" onClick={() => setMenuOpen(false)} className="mobile-menu-link">
+                <Tag size={16} /> Tarifs
+              </Link>
               <Link to="/blog" onClick={() => setMenuOpen(false)} className="mobile-menu-link">
                 <BookOpen size={16} /> Blog
               </Link>
