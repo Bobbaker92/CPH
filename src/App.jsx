@@ -21,6 +21,7 @@ import CGV from './pages/legal/CGV'
 import Confidentialite from './pages/legal/Confidentialite'
 import NotFound from './pages/NotFound'
 import About from './pages/About'
+import Tarifs from './pages/Tarifs'
 
 // Espaces privés : lazy (uniquement chargés quand l'utilisateur s'y rend)
 const ClientDashboard = lazy(() => import('./pages/client/Dashboard'))
@@ -72,6 +73,7 @@ function App() {
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogArticle />} />
           <Route path="/a-propos" element={<About />} />
+          <Route path="/tarifs" element={<Tarifs />} />
           <Route path="/mentions-legales" element={<MentionsLegales />} />
           <Route path="/cgv" element={<CGV />} />
           <Route path="/confidentialite" element={<Confidentialite />} />
