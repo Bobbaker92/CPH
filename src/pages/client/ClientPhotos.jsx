@@ -1,6 +1,13 @@
-import { Image, Download, Maximize2, CheckCircle, AlertCircle } from 'lucide-react'
+import { useState } from 'react'
+import { Download, Maximize2, CheckCircle, AlertCircle, X } from 'lucide-react'
+import BeforeAfterSlider from '../../components/BeforeAfterSlider'
+
+const PHOTO_AVANT = '/photos/avant-mock.svg'
+const PHOTO_APRES = '/photos/apres-mock.svg'
 
 export default function ClientPhotos() {
+  const [lightbox, setLightbox] = useState(null) // 'avant' | 'apres' | null
+
   return (
     <>
       <div className="page-header">
@@ -8,35 +15,54 @@ export default function ClientPhotos() {
         <p>Photo avant / apr&egrave;s du nettoyage et observations de toiture.</p>
       </div>
 
-      {/* Comparatif avant / après */}
+      {/* Slider drag avant / après */}
       <div className="card" style={{marginBottom:20, padding:0, overflow:'hidden'}}>
         <div className="photo-compare-header">
           <div>
-            <h3>Avant / apr&egrave;s</h3>
-            <p>Nettoyage du 4 mai 2026</p>
+            <h3>Comparatif interactif</h3>
+            <p>Glissez la poign&eacute;e pour comparer &mdash; nettoyage du 4 mai 2026</p>
           </div>
-          <button className="btn btn-sm btn-outline"><Download size={13} /> T&eacute;l&eacute;charger</button>
+          <button className="btn btn-sm btn-outline" type="button">
+            <Download size={13} /> T&eacute;l&eacute;charger
+          </button>
         </div>
+        <BeforeAfterSlider
+          beforeSrc={PHOTO_AVANT}
+          afterSrc={PHOTO_APRES}
+          beforeAlt="Panneaux encrass&eacute;s avant nettoyage"
+          afterAlt="Panneaux propres apr&egrave;s nettoyage"
+        />
+      </div>
+
+      {/* Vignettes individuelles + lightbox */}
+      <div className="card" style={{marginBottom:20}}>
+        <h3 style={{marginBottom:14}}>Photos individuelles</h3>
         <div className="photo-compare">
           <figure className="photo-compare-item">
-            <div className="photo-placeholder photo-placeholder-large">
-              <Image size={44} />
-              <span style={{fontSize:13, fontWeight:600}}>Photo avant</span>
-              <span style={{fontSize:11, color:'var(--gray-400)'}}>Disponible apr&egrave;s intervention</span>
-              <button className="photo-zoom" aria-label="Agrandir"><Maximize2 size={14} /></button>
-            </div>
+            <button
+              type="button"
+              className="photo-thumb"
+              onClick={() => setLightbox('avant')}
+              aria-label="Agrandir la photo avant"
+            >
+              <img src={PHOTO_AVANT} alt="Panneaux avant nettoyage" loading="lazy" decoding="async" />
+              <Maximize2 size={18} className="photo-thumb-icon" />
+            </button>
             <figcaption>
               <span className="badge badge-orange">Avant</span>
               <span>10h15</span>
             </figcaption>
           </figure>
           <figure className="photo-compare-item">
-            <div className="photo-placeholder photo-placeholder-large">
-              <Image size={44} />
-              <span style={{fontSize:13, fontWeight:600}}>Photo apr&egrave;s</span>
-              <span style={{fontSize:11, color:'var(--gray-400)'}}>Disponible apr&egrave;s intervention</span>
-              <button className="photo-zoom" aria-label="Agrandir"><Maximize2 size={14} /></button>
-            </div>
+            <button
+              type="button"
+              className="photo-thumb"
+              onClick={() => setLightbox('apres')}
+              aria-label="Agrandir la photo apr&egrave;s"
+            >
+              <img src={PHOTO_APRES} alt="Panneaux apr&egrave;s nettoyage" loading="lazy" decoding="async" />
+              <Maximize2 size={18} className="photo-thumb-icon" />
+            </button>
             <figcaption>
               <span className="badge badge-green">Apr&egrave;s</span>
               <span>11h30</span>
@@ -85,6 +111,33 @@ export default function ClientPhotos() {
           </div>
         </div>
       </div>
+
+      {/* Lightbox plein écran */}
+      {lightbox && (
+        <div
+          className="photo-lightbox"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Photo ${lightbox === 'avant' ? 'avant' : 'après'} en plein écran`}
+          onClick={() => setLightbox(null)}
+          onKeyDown={(e) => e.key === 'Escape' && setLightbox(null)}
+        >
+          <button
+            type="button"
+            className="photo-lightbox-close"
+            onClick={() => setLightbox(null)}
+            aria-label="Fermer"
+            autoFocus
+          >
+            <X size={24} />
+          </button>
+          <img
+            src={lightbox === 'avant' ? PHOTO_AVANT : PHOTO_APRES}
+            alt={lightbox === 'avant' ? 'Panneaux avant nettoyage' : 'Panneaux après nettoyage'}
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </>
   )
 }
