@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+  <defs>
+    <linearGradient id="dirty" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5b6470"/>
+      <stop offset="1" stop-color="#3a414b"/>
+    </linearGradient>
+    <pattern id="dust" patternUnits="userSpaceOnUse" width="20" height="20">
+      <rect width="20" height="20" fill="transparent"/>
+      <circle cx="3" cy="5" r="1.2" fill="#8b6f47" opacity="0.5"/>
+      <circle cx="14" cy="11" r="0.9" fill="#a08762" opacity="0.4"/>
+      <circle cx="9" cy="17" r="1.5" fill="#6b5a3f" opacity="0.6"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="500" fill="url(#dirty)"/>
+  <!-- Cellules photovoltaïques (grille) -->
+  <g stroke="#1f242c" stroke-width="2" fill="#4a525e">
+    <rect x="40" y="60" width="115" height="80"/>
+    <rect x="170" y="60" width="115" height="80"/>
+    <rect x="300" y="60" width="115" height="80"/>
+    <rect x="430" y="60" width="115" height="80"/>
+    <rect x="560" y="60" width="115" height="80"/>
+    <rect x="40" y="155" width="115" height="80"/>
+    <rect x="170" y="155" width="115" height="80"/>
+    <rect x="300" y="155" width="115" height="80"/>
+    <rect x="430" y="155" width="115" height="80"/>
+    <rect x="560" y="155" width="115" height="80"/>
+    <rect x="40" y="250" width="115" height="80"/>
+    <rect x="170" y="250" width="115" height="80"/>
+    <rect x="300" y="250" width="115" height="80"/>
+    <rect x="430" y="250" width="115" height="80"/>
+    <rect x="560" y="250" width="115" height="80"/>
+  </g>
+  <!-- Couche poussière -->
+  <rect width="800" height="500" fill="url(#dust)"/>
+  <!-- Tâches visibles -->
+  <ellipse cx="200" cy="120" rx="50" ry="20" fill="#7a6b4f" opacity="0.55"/>
+  <ellipse cx="500" cy="200" rx="80" ry="30" fill="#6b5a3f" opacity="0.5"/>
+  <ellipse cx="320" cy="290" rx="40" ry="15" fill="#5a4a35" opacity="0.6"/>
+  <text x="400" y="450" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="22" font-weight="700" fill="white" opacity="0.7">
+    Avant nettoyage
+  </text>
+</svg>
