@@ -4,6 +4,7 @@ import './App.css'
 import ScrollToTop from './components/ScrollToTop'
 import CookieConsent from './components/CookieConsent'
 import SkipLink from './components/SkipLink'
+import { ToastProvider } from './components/toast/ToastProvider'
 
 // Pages publiques : eager (visiteurs SEO + Lighthouse)
 import Landing from './pages/Landing'
@@ -52,10 +53,11 @@ function LazyFallback() {
 function App() {
   return (
     <BrowserRouter>
-      <SkipLink />
-      <ScrollToTop />
-      <CookieConsent />
-      <Suspense fallback={<LazyFallback />}>
+      <ToastProvider>
+        <SkipLink />
+        <ScrollToTop />
+        <CookieConsent />
+        <Suspense fallback={<LazyFallback />}>
         <Routes>
           {/* Public */}
           <Route path="/" element={<Landing />} />
@@ -103,6 +105,7 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
+      </ToastProvider>
     </BrowserRouter>
   )
 }

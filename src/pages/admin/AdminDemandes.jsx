@@ -14,6 +14,14 @@ import {
   removeDemande as removeDemandeStore,
   subscribe,
 } from '../../lib/demandesStore'
+import { useToast } from '../../components/toast/useToast'
+
+const STATUT_LIBELLE = {
+  nouveau: 'Nouveau',
+  'a-rappeler': 'À rappeler',
+  planifie: 'Planifié',
+  refuse: 'Refusé',
+}
 
 const STATUTS = [
   { key: 'tous', label: 'Toutes', color: 'gray' },
@@ -90,8 +98,11 @@ export default function AdminDemandes() {
     })
   }, [filtre, search, demandes])
 
+  const toast = useToast()
+
   const changeStatut = (id, statut) => {
     updateDemande(id, { statut })
+    toast.success(`Statut mis à jour : ${STATUT_LIBELLE[statut] || statut}`)
   }
 
   const planifier = (d) => {
@@ -107,7 +118,10 @@ export default function AdminDemandes() {
       }
     })
   }
-  const removeDemande = (id) => removeDemandeStore(id)
+  const removeDemande = (id) => {
+    removeDemandeStore(id)
+    toast.info('Demande supprimée')
+  }
 
   const addDemande = (data) => {
     addDemandeStore({
