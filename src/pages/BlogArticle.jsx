@@ -2,6 +2,7 @@ import { useParams, Link } from 'react-router-dom'
 import { Shield, Calendar, Clock, ArrowLeft, BookOpen, User, Phone, Check, ArrowRight, Sun } from 'lucide-react'
 import useSeo from '../lib/useSeo'
 import useJsonLd from '../lib/useJsonLd'
+import BlogShareButtons from '../components/BlogShareButtons'
 
 const SITE = 'https://cphpaca.fr'
 
@@ -314,6 +315,8 @@ export default function BlogArticle() {
           <h1 style={{fontSize:28, fontWeight:700, color:'var(--primary)', lineHeight:1.3, marginBottom:16}}>
             {article.titre}
           </h1>
+
+          <BlogShareButtons slug={slug} title={article.titre} />
 
           {/* Teaser CTA (haut d'article) */}
           <div className="article-teaser-cta">
