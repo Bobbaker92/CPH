@@ -123,6 +123,23 @@ function loadDraft() {
   }
 }
 
+/**
+ * Lit la session client active (localStorage.user) et pré-remplit nom/tel/email
+ * si l'utilisateur est connecté en tant que client. Permet à un client existant
+ * qui clique "Réserver une nouvelle intervention" de gagner 30 secondes.
+ */
+function loadClientPrefill() {
+  try {
+    const raw = localStorage.getItem('user')
+    if (!raw) return null
+    const user = JSON.parse(raw)
+    if (user?.role !== 'client' || !user.email) return null
+    return { nom: user.nom || '', email: user.email, tel: user.tel || '' }
+  } catch {
+    return null
+  }
+}
+
 function saveDraft(form, step) {
   // On ne sauve que si l'utilisateur a fait au moins 1 choix réel.
   const hasContent = Object.values(form).some((v) => v && String(v).trim())
@@ -145,6 +162,7 @@ export default function Formulaire() {
   const navigate = useNavigate()
   const [draftRestored, setDraftRestored] = useState(false)
   const initialDraft = loadDraft()
+  const initialPrefill = loadClientPrefill()
   const [step, setStep] = useState(initialDraft?.step ?? 0)
 
   useSeo({
@@ -152,7 +170,13 @@ export default function Formulaire() {
     description: "Obtenez un devis pour le nettoyage de vos panneaux solaires en PACA. 5 questions, 2 minutes. Intervention dès 179 € TTC.",
     path: '/devis',
   })
-  const [form, setForm] = useState(initialDraft?.form ?? EMPTY_FORM)
+  const [form, setForm] = useState(() => {
+    // Priorité 1 : brouillon en cours (autosave)
+    if (initialDraft?.form) return initialDraft.form
+    // Priorité 2 : client connecté → pré-remplir nom/tel/email
+    if (initialPrefill) return { ...EMPTY_FORM, ...initialPrefill }
+    return EMPTY_FORM
+  })
 
   useEffect(() => {
     if (initialDraft) setDraftRestored(true)
