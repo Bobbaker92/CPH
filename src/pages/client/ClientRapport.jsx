@@ -1,12 +1,55 @@
-import { FileText, Download, CheckCircle, AlertTriangle } from 'lucide-react'
+import { Download, CheckCircle, AlertTriangle, Printer, Sun } from 'lucide-react'
 
 export default function ClientRapport() {
+  const handlePrint = () => window.print()
+
   return (
-    <>
-      <div className="page-header">
-        <h1>Rapport d'intervention</h1>
-        <p>{"Rapport d\u00E9taill\u00E9 de l'\u00E9tat de vos panneaux et de votre toiture."}</p>
+    <div className="rapport-print-root">
+      <div className="page-header rapport-no-print">
+        <div className="page-header-row">
+          <div>
+            <h1>Rapport d'intervention</h1>
+            <p>{"Rapport d\u00E9taill\u00E9 de l'\u00E9tat de vos panneaux et de votre toiture."}</p>
+          </div>
+          <button className="btn btn-outline btn-sm" onClick={handlePrint}>
+            <Printer size={14} /> Imprimer / Enregistrer en PDF
+          </button>
+        </div>
       </div>
+
+      {/* En-tête type rapport pro (visible uniquement à l'impression) */}
+      <header className="rapport-print-header">
+        <div className="rapport-print-brand">
+          <div className="rapport-print-logo"><Sun size={22} /></div>
+          <div>
+            <strong>CPH Solar</strong>
+            <span>Rapport d&rsquo;intervention</span>
+          </div>
+        </div>
+        <div className="rapport-print-meta">
+          <p>168 rue du Dirigeable, 13400 Aubagne</p>
+          <p>SIREN 933 929 051 \u2014 contact@cphpaca.fr \u2014 04 12 16 06 30</p>
+        </div>
+      </header>
+
+      <section className="rapport-client-info">
+        <div>
+          <span>Client</span>
+          <strong>Marie Dupont</strong>
+        </div>
+        <div>
+          <span>Adresse</span>
+          <strong>15 rue Paradis, 13008 Marseille</strong>
+        </div>
+        <div>
+          <span>Date d&rsquo;intervention</span>
+          <strong>4 mai 2026</strong>
+        </div>
+        <div>
+          <span>Couvreur</span>
+          <strong>Karim Ziani \u2014 Qualibat / RGE</strong>
+        </div>
+      </section>
 
       {/* Rapport panneaux */}
       <div className="card" style={{marginBottom:24}}>
@@ -85,15 +128,24 @@ export default function ClientRapport() {
         <p style={{fontSize:13, color:'var(--gray-400)', marginTop:8}}>{"- Karim, couvreur certifi\u00E9 Qualibat"}</p>
       </div>
 
-      {/* Actions */}
-      <div style={{display:'flex', gap:16}}>
-        <button className="btn btn-dark">
+      {/* Signature couvreur (visible aussi à l'impression) */}
+      <section className="rapport-signature">
+        <div>
+          <span>Signature couvreur</span>
+          <div className="rapport-signature-pad">Karim Ziani</div>
+          <small>Couvreur certifi\u00E9 Qualibat / RGE \u2014 4 mai 2026, 11h45</small>
+        </div>
+      </section>
+
+      {/* Actions (cachées à l'impression) */}
+      <div className="rapport-no-print" style={{display:'flex', gap:16, marginTop:24, flexWrap:'wrap'}}>
+        <button className="btn btn-dark" onClick={handlePrint}>
           <Download size={16} /> {"T\u00E9l\u00E9charger le rapport PDF"}
         </button>
         <button className="btn btn-primary">
           Demander un devis couverture
         </button>
       </div>
-    </>
+    </div>
   )
 }
