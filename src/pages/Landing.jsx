@@ -74,12 +74,30 @@ const TEMOIGNAGES = [
   { nom: 'Marc L.', ville: 'Aubagne', note: 5, texte: "Prix correct, travail impeccable. Le fait que ce soit de vrais couvreurs et pas juste des nettoyeurs fait toute la diff\u00E9rence." },
 ]
 
+function getLoggedUser() {
+  try {
+    const raw = localStorage.getItem('user')
+    if (!raw) return null
+    const u = JSON.parse(raw)
+    if (!u?.role || !u?.email) return null
+    const prenom = String(u.nom || '').trim().split(/\s+/)[0] || ''
+    const espacePath = u.role === 'admin' ? '/admin'
+      : u.role === 'couvreur' ? '/couvreur'
+      : u.role === 'client' ? '/client'
+      : '/connexion'
+    return { ...u, prenom, espacePath }
+  } catch {
+    return null
+  }
+}
+
 export default function Landing() {
   const navigate = useNavigate()
   const [form, setForm] = useState({ nom: '', tel: '', email: '', adresse: '', ville: '', panneaux: '' })
   const [activeTestimonial, setActiveTestimonial] = useState(0)
   const [menuOpen, setMenuOpen] = useState(false)
   const [callbackOpen, setCallbackOpen] = useState(false)
+  const [loggedUser] = useState(() => getLoggedUser())
 
   useSeo({
     title: null,
@@ -131,9 +149,15 @@ export default function Landing() {
             <Link to="/blog" className="nav-link">
               <BookOpen size={14} /> Blog
             </Link>
-            <Link to="/connexion" className="btn btn-primary btn-sm" style={{padding:'9px 20px'}}>
-              <User size={13} /> Mon espace
-            </Link>
+            {loggedUser ? (
+              <Link to={loggedUser.espacePath} className="btn btn-primary btn-sm" style={{padding:'9px 20px'}}>
+                <User size={13} /> {loggedUser.prenom ? `Bonjour ${loggedUser.prenom}` : 'Mon espace'}
+              </Link>
+            ) : (
+              <Link to="/connexion" className="btn btn-primary btn-sm" style={{padding:'9px 20px'}}>
+                <User size={13} /> Mon espace
+              </Link>
+            )}
           </div>
 
           {/* Mobile burger button */}
@@ -171,8 +195,12 @@ export default function Landing() {
               <Link to="/blog" onClick={() => setMenuOpen(false)} className="mobile-menu-link">
                 <BookOpen size={16} /> Blog
               </Link>
-              <Link to="/connexion" onClick={() => setMenuOpen(false)} className="mobile-menu-link">
-                <User size={16} /> Mon espace
+              <Link
+                to={loggedUser ? loggedUser.espacePath : '/connexion'}
+                onClick={() => setMenuOpen(false)}
+                className="mobile-menu-link"
+              >
+                <User size={16} /> {loggedUser?.prenom ? `Bonjour ${loggedUser.prenom}` : 'Mon espace'}
               </Link>
               <div className="mobile-menu-divider" />
               <Link to="/mentions-legales" onClick={() => setMenuOpen(false)} className="mobile-menu-link-sub">
