@@ -92,27 +92,78 @@ function sessionKeyAbandonFormulaire(tel = '') {
   return `cph_lead_abandon_formulaire_${hashTel(tel)}`
 }
 
+const DRAFT_KEY = 'cph_devis_draft_v1'
+const DRAFT_TTL_MS = 7 * 24 * 60 * 60 * 1000 // 7 jours
+
+const EMPTY_FORM = {
+  panneaux: '',
+  etage: '',
+  tuile: '',
+  integration: '',
+  acces: '',
+  ville: '',
+  codePostal: '',
+  nom: '',
+  tel: '',
+  email: '',
+}
+
+function loadDraft() {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw)
+    if (!parsed?.timestamp || Date.now() - parsed.timestamp > DRAFT_TTL_MS) {
+      localStorage.removeItem(DRAFT_KEY)
+      return null
+    }
+    return parsed
+  } catch {
+    return null
+  }
+}
+
+function saveDraft(form, step) {
+  // On ne sauve que si l'utilisateur a fait au moins 1 choix réel.
+  const hasContent = Object.values(form).some((v) => v && String(v).trim())
+  if (!hasContent) return
+  try {
+    localStorage.setItem(
+      DRAFT_KEY,
+      JSON.stringify({ form, step, timestamp: Date.now() })
+    )
+  } catch {
+    // localStorage indisponible — pas grave
+  }
+}
+
+function clearDraft() {
+  try { localStorage.removeItem(DRAFT_KEY) } catch { /* ignore */ }
+}
+
 export default function Formulaire() {
   const navigate = useNavigate()
-  const [step, setStep] = useState(0)
+  const [draftRestored, setDraftRestored] = useState(false)
+  const initialDraft = loadDraft()
+  const [step, setStep] = useState(initialDraft?.step ?? 0)
 
   useSeo({
     title: 'Devis gratuit — Nettoyage de panneaux solaires',
     description: "Obtenez un devis pour le nettoyage de vos panneaux solaires en PACA. 5 questions, 2 minutes. Intervention dès 179 € TTC.",
     path: '/devis',
   })
-  const [form, setForm] = useState({
-    panneaux: '',
-    etage: '',
-    tuile: '',
-    integration: '',
-    acces: '',
-    ville: '',
-    codePostal: '',
-    nom: '',
-    tel: '',
-    email: '',
-  })
+  const [form, setForm] = useState(initialDraft?.form ?? EMPTY_FORM)
+
+  useEffect(() => {
+    if (initialDraft) setDraftRestored(true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Auto-save brouillon à chaque changement (debounced à 400ms)
+  useEffect(() => {
+    const t = setTimeout(() => saveDraft(form, step), 400)
+    return () => clearTimeout(t)
+  }, [form, step])
   const [cpLookup, setCpLookup] = useState({ loading: false, error: '', options: [] })
   const [callbackOpen, setCallbackOpen] = useState(false)
   const formRef = useRef(form)
@@ -272,6 +323,7 @@ export default function Formulaire() {
         etage: form.etage,
         source: 'Formulaire',
       })
+      clearDraft() // funnel terminé → on supprime le brouillon
       navigate('/reservation', { state: { devis: form } })
     }
   }
@@ -304,6 +356,27 @@ export default function Formulaire() {
           <div className="funnel-progress-bar" style={{width:`${progress}%`}} />
         </div>
       </div>
+
+      {/* Bandeau brouillon restauré */}
+      {draftRestored && (
+        <div className="funnel-draft-banner" role="status" aria-live="polite">
+          <span>
+            <strong>Brouillon restauré.</strong> Vos réponses précédentes sont pré-remplies.
+          </span>
+          <button
+            type="button"
+            className="funnel-draft-banner-btn"
+            onClick={() => {
+              clearDraft()
+              setForm(EMPTY_FORM)
+              setStep(0)
+              setDraftRestored(false)
+            }}
+          >
+            Recommencer à zéro
+          </button>
+        </div>
+      )}
 
       {/* Steps indicator */}
       <div className="funnel-steps">
