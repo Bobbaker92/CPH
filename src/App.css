@@ -6260,3 +6260,83 @@ tbody tr:last-child td { border-bottom: none; }
   gap: 4px;
   margin-top: 4px;
 }
+
+/* === ClientRapport — layout type rapport pro === */
+.rapport-print-header {
+  display: none; /* visible uniquement à l'impression */
+}
+.rapport-client-info {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 16px 20px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px 24px;
+  margin-bottom: 20px;
+}
+.rapport-client-info > div { display: flex; flex-direction: column; gap: 2px; }
+.rapport-client-info span {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.rapport-client-info strong { font-size: 14px; color: #0f172a; }
+.rapport-signature {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 20px;
+  margin-top: 16px;
+}
+.rapport-signature span {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+.rapport-signature-pad {
+  font-family: 'Brush Script MT', cursive;
+  font-size: 28px;
+  color: #1e3a8a;
+  border-bottom: 1px solid #cbd5e1;
+  padding: 12px 0;
+  margin-bottom: 6px;
+}
+.rapport-signature small { color: #64748b; font-size: 12px; }
+
+/* Mode impression */
+@media print {
+  .rapport-no-print, .admin-shell .admin-sidebar, .admin-topbar,
+  .client-shell .client-sidebar, .client-mobile-nav,
+  nav, footer.footer, .callback-fab { display: none !important; }
+  .rapport-print-root { padding: 0 !important; }
+  .rapport-print-header {
+    display: flex !important;
+    align-items: flex-start;
+    justify-content: space-between;
+    border-bottom: 2px solid #2563eb;
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+    color: #0f172a;
+  }
+  .rapport-print-brand { display: flex; align-items: center; gap: 12px; }
+  .rapport-print-logo {
+    width: 44px; height: 44px;
+    background: #fbbf24;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: #0f172a;
+  }
+  .rapport-print-brand strong { display: block; font-size: 18px; font-weight: 800; }
+  .rapport-print-brand span { display: block; font-size: 12px; color: #64748b; }
+  .rapport-print-meta { font-size: 11px; color: #64748b; text-align: right; }
+  .rapport-print-meta p { margin: 0; }
+  .card { box-shadow: none !important; border: 1px solid #e5e7eb !important; page-break-inside: avoid; }
+  body { background: white !important; }
+}
