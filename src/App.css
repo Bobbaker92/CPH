@@ -6261,6 +6261,34 @@ tbody tr:last-child td { border-bottom: none; }
   margin-top: 4px;
 }
 
+/* === Nav landing — group user (Bonjour + logout) === */
+.nav-user-group {
+  display: inline-flex;
+  align-items: stretch;
+  gap: 0;
+}
+.nav-user-group .btn {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.nav-logout-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-left: 0;
+  color: rgba(255, 255, 255, 0.75);
+  padding: 0 12px;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+  cursor: pointer;
+  transition: all 160ms;
+  display: inline-flex;
+  align-items: center;
+}
+.nav-logout-btn:hover {
+  background: rgba(220, 38, 38, 0.85);
+  color: white;
+}
+
 /* === ClientRapport — layout type rapport pro === */
 .rapport-print-header {
   display: none; /* visible uniquement à l'impression */

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Phone, Shield, Clock, Star, Award, MapPin, User, BookOpen, ChevronRight, Sun, Droplets, FileCheck, Zap, ArrowRight, Check, Quote, Menu, X } from 'lucide-react'
+import { Phone, Shield, Clock, Star, Award, MapPin, User, BookOpen, ChevronRight, Sun, Droplets, FileCheck, Zap, ArrowRight, Check, Quote, Menu, X, LogOut } from 'lucide-react'
 import CallbackModal, { CallbackFab } from '../components/CallbackModal'
 import useSeo from '../lib/useSeo'
 import useJsonLd from '../lib/useJsonLd'
@@ -97,7 +97,12 @@ export default function Landing() {
   const [activeTestimonial, setActiveTestimonial] = useState(0)
   const [menuOpen, setMenuOpen] = useState(false)
   const [callbackOpen, setCallbackOpen] = useState(false)
-  const [loggedUser] = useState(() => getLoggedUser())
+  const [loggedUser, setLoggedUser] = useState(() => getLoggedUser())
+
+  const handleLogout = () => {
+    try { localStorage.removeItem('user') } catch { /* ignore */ }
+    setLoggedUser(null)
+  }
 
   useSeo({
     title: null,
@@ -150,9 +155,20 @@ export default function Landing() {
               <BookOpen size={14} /> Blog
             </Link>
             {loggedUser ? (
-              <Link to={loggedUser.espacePath} className="btn btn-primary btn-sm" style={{padding:'9px 20px'}}>
-                <User size={13} /> {loggedUser.prenom ? `Bonjour ${loggedUser.prenom}` : 'Mon espace'}
-              </Link>
+              <div className="nav-user-group">
+                <Link to={loggedUser.espacePath} className="btn btn-primary btn-sm" style={{padding:'9px 20px'}}>
+                  <User size={13} /> {loggedUser.prenom ? `Bonjour ${loggedUser.prenom}` : 'Mon espace'}
+                </Link>
+                <button
+                  type="button"
+                  className="nav-logout-btn"
+                  onClick={handleLogout}
+                  aria-label="Se déconnecter"
+                  title="Se déconnecter"
+                >
+                  <LogOut size={14} />
+                </button>
+              </div>
             ) : (
               <Link to="/connexion" className="btn btn-primary btn-sm" style={{padding:'9px 20px'}}>
                 <User size={13} /> Mon espace
@@ -202,6 +218,16 @@ export default function Landing() {
               >
                 <User size={16} /> {loggedUser?.prenom ? `Bonjour ${loggedUser.prenom}` : 'Mon espace'}
               </Link>
+              {loggedUser && (
+                <button
+                  type="button"
+                  className="mobile-menu-link"
+                  onClick={() => { handleLogout(); setMenuOpen(false) }}
+                  style={{textAlign:'left', background:'none', border:'none', width:'100%', font:'inherit', cursor:'pointer'}}
+                >
+                  <LogOut size={16} /> Se déconnecter
+                </button>
+              )}
               <div className="mobile-menu-divider" />
               <Link to="/mentions-legales" onClick={() => setMenuOpen(false)} className="mobile-menu-link-sub">
                 {"Mentions l\u00E9gales"}
