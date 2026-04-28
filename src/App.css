@@ -6511,6 +6511,37 @@ tbody tr:last-child td { border-bottom: none; }
   font-size: 12px;
   font-weight: 600;
 }
+
+/* === Login — checkbox remember + CTA pas encore client === */
+.login-remember {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #475569;
+  cursor: pointer;
+  user-select: none;
+}
+.login-remember input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #2563eb;
+  cursor: pointer;
+}
+.login-cta-devis {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.login-cta-devis span {
+  font-size: 13px;
+  color: #64748b;
+}
 @media (max-width: 768px) {
   .landing-ba-section { padding: 56px 0; }
   .landing-ba-head h2 { font-size: 22px; }
