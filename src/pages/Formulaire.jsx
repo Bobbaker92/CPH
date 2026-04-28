@@ -294,13 +294,15 @@ export default function Formulaire() {
     }
   }, [])
 
+  const emailValide = (e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(e || '').trim())
+
   const canNext = () => {
     switch (step) {
       case 0: return !!form.panneaux
       case 1: return !!form.etage && !!form.acces
       case 2: return !!form.tuile && !!form.integration
       case 3: return !!form.ville && !!form.codePostal
-      case 4: return !!form.nom && !!form.tel
+      case 4: return !!form.nom && !!form.tel && emailValide(form.email)
       default: return false
     }
   }
@@ -323,6 +325,8 @@ export default function Formulaire() {
       case 4:
         if (!form.nom) return 'Renseignez votre nom'
         if (!form.tel) return 'Renseignez votre t\u00E9l\u00E9phone'
+        if (!form.email) return 'Renseignez votre email pour recevoir la confirmation'
+        if (!emailValide(form.email)) return 'Adresse email invalide'
         return ''
       default: return ''
     }
