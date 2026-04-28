@@ -6011,6 +6011,8 @@ tbody tr:last-child td { border-bottom: none; }
 @media (max-width: 600px) {
   .toast-container { top: auto; bottom: 20px; right: 12px; left: 12px; }
   .toast { min-width: 0; max-width: none; }
+}
+
 /* === Page /a-propos === */
 .about-page { background: #f8fafc; min-height: 100vh; color: #0f172a; }
 .about-header {

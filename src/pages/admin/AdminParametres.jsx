@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
-import { Settings, RotateCcw, Download, Upload, AlertTriangle, Check, FileJson } from 'lucide-react'
+import { Settings, RotateCcw, Download, Upload, AlertTriangle, Check, FileJson, Sparkles } from 'lucide-react'
+import { applyDemoSeed } from '../../lib/demoSeed'
 
 const STORE_KEYS = [
   { key: 'cph_demandes_v1',           label: 'Demandes' },
@@ -85,6 +86,14 @@ export default function AdminParametres() {
     reader.readAsText(file)
     // Reset input pour permettre de reimporter le même fichier
     event.target.value = ''
+  }
+
+  const handleDemoSeed = () => {
+    const stats = applyDemoSeed()
+    showFeedback(
+      'success',
+      `Données démo injectées : ${stats.demandes} demandes, ${stats.interventions} interventions, ${stats.clients} clients, ${stats.parrainages} parrainages. Rechargez la page pour les voir.`
+    )
   }
 
   const handleReset = () => {
@@ -179,6 +188,26 @@ export default function AdminParametres() {
           />
           <button className="btn btn-outline" onClick={() => fileInputRef.current?.click()}>
             <Upload size={14} /> Choisir un fichier&hellip;
+          </button>
+        </div>
+      </section>
+
+      {/* Demo seed — pour les démos prospects */}
+      <section className="admin-card" style={{borderColor:'#c4b5fd', background:'#faf5ff'}}>
+        <div className="admin-card-row">
+          <div>
+            <h3>
+              <Sparkles size={16} style={{verticalAlign:'middle', marginRight:6, color:'#7c3aed'}} />
+              Charger un set de démo
+            </h3>
+            <p>Injecte 10 demandes variées (statuts/sources mélangés), 5 interventions (futures + passées), 3 clients et 2 parrainages. Pratique pour montrer le site à un prospect avec des données réalistes.</p>
+          </div>
+          <button
+            className="btn btn-outline"
+            style={{borderColor:'#7c3aed', color:'#7c3aed'}}
+            onClick={handleDemoSeed}
+          >
+            <Sparkles size={14} /> Charger la démo
           </button>
         </div>
       </section>
