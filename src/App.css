@@ -348,6 +348,36 @@
 }
 .form-card form { display: flex; flex-direction: column; gap: 16px; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+/* Grid items doivent pouvoir rétrécir sous leur min-content (sinon
+   le type=tel déborde de sa colonne sur certains zooms / résolutions). */
+.form-card .input-group { min-width: 0; }
+.form-card .input-group input,
+.form-card .input-group select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-family: inherit;
+  background: white;
+  color: var(--gray-800);
+  transition: border-color 160ms;
+}
+.form-card .input-group input:focus,
+.form-card .input-group select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.form-card .input-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gray-500);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
 
 /* Zone */
 .zone-grid {
