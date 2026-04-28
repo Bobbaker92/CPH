@@ -577,6 +577,7 @@ export default function Landing() {
               <p><a href="#">Nettoyage panneaux solaires</a></p>
               <p><a href="#">Inspection toiture</a></p>
               <p><Link to="/blog">Blog</Link></p>
+              <p><Link to="/a-propos">À propos</Link></p>
             </div>
             <div>
               <h4 style={{color:'white', fontSize:13, fontWeight:700, marginBottom:12}}>Contact</h4>
