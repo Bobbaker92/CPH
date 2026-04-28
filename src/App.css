@@ -6011,4 +6011,149 @@ tbody tr:last-child td { border-bottom: none; }
 @media (max-width: 600px) {
   .toast-container { top: auto; bottom: 20px; right: 12px; left: 12px; }
   .toast { min-width: 0; max-width: none; }
+/* === Page /a-propos === */
+.about-page { background: #f8fafc; min-height: 100vh; color: #0f172a; }
+.about-header {
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+  color: white;
+  padding: 60px 0 80px;
+}
+.about-header .container { max-width: 820px; }
+.about-back {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 13px;
+  text-decoration: none;
+  display: inline-block;
+  margin-bottom: 24px;
+}
+.about-back:hover { color: white; }
+.about-eyebrow {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #fbbf24;
+  margin-bottom: 12px;
+}
+.about-header h1 {
+  font-size: 42px;
+  font-weight: 800;
+  line-height: 1.15;
+  margin: 0 0 18px;
+}
+.about-lede {
+  font-size: 16px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  max-width: 680px;
+}
+.about-main { max-width: 820px; padding: 56px 24px 80px; }
+.about-grid {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 36px;
+  margin-bottom: 48px;
+}
+.about-portrait-mock {
+  width: 240px;
+  height: 240px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 12px 32px rgba(251, 191, 36, 0.3);
+}
+.about-portrait-caption {
+  margin-top: 14px;
+  text-align: center;
+}
+.about-portrait-caption strong { display: block; font-size: 16px; }
+.about-portrait-caption span { font-size: 12px; color: #64748b; }
+.about-bio h2 { font-size: 22px; font-weight: 700; margin: 0 0 14px; }
+.about-bio p { font-size: 15px; line-height: 1.7; color: #334155; margin: 0 0 14px; }
+.about-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 48px;
+}
+.about-stat {
+  background: white;
+  border-radius: 12px;
+  padding: 22px 18px;
+  text-align: center;
+  border: 1px solid #e2e8f0;
+}
+.about-stat svg { color: #2563eb; margin-bottom: 8px; }
+.about-stat strong {
+  display: block;
+  font-size: 24px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 2px;
+}
+.about-stat span { font-size: 12px; color: #64748b; }
+.about-certifs h2 { font-size: 22px; font-weight: 700; margin: 0 0 16px; }
+.about-certifs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 48px;
+}
+.about-certif {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.about-certif svg { color: #16a34a; flex-shrink: 0; }
+.about-certif strong { display: block; font-size: 14px; font-weight: 700; }
+.about-certif span { font-size: 12.5px; color: #64748b; }
+.about-values { margin-bottom: 48px; }
+.about-values h2 { font-size: 22px; font-weight: 700; margin: 0 0 16px; }
+.about-values ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.about-values li {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-left: 3px solid #2563eb;
+  border-radius: 8px;
+  padding: 14px 18px;
+  font-size: 14.5px;
+  color: #334155;
+}
+.about-values li strong { color: #0f172a; }
+.about-cta {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: white;
+  padding: 36px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+.about-cta h2 { font-size: 22px; font-weight: 700; margin: 0 0 8px; color: white; }
+.about-cta p { margin: 0; color: rgba(255, 255, 255, 0.85); font-size: 14.5px; }
+.about-cta-actions { display: flex; gap: 12px; flex-shrink: 0; }
+.about-cta-actions .btn-outline { background: rgba(255, 255, 255, 0.1); color: white; border-color: rgba(255, 255, 255, 0.3); }
+.about-cta-actions .btn-outline:hover { background: rgba(255, 255, 255, 0.2); }
+@media (max-width: 768px) {
+  .about-header { padding: 40px 0 56px; }
+  .about-header h1 { font-size: 30px; }
+  .about-main { padding: 40px 16px 56px; }
+  .about-grid { grid-template-columns: 1fr; gap: 24px; }
+  .about-portrait-mock { width: 180px; height: 180px; margin: 0 auto; }
+  .about-stats { grid-template-columns: repeat(2, 1fr); }
+  .about-certifs-grid { grid-template-columns: 1fr; }
+  .about-cta { flex-direction: column; align-items: stretch; padding: 24px; }
+  .about-cta-actions { width: 100%; }
+  .about-cta-actions .btn { flex: 1; justify-content: center; }
 }
