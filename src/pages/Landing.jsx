@@ -6,6 +6,7 @@ import useSeo from '../lib/useSeo'
 import useJsonLd from '../lib/useJsonLd'
 import { CookieReopenLink } from '../components/CookieConsent'
 import RoiCalculator from '../components/RoiCalculator'
+import SeasonBanner from '../components/SeasonBanner'
 
 const FAQ = [
   {
@@ -135,6 +136,7 @@ export default function Landing() {
 
   return (
     <div style={{overflow:'hidden'}}>
+      <SeasonBanner />
       {/* Navbar */}
       <nav className="navbar">
         <div className="container" style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
